@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>간이 염분계 보정하기 — 굴절 염분계로 보정곡선 만들기</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root{
+    --navy:#0A3D4F; --teal:#12808C; --teal2:#1AA7A0; --mint:#2FD3B6; --mint-soft:#C7F2E8;
+    --ink:#16313A; --soft:#5B7178; --line:#D6E6E6; --paper:#EEF7F7; --coral:#E1733E;
+    --coral-soft:#FBE3D3; --gold:#D9A441;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Pretendard",sans-serif;color:var(--ink);line-height:1.65;
+    background:
+      radial-gradient(1200px 500px at 80% -10%,rgba(47,211,182,.10),transparent 60%),
+      linear-gradient(180deg,#F4FBFB,#E7F4F4);
+    min-height:100vh;padding:22px 16px 60px;
+  }
+  .wrap{max-width:1040px;margin:0 auto}
+  .bg-deco{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+  .bg-deco svg{width:100%;height:100%;display:block}
+  @media print{.bg-deco{display:none}}
+  .discuss{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin:6px 0 18px}
+  .discuss ol{margin-left:20px}
+  .discuss li{font-size:.95rem;line-height:1.62;margin-bottom:10px;color:var(--ink)}
+  .discuss li:last-child{margin-bottom:0}
+  .discuss li b{color:var(--teal)}
+  .refbox{background:#FFF6E9;border:1.5px solid #F0CE97;border-radius:12px;padding:13px 16px;margin:2px 0 4px}
+  .refbox label{display:block;font-weight:800;color:#9A6612;margin-bottom:7px;font-size:.95rem}
+  .refbox input{width:100%;padding:11px 13px;border:1.5px solid #E6C58E;border-radius:9px;font-family:inherit;font-size:1rem;background:#fff;outline:none}
+  .refbox input:focus{border-color:var(--coral)}
+  .refhint{background:var(--mint-soft);border-left:4px solid var(--teal2);padding:9px 13px;border-radius:8px;font-size:.92rem;color:var(--ink);margin:0 0 12px}
+  .count-pick{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+  .count-pick button{font-family:inherit;font-weight:700;font-size:.95rem;padding:9px 16px;border-radius:10px;border:1.5px solid var(--line);background:#fff;color:var(--soft);cursor:pointer;transition:.18s}
+  .count-pick button:hover{border-color:var(--teal2)}
+  .count-pick button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+  .mrow{display:grid;grid-template-columns:74px 0.9fr 1.2fr;gap:8px;align-items:center;margin-bottom:8px}
+  .mrow .mlabel{font-weight:700;color:var(--navy);font-size:.92rem}
+  .mrow input{padding:9px 12px;border:1.5px solid var(--line);border-radius:9px;font-family:inherit;font-size:.98rem;background:#FCFEFE;outline:none}
+  .mrow input:focus{border-color:var(--teal);background:#fff}
+  @media(max-width:560px){.mrow{grid-template-columns:60px 1fr 1fr;gap:6px}.mrow .mlabel{font-size:.84rem}}
+  header{margin-bottom:20px}
+  .kick{display:inline-block;font-size:.72rem;letter-spacing:.18em;font-weight:800;color:var(--teal2);border:1.5px solid var(--teal2);padding:4px 11px;border-radius:30px;text-transform:uppercase}
+  h1{font-size:clamp(1.5rem,3.6vw,2.1rem);font-weight:800;color:var(--navy);margin:13px 0 5px;line-height:1.18}
+  .sub{color:var(--soft);font-size:.98rem}
+  .steps{display:flex;gap:8px;margin:20px 0 22px;flex-wrap:wrap}
+  .step{flex:1 1 120px;min-width:108px;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:11px 9px;cursor:pointer;transition:.2s;text-align:center;font-family:inherit;color:var(--soft)}
+  .step .n{font-size:.68rem;letter-spacing:.08em;font-weight:800;display:block;margin-bottom:2px}
+  .step .t{font-size:.9rem;font-weight:700}
+  .step.on{background:var(--navy);color:#fff;border-color:var(--navy);transform:translateY(-2px);box-shadow:0 12px 28px -16px rgba(10,61,79,.7)}
+  .step.on .n{color:var(--mint)}
+  .step.done{border-color:var(--teal2);color:var(--teal)}
+  .step.done .n{color:var(--teal2)}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:0 18px 44px -28px rgba(10,61,79,.55)}
+  .panel + .panel{margin-top:14px}
+  .secHead{display:flex;align-items:baseline;gap:12px;margin-bottom:10px}
+  .secNo{font-size:.74rem;font-weight:800;letter-spacing:.05em;color:var(--teal2);text-transform:uppercase}
+  h2{font-size:1.3rem;font-weight:800;color:var(--navy)}
+  p{color:var(--ink)}
+  .hint{color:var(--soft);font-size:.92rem}
+  .em{background:#FBEFE7;border-left:4px solid var(--coral);padding:11px 14px;border-radius:8px;font-size:.95rem;margin:10px 0}
+  .em b{color:var(--coral)}
+  .ok{background:var(--mint-soft);border-left:4px solid var(--teal2);padding:11px 14px;border-radius:8px;font-size:.95rem;margin:10px 0}
+  .hook{background:linear-gradient(180deg,#FFF6E9,#FDEFD8);border:1.5px solid #F0CE97;border-radius:12px;padding:14px 16px;font-size:1rem;line-height:1.6;color:var(--ink);margin:6px 0 14px}
+  .hook b{color:#B9791C}
+  .note{background:#F1F8F8;border:1px dashed #9FC4C9;border-radius:10px;padding:12px 15px;font-size:.92rem;color:var(--ink);margin:14px 0 0}
+  .note b{color:var(--teal)}
+  h3.sec{font-size:1.04rem;font-weight:800;color:var(--navy);margin:18px 0 8px}
+  label{display:block;font-weight:700;font-size:.92rem;color:var(--navy);margin:14px 0 6px}
+  input[type=text],input[type=number],textarea{width:100%;font-family:inherit;font-size:1rem;color:var(--ink);padding:10px 13px;border:1.5px solid var(--line);border-radius:10px;background:#FCFEFE;outline:none;transition:.2s}
+  input:focus,textarea:focus{border-color:var(--teal);background:#fff}
+  textarea{min-height:90px;resize:vertical;line-height:1.55}
+  .btn{font-family:inherit;font-weight:700;font-size:.95rem;padding:10px 20px;border-radius:11px;border:none;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:8px}
+  .btn.primary{background:var(--teal);color:#fff}
+  .btn.primary:hover{background:var(--navy)}
+  .btn.ghost{background:#fff;color:var(--teal);border:1.5px solid var(--teal)}
+  .btn.ghost:hover{background:var(--paper)}
+  .nav-btns{display:flex;justify-content:space-between;margin-top:24px;gap:10px;flex-wrap:wrap}
+  .guide{display:grid;gap:14px;grid-template-columns:1fr 1fr;margin-top:12px}
+  @media(max-width:720px){.guide{grid-template-columns:1fr}}
+  .gcard{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px}
+  .gcard .badge{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:var(--teal);color:#fff;font-weight:800;border-radius:50%;flex-shrink:0;font-size:.95rem}
+  .gcard .row{display:flex;align-items:flex-start;gap:10px}
+  .gcard h3{font-size:1.02rem;color:var(--navy);font-weight:800;margin-bottom:4px}
+  .gcard p{font-size:.92rem;color:var(--ink)}
+  .gcard svg{margin:4px auto;display:block}
+  .compare2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0 4px}
+  @media(max-width:640px){.compare2{grid-template-columns:1fr}}
+  .icard{border-radius:14px;padding:16px 18px;border:1.5px solid var(--line);background:#fff;display:flex;flex-direction:column;gap:9px}
+  .icard.ours{border-color:var(--teal2);background:linear-gradient(180deg,#F2FBFA,#E8F6F4)}
+  .icard.ref{border-color:var(--coral);background:linear-gradient(180deg,#FFF6EF,#FCEADD)}
+  .icard h3{font-size:1.06rem;font-weight:800;color:var(--navy)}
+  .icard .tag{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.04em;padding:3px 10px;border-radius:20px;align-self:flex-start}
+  .icard.ours .tag{background:var(--teal);color:#fff}
+  .icard.ref .tag{background:var(--coral);color:#fff}
+  .icard .out{font-size:.92rem;background:rgba(255,255,255,.7);border-radius:8px;padding:7px 10px}
+  .icard .out b{color:var(--navy)}
+  .icard ul{margin:0 0 0 18px}
+  .icard li{font-size:.88rem;margin-bottom:4px;color:var(--ink)}
+  .icard svg{margin:2px auto 0}
+  .calflow{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;margin:16px 0 4px}
+  .cf-box{background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:11px 14px;text-align:center;font-weight:800;color:var(--navy);font-size:.95rem;line-height:1.3}
+  .cf-box small{display:block;font-weight:600;color:var(--soft);font-size:.76rem;margin-top:3px}
+  .cf-box.ref{border-color:var(--coral);background:#FFF6EF;color:#A8431D}
+  .cf-box.ref small{color:#C77C50}
+  .cf-box.ours{border-color:var(--teal2);background:#EFF9F8;color:var(--teal)}
+  .cf-box.ours small{color:#3C8E8C}
+  .cf-box.curve{border-color:var(--navy);background:var(--navy);color:#fff}
+  .cf-box.curve small{color:var(--mint-soft)}
+  .cf-box.goal{border-color:var(--gold);background:#FFF7E6;color:#9A6612}
+  .cf-box.goal small{color:#B58A3C}
+  .cf-col{display:flex;flex-direction:column;gap:8px}
+  .cf-arrow{font-size:1.5rem;color:var(--teal2);font-weight:800;line-height:1}
+  @media(max-width:560px){.calflow{flex-direction:column}.cf-arrow{transform:rotate(90deg)}}
+  .eyewrap{display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start;margin-top:8px}
+  @media(max-width:720px){.eyewrap{grid-template-columns:1fr}}
+  .eye-stage{display:flex;justify-content:center}
+  #eyepiece{display:block;width:100%;max-width:290px;background:#0E2F3A;border-radius:50%;border:7px solid #16313A;box-shadow:0 14px 30px -16px rgba(10,61,79,.8)}
+  .eye-read{background:var(--navy);border-radius:12px;padding:12px 14px;text-align:center;margin-top:12px}
+  .eye-read .lab{font-size:.74rem;font-weight:800;color:var(--mint)}
+  .eye-read .num{font-size:1.9rem;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;line-height:1.1}
+  .eye-read .unit{font-size:.85rem;color:var(--mint-soft);font-weight:700}
+  .simgrid{display:grid;grid-template-columns:300px 1fr;gap:18px;margin-top:8px}
+  @media(max-width:720px){.simgrid{grid-template-columns:1fr}}
+  .stage{background:linear-gradient(180deg,#F7FCFC,#EAF6F6);border:1px solid var(--line);border-radius:14px}
+  canvas{display:block;width:100%;border-radius:11px}
+  .reads{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:9px;margin-top:10px}
+  .read{border-radius:11px;padding:11px 12px}
+  .read.t{background:var(--navy)} .read.c{background:#FBEFE7;border:1px solid #F1C9B2} .read.s{background:#EAF6F6;border:1px solid #B7DDDA}
+  .read .lab{font-size:.72rem;font-weight:800;letter-spacing:.02em;line-height:1.25}
+  .read .num{font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.15}
+  .read.t .lab{color:var(--mint)} .read.t .num{color:#fff}
+  .read.c .lab{color:var(--coral)} .read.c .num{color:#A8431D}
+  .read.s .lab{color:var(--teal)} .read.s .num{color:var(--navy)}
+  .read .unit{font-size:.78rem;font-weight:700;opacity:.85}
+  .ctrl{margin-top:6px}
+  input[type=range]{width:100%;height:6px;border-radius:6px;appearance:none;background:linear-gradient(90deg,var(--teal2),var(--mint));outline:none}
+  input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--teal);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+  input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--teal);cursor:pointer}
+  .ctrl-row{display:flex;justify-content:space-between;align-items:baseline;font-weight:700;color:var(--navy);font-size:.95rem;margin-bottom:8px}
+  .ctrl-row .v{color:var(--coral);font-variant-numeric:tabular-nums;font-size:1.05rem}
+  .phys-card{margin-top:16px;background:linear-gradient(180deg,#F0F8F8,#E5F2F2);border:1.5px solid #B7DDDA;border-radius:14px;padding:18px 22px}
+  .phys-card h3{font-size:1.06rem;font-weight:800;color:var(--navy);margin-bottom:10px}
+  .phys-card ol{margin-left:20px}
+  .phys-card li{font-size:.94rem;line-height:1.65;margin-bottom:9px;color:var(--ink)}
+  .phys-card li b{color:var(--teal)}
+  .phys-card li i{color:#0F718C;font-style:italic;font-weight:600}
+  .phys-card .hint{color:var(--soft);font-size:.84rem;font-style:italic}
+  .connect-card{margin-top:14px;background:linear-gradient(180deg,#0E2F3A,#12414F);border-radius:14px;padding:18px 22px;display:flex;gap:18px;align-items:center;color:#EAF6F6}
+  @media(max-width:600px){.connect-card{flex-direction:column;text-align:center}}
+  .connect-card h3{font-size:1.04rem;font-weight:800;color:#fff;margin-bottom:7px}
+  .connect-card p{font-size:.93rem;line-height:1.6;color:#CFE7E7}
+  .connect-card p b{color:var(--mint)}
+  .cc-svg{flex-shrink:0;background:#fff;border-radius:12px;padding:6px}
+  .vibe-levels{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:14px 0}
+  @media(max-width:640px){.vibe-levels{grid-template-columns:1fr}}
+  .vlv{display:flex;flex-direction:column;gap:3px;text-align:left;padding:13px 15px;border:1.5px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;font-family:inherit;transition:.18s}
+  .vlv:hover{border-color:var(--teal2)}
+  .vlv .t{font-weight:800;color:var(--navy);font-size:1rem}
+  .vlv .d{font-size:.82rem;color:var(--soft)}
+  .vlv.on{background:var(--navy);border-color:var(--navy)}
+  .vlv.on .t{color:#fff} .vlv.on .d{color:var(--mint-soft)}
+  .vibe-step h3{font-size:1.05rem;font-weight:800;color:var(--navy);margin-bottom:6px}
+  .prompt-box{background:#0E2F3A;border-radius:12px;padding:14px 16px;margin:10px 0;overflow:auto}
+  .prompt-box pre{font-family:"Pretendard",sans-serif;white-space:pre-wrap;color:#DCEFEF;font-size:.9rem;line-height:1.55;margin:0}
+  .prompt-guide{margin:8px 0 4px 20px}
+  .prompt-guide li{font-size:.92rem;margin-bottom:5px;color:var(--ink)}
+  .prompt-guide li b{color:var(--teal)}
+  .sandbox{margin-top:18px;padding-top:18px;border-top:1px dashed var(--line)}
+  #vibe-code{min-height:120px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85rem;line-height:1.5}
+  .frame-wrap{margin-top:12px;border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
+  .frame-tag{background:var(--paper);color:var(--soft);font-size:.78rem;font-weight:700;padding:7px 12px;border-bottom:1px solid var(--line)}
+  #vibe-frame{width:100%;height:420px;border:0;background:#fff;display:block}
+  table{width:100%;border-collapse:collapse;margin-top:10px}
+  th,td{border:1px solid var(--line);padding:8px 6px;text-align:center;font-size:.92rem}
+  th{background:var(--teal);color:#fff;font-weight:700;line-height:1.3}
+  td input.hcell{width:100%;text-align:center;font-family:inherit;font-size:1.05rem;font-weight:700;color:var(--ink);border:1.5px solid var(--teal2);border-radius:8px;background:#FFFDF6;outline:none;padding:9px 4px;cursor:text}
+  td input.hcell::placeholder{color:#C2A98F;font-weight:500;font-size:.9rem}
+  td input.hcell:focus{border-color:var(--coral);background:#fff;box-shadow:0 0 0 3px rgba(225,115,62,.15)}
+  td.lock{background:#F1F8F8;font-weight:700;color:var(--navy)}
+  td.lock small{display:block;font-weight:600;color:var(--soft);font-size:.76rem;margin-top:2px}
+  .result-card{background:var(--coral-soft);border:1.5px solid var(--coral);border-radius:14px;padding:18px;margin-top:14px}
+  .result-card .lab{font-size:.82rem;font-weight:800;color:var(--coral)}
+  .result-card .big{font-size:2.4rem;font-weight:800;color:#A8431D;font-variant-numeric:tabular-nums;line-height:1.1;margin-top:2px}
+  .result-card .big.warn{font-size:1.05rem;color:#9A5B2E}
+  .equ{background:var(--navy);color:#fff;border-radius:10px;padding:11px 14px;font-size:.95rem;margin-top:12px}
+  .equ .r2{color:#A9D7D7;font-size:.85rem;margin-top:5px;line-height:1.5}
+  .equ .r2 b{color:#fff}
+  .cmpbox{margin-top:14px;background:#F1F8F8;border:1.5px solid #B7DDDA;border-radius:12px;padding:14px 16px}
+  .cmp-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;font-size:.96rem;color:var(--ink)}
+  .cmp-row b{font-variant-numeric:tabular-nums;font-weight:800;color:var(--navy);font-size:1.1rem}
+  .cmp-row.diff{border-top:1px dashed #9FC4C9;margin-top:4px;padding-top:9px}
+  .cmp-row.diff b{color:var(--coral)}
+  .cmp-grade{margin-top:9px;font-weight:800;color:var(--teal);font-size:1.02rem;text-align:center;background:var(--mint-soft);border-radius:8px;padding:8px}
+  .cmp-sea{margin-top:8px;font-size:.9rem;color:var(--soft);text-align:center}
+  .summary{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
+  @media(max-width:720px){.summary{grid-template-columns:1fr}}
+  .scard{background:var(--paper);border-radius:12px;padding:14px 16px;border:1px solid var(--line)}
+  .scard .l{font-size:.78rem;font-weight:800;color:var(--teal);letter-spacing:.02em}
+  .scard .v{font-size:1.4rem;font-weight:800;color:var(--navy);margin-top:2px;font-variant-numeric:tabular-nums}
+  .scard .v small{font-size:.85rem;font-weight:700;color:var(--soft)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:600px){.row2{grid-template-columns:1fr}}
+  .hide{display:none !important}
+  @media print{body{background:#fff;padding:10px}.steps,.nav-btns,.btn{display:none !important}canvas:not(#graph){display:none !important}.panel{box-shadow:none;border:1px solid #ccc;break-inside:avoid;margin-bottom:8px}}
+  .report-field{margin-top:16px}
+  .photo-block{margin-top:16px}
+  .photo-block > label{margin-bottom:2px}
+  .photo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:10px}
+  .photo-slot{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px}
+  .ph-label{font-size:.82rem;font-weight:800;color:var(--navy);margin-bottom:7px;text-align:center}
+  .ph-drop{display:flex;align-items:center;justify-content:center;text-align:center;min-height:92px;border:2px dashed #9FC4C9;border-radius:10px;background:#fff;color:var(--teal);font-weight:700;font-size:.85rem;cursor:pointer;transition:.18s;padding:8px}
+  .ph-drop:hover{border-color:var(--teal2);background:var(--mint-soft)}
+  .ph-have{position:relative}
+  .ph-thumb{width:100%;border-radius:10px;display:block;border:1px solid var(--line)}
+  .ph-del{position:absolute;top:6px;right:6px;background:rgba(10,61,79,.82);color:#fff;border:none;border-radius:8px;padding:5px 9px;font-size:.76rem;font-weight:700;cursor:pointer;font-family:inherit}
+  .ph-del:hover{background:var(--coral)}
+  .ph-cap{width:100%;margin-top:8px;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-family:inherit;font-size:.84rem;background:#fff;outline:none}
+  .ph-cap:focus{border-color:var(--teal)}
+  .report-cta{margin-top:20px;background:linear-gradient(180deg,#0E2F3A,#12414F);border-radius:16px;padding:22px;text-align:center}
+  .report-cta h3{color:#fff;font-size:1.12rem;font-weight:800;margin-bottom:6px}
+  .report-cta p{color:#CFE7E7;font-size:.92rem;margin-bottom:14px}
+  .btn.report{background:var(--mint);color:#06343a;font-size:1.04rem;padding:13px 26px}
+  .btn.report:hover{background:#7fe8d2}
+  .report-cta .report-note{background:rgba(255,255,255,.92);border:none;border-radius:10px;padding:11px 14px;font-size:.85rem;color:#5a4a22;margin-top:14px;text-align:left;line-height:1.55}
+  @media print{.photo-block,.report-cta,.report-field{break-inside:avoid}}
+  /* ===== 탐구 목적 ===== */
+  .purpose{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:6px 0 16px}
+  @media(max-width:760px){.purpose{grid-template-columns:1fr}}
+  .pcard{border-radius:14px;padding:15px 16px;border:1.5px solid var(--line);background:#fff}
+  .pcard.p1{border-color:var(--coral);background:linear-gradient(180deg,#FFF6EF,#FDEDE1)}
+  .pcard.p2{border-color:var(--teal2);background:linear-gradient(180deg,#F2FBFA,#E8F6F4)}
+  .pcard.p3{border-color:var(--gold);background:linear-gradient(180deg,#FFF9EC,#FDF1D6)}
+  .pcard .pk{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.04em;padding:3px 10px;border-radius:20px;color:#fff;margin-bottom:8px}
+  .pcard.p1 .pk{background:var(--coral)} .pcard.p2 .pk{background:var(--teal)} .pcard.p3 .pk{background:var(--gold)}
+  .pcard h4{font-size:1rem;color:var(--navy);font-weight:800;margin-bottom:5px}
+  .pcard p{font-size:.9rem;line-height:1.5;color:var(--ink)}
+  .pcard ul{margin:4px 0 0 16px} .pcard li{font-size:.88rem;line-height:1.45;margin-bottom:3px}
+  /* ===== 원리 학습 공간(시뮬레이터) ===== */
+  .labsim{background:linear-gradient(180deg,#F7FCFC,#EAF6F6);border:1.5px solid #B7DDDA;border-radius:16px;padding:18px 20px;margin:12px 0}
+  .labsim h3{font-size:1.06rem;font-weight:800;color:var(--navy);margin-bottom:4px}
+  .labsim .subhint{font-size:.9rem;color:var(--soft);margin-bottom:10px}
+  .simrow{display:grid;grid-template-columns:1.15fr 1fr;gap:18px;align-items:start}
+  @media(max-width:720px){.simrow{grid-template-columns:1fr}}
+  .simrow canvas{display:block;width:100%;background:#fff;border-radius:12px;border:1px solid var(--line)}
+  .simctrl .ctrl-row{display:flex;justify-content:space-between;align-items:baseline;font-weight:700;color:var(--navy);font-size:.95rem;margin-bottom:8px}
+  .simctrl .ctrl-row .v{color:var(--coral);font-variant-numeric:tabular-nums;font-size:1.05rem}
+  .metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+  .metric{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+  .metric .l{font-size:.72rem;font-weight:800;color:var(--teal);letter-spacing:.02em}
+  .metric .v{font-size:1.15rem;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;line-height:1.2}
+  .metric .v small{font-size:.72rem;font-weight:700;color:var(--soft)}
+  .toggle-deep{margin-top:12px}
+  .toggle-deep>summary{cursor:pointer;list-style:none;font-weight:800;color:var(--teal);font-size:.95rem;padding:10px 14px;background:var(--mint-soft);border-radius:10px;border:1.5px solid var(--teal2)}
+  .toggle-deep>summary::-webkit-details-marker{display:none}
+  .toggle-deep>summary::before{content:"▸ ";color:var(--teal2)}
+  .toggle-deep[open]>summary::before{content:"▾ "}
+  .toggle-deep .deepbody{padding:14px 4px 2px}
+  /* ===== 자기점검 / 힌트 ===== */
+  .selfcheck{margin:14px 0;background:#F1F8F8;border:1.5px solid #B7DDDA;border-radius:12px;padding:13px 16px}
+  .selfcheck .t{font-weight:800;color:var(--teal);font-size:.95rem;margin-bottom:7px}
+  .selfcheck label{display:flex;align-items:flex-start;gap:9px;font-weight:500;color:var(--ink);font-size:.92rem;margin:6px 0;cursor:pointer}
+  .selfcheck input{margin-top:4px;width:17px;height:17px;accent-color:var(--teal);flex-shrink:0}
+  details.hint-d{margin:10px 0}
+  details.hint-d>summary{cursor:pointer;list-style:none;color:var(--coral);font-weight:700;font-size:.9rem}
+  details.hint-d>summary::-webkit-details-marker{display:none}
+  details.hint-d>summary::before{content:"💡 "}
+  details.hint-d .hb{margin-top:7px;background:#FBEFE7;border-left:4px solid var(--coral);border-radius:8px;padding:10px 13px;font-size:.9rem;line-height:1.55}
+  .trouble{margin-top:10px;background:#FFF6E9;border:1.5px dashed #F0CE97;border-radius:10px;padding:11px 14px;font-size:.88rem;color:#5a4a22;line-height:1.5}
+  .trouble b{color:#9A6612}
+  /* ===== 쇠구슬 수 찾기 ===== */
+  .ballstate{border-radius:12px;padding:12px 14px;font-weight:800;text-align:center;font-size:1.02rem;margin-top:10px;transition:.2s}
+  .ballstate.sink{background:#FBE3D3;border:1.5px solid var(--coral);color:#A8431D}
+  .ballstate.unstable{background:#FFF6E9;border:1.5px solid var(--gold);color:#9A6612}
+  .ballstate.good{background:var(--mint-soft);border:1.5px solid var(--teal2);color:var(--teal)}
+  .ballstate.high{background:#EAF2FB;border:1.5px solid #7F9FD0;color:#3A5A88}
+  .ballstate small{display:block;font-weight:600;font-size:.82rem;margin-top:3px;color:inherit;opacity:.9}
+  .ballpick{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;background:#fff;border:1.5px solid var(--teal2);border-radius:12px;padding:12px 15px}
+  .ballpick label{margin:0;font-weight:800;color:var(--navy)}
+  .ballpick input[type=number]{width:80px;text-align:center;font-size:1.1rem;font-weight:800}
+</style>
+</head>
+<body>
+<div class="bg-deco" aria-hidden="true">
+  <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+    <defs><radialGradient id="glow" cx="82%" cy="6%" r="55%"><stop offset="0%" stop-color="#2FD3B6" stop-opacity="0.14"/><stop offset="100%" stop-color="#2FD3B6" stop-opacity="0"/></radialGradient></defs>
+    <rect x="0" y="0" width="1440" height="900" fill="url(#glow)"/>
+    <g fill="#2FD3B6" fill-opacity="0.16">
+      <circle cx="170" cy="560" r="11"/><circle cx="250" cy="470" r="6"/><circle cx="120" cy="660" r="7"/><circle cx="1280" cy="520" r="12"/><circle cx="1200" cy="430" r="6"/><circle cx="1340" cy="610" r="8"/><circle cx="700" cy="610" r="7"/><circle cx="980" cy="560" r="9"/><circle cx="430" cy="640" r="5"/><circle cx="560" cy="540" r="6"/>
+    </g>
+    <path fill="#1AA7A0" fill-opacity="0.10" d="M0,742 C240,690 480,792 720,752 C960,712 1200,786 1440,732 L1440,900 L0,900 Z"/>
+    <path fill="#12808C" fill-opacity="0.10" d="M0,808 C300,766 560,850 820,808 C1080,766 1300,840 1440,802 L1440,900 L0,900 Z"/>
+    <path fill="#0A3D4F" fill-opacity="0.08" d="M0,860 C360,834 720,884 1080,856 C1260,842 1380,866 1440,856 L1440,900 L0,900 Z"/>
+  </svg>
+</div>
+<div class="wrap">
+  <header>
+    <span class="kick">영재 과학 · 측정과 보정 탐구</span>
+    <h1>간이 염분계 보정하기</h1>
+    <p class="sub">정밀한 굴절 염분계로 우리 간이 염분계를 보정하고, 보정곡선으로 미지 용액의 염분을 알아내자!</p>
+  </header>
+  <nav class="steps" id="stepNav">
+    <button class="step on" data-s="1"><span class="n">STEP 1</span><span class="t">시작</span></button>
+    <button class="step" data-s="2"><span class="n">STEP 2</span><span class="t">보정이란?</span></button>
+    <button class="step" data-s="3"><span class="n">STEP 3</span><span class="t">굴절 염분계</span></button>
+    <button class="step" data-s="4"><span class="n">STEP 4</span><span class="t">측정기 만들기</span></button>
+    <button class="step" data-s="5"><span class="n">STEP 5</span><span class="t">시뮬레이터</span></button>
+    <button class="step" data-s="6"><span class="n">STEP 6</span><span class="t">높이 측정법</span></button>
+    <button class="step" data-s="7"><span class="n">STEP 7</span><span class="t">용액 만들기</span></button>
+    <button class="step" data-s="8"><span class="n">STEP 8</span><span class="t">왜 보정곡선?</span></button>
+    <button class="step" data-s="9"><span class="n">STEP 9</span><span class="t">보정곡선</span></button>
+    <button class="step" data-s="10"><span class="n">STEP 10</span><span class="t">미지 용액</span></button>
+    <button class="step" data-s="11"><span class="n">STEP 11</span><span class="t">바이브 코딩</span></button>
+    <button class="step" data-s="12"><span class="n">STEP 12</span><span class="t">마무리</span></button>
+  </nav>
+
+  <!-- STEP 1 -->
+  <div class="panel" data-step="1">
+    <div class="secHead"><span class="secNo">STEP 1</span><h2>오늘의 탐구 시작하기</h2></div>
+    <div class="hook">🤔 <b>생각해 보기</b> — 우리가 만든 간이 염분계는 소금물에서 측정기가 떠오른 <b>"높이(cm)"</b>를 알려줘요. 그런데 높이가 2 cm라고 해서, 그게 <b>염분이 정확히 얼마인지</b> 바로 알 수 있을까요?</div>
+    <p>오늘은 두 가지 도구를 함께 씁니다. 직접 만든 <b>간이 염분계</b>(떠오른 높이를 알려줌)와, 빛의 굴절을 이용하는 정밀한 <b>굴절 염분계</b>(염분을 바로 알려줌)예요. 정밀한 도구를 <b>기준</b>으로 삼아 우리 간이 염분계를 <b>보정</b>하고, 만들어진 <b>보정곡선</b>으로 선생님이 나눠준 <b>미지 용액의 염분</b>을 알아냅니다. 참고로 전 세계 바다의 평균 염분은 약 <b>35‰</b> — 바닷물 1 kg에 소금이 약 35 g 녹아 있는 정도로, 우리 굴절 염분계 눈금(g/100g)으로는 약 <b>3.5</b>에 해당해요.</p>
+    <h3 class="sec">🎯 우리는 왜 이 탐구를 할까? — 세 가지 목적</h3>
+    <div class="purpose">
+      <div class="pcard p1">
+        <span class="pk">실험적 목적</span>
+        <h4>무엇을 해내나</h4>
+        <p>정밀한 <b>굴절 염분계</b>를 기준으로 직접 만든 <b>간이 염분계</b>를 보정해 <b>보정곡선</b>을 만들고, 그 곡선으로 <b>미지 용액의 농도</b>를 알아맞힌 뒤 실제값으로 확인한다.</p>
+      </div>
+      <div class="pcard p2">
+        <span class="pk">과학적 목적</span>
+        <h4>어떤 원리를 이해하나</h4>
+        <ul>
+          <li><b>부력·밀도</b> — 소금이 녹으면 밀도가 커지고, 그래서 측정기가 더 높이 뜬다</li>
+          <li><b>빛의 굴절</b> — 소금이 많을수록 빛이 더 꺾인다</li>
+          <li><b>보정</b> — 기준으로 도구를 ‘가르친다’</li>
+        </ul>
+      </div>
+      <div class="pcard p3">
+        <span class="pk">탐구 관점</span>
+        <h4>어떤 태도를 기르나</h4>
+        <ul>
+          <li>모든 <b>측정에는 기준</b>이 필요하다</li>
+          <li>데이터의 <b>오차를 읽고</b> 원인을 따진다</li>
+          <li>변인을 <b>스스로 설계·통제</b>한다</li>
+          <li>개념을 <b>다른 측정으로 전이</b>한다</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note" style="margin:0 0 14px">🧭 <b>이 자료 혼자서 끝까지!</b> 위 STEP 버튼으로 언제든 오갈 수 있어요. 각 단계에는 <b>예측 → 시뮬레이터로 확인 → 직접 측정 → 스스로 점검</b>이 들어 있고, 막히면 <b>💡힌트</b>를 열어 보세요. 입력한 내용은 자동 저장되고 마지막에 <b>보고서</b>로 정리됩니다.</div>
+    <div class="ok"><b>준비물</b> · <b>굴절 염분계</b>(ATAGO MASTER-BX/S28M — 염화나트륨 0~28 g/100g · Brix 0~33% 이중 눈금), 증류수(영점용), 스포이드, <b>쇠구슬</b>(개수는 STEP 4에서 <b>직접 찾음</b>), 소금, 물, 비커 5개(기준 4 + 미지 1), 눈금실린더, 자, 네임펜(유성 펜)·스티커, 전자저울, 약수저, 유리 막대, 키친타올</div>
+    <div style="margin-bottom:4px"><label for="grp">모둠 이름</label><input id="grp" type="text" placeholder="예: 짠물탐험대"></div>
+    <label>모둠 인원</label>
+    <div class="count-pick" id="countPick">
+      <button type="button" data-n="2">2명</button><button type="button" data-n="3">3명</button><button type="button" data-n="4">4명</button><button type="button" data-n="5">5명</button><button type="button" data-n="6">6명</button>
+    </div>
+    <div id="memberRows"></div>
+    <div class="report-field"><label for="rk-hyp">🔮 우리 모둠의 가설 <span class="hint" style="font-weight:500">— 소금물의 진하기와 측정기가 떠오른 높이는 어떤 관계일까?</span></label>
+      <textarea id="rk-hyp" data-rkey="hypothesis" placeholder="예: 소금물이 진할수록(염분이 클수록) 간이 염분계가 더 높이 떠오를 것이다."></textarea></div>
+    <div class="em"><b>기억해 두세요.</b> 모둠 이름·측정 결과·올린 사진은 이 기기(브라우저)에 자동 저장됩니다. 같은 기기에서 다시 열면 이어서 할 수 있어요. 탐구하면서 칸을 채우고 사진을 올리면, 마지막 단계에서 <b>Word 보고서</b>로 자동 정리됩니다.</div>
+    <div class="nav-btns"><span></span><button class="btn primary" data-go="2">다음 단계 → 보정이란?</button></div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="panel hide" data-step="2">
+    <div class="secHead"><span class="secNo">STEP 2</span><h2>'보정'이 뭘까? — 두 도구 이야기</h2></div>
+    <p>측정 도구는 <b>믿을 수 있는 기준</b>이 있어야 정확해집니다. 우리에게는 성격이 다른 두 도구가 있어요.</p>
+    <div class="compare2">
+      <div class="icard ours">
+        <span class="tag">우리가 만든 도구</span>
+        <h3>간이 염분계</h3>
+        <svg viewBox="0 0 120 70" width="120" height="62" aria-hidden="true">
+          <rect x="8" y="30" width="104" height="34" rx="6" fill="#1AA7A0" fill-opacity=".16"/>
+          <line x1="8" y1="30" x2="112" y2="30" stroke="#1AA7A0" stroke-width="2"/>
+          <rect x="55" y="10" width="9" height="40" rx="2" fill="#fff" stroke="#0A3D4F" stroke-width="2"/>
+          <ellipse cx="59" cy="52" rx="11" ry="9" fill="#fff" stroke="#0A3D4F" stroke-width="2"/>
+          <circle cx="56" cy="52" r="2.4" fill="#5B7178"/><circle cx="62" cy="54" r="2.4" fill="#5B7178"/>
+          <line x1="64" y1="22" x2="86" y2="22" stroke="#C75A2E" stroke-width="2"/>
+          <text x="89" y="25" font-size="9" fill="#C75A2E" font-family="Pretendard" font-weight="700">높이</text>
+        </svg>
+        <div class="out">알려주는 값 → <b>떠오른 높이 (cm)</b></div>
+        <ul><li>만들기 쉽고, 부력 원리를 눈으로 봄</li><li>하지만 높이 2 cm가 곧 "염분 ○○"은 아님</li><li>측정기 모양·쇠구슬 수에 따라 값이 달라짐 → <b>보정이 필요!</b></li></ul>
+      </div>
+      <div class="icard ref">
+        <span class="tag">정밀한 기준 도구</span>
+        <h3>굴절 염분계</h3>
+        <svg viewBox="0 0 120 70" width="120" height="62" aria-hidden="true">
+          <rect x="18" y="26" width="78" height="20" rx="9" fill="#fff" stroke="#0A3D4F" stroke-width="2"/>
+          <circle cx="30" cy="36" r="7" fill="#0E2F3A"/><circle cx="30" cy="36" r="3" fill="#2FD3B6"/>
+          <rect x="92" y="22" width="14" height="28" rx="4" fill="#D7E8E8" stroke="#0A3D4F" stroke-width="2"/>
+          <path d="M44 30 L60 40" stroke="#D9A441" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M60 40 L74 34" stroke="#D9A441" stroke-width="2.4" stroke-linecap="round"/>
+          <text x="40" y="60" font-size="9" fill="#C75A2E" font-family="Pretendard" font-weight="700">빛의 굴절</text>
+        </svg>
+        <div class="out">알려주는 값 → <b>농도 (g/100g)</b></div>
+        <ul><li>빛이 꺾이는 정도로 염분을 바로 읽음</li><li>정밀해서 <b>"기준값"</b>으로 믿을 수 있음</li><li>맛보지 않고도 염분을 바로 알 수 있음</li></ul>
+      </div>
+    </div>
+    <div class="hook">💭 <b>우리 조 아이디어 먼저!</b> — 두 도구를 어떻게 함께 쓰면, 간이 염분계의 '높이'를 믿을 수 있는 '농도'로 바꿀 수 있을까요? 아래 설명을 읽기 전에 조의 아이디어를 먼저 적어 보세요.</div>
+    <div class="report-field" style="margin-top:0"><textarea id="rk-idea" data-rkey="ideaCalib" placeholder="예: 두 도구로 같은 소금물을 재서, 높이가 몇 cm일 때 농도가 얼마인지 짝을 지어 둔다…"></textarea></div>
+    <h3 class="sec">📐 보정(calibration)이란?</h3>
+    <p><b>정확한 기준 도구로 잰 값</b>과 <b>우리 도구로 잰 값</b>을 짝지어, 둘 사이의 관계를 찾는 일이에요. 두 가지 비유로 이해해 봐요.</p>
+    <div class="ok">🪵 <b>눈금 없는 막대에 눈금 새기기</b> — 우리 간이 염분계는 "눈금 없는 막대" 같아요. 정확한 자(굴절 염분계)를 옆에 대고, 어디가 얼마인지 눈금을 새겨 넣는 것이 보정입니다.</div>
+    <div class="ok" style="margin-top:8px">⚖️ <b>새 체중계 맞춰보기</b> — 새로 산 체중계가 정확한지 모를 때, 무게를 아는 추(기준)를 올려 보고 맞춰보죠. 그것과 똑같은 일을 해요.</div>
+    <h3 class="sec">📈 보정곡선(calibration curve)</h3>
+    <p>진하기가 다른 용액을 <b>여러 개</b> 준비해 두 도구로 모두 재고, 그래프로 그리면 <b>'높이 ↔ 염분'의 관계를 보여주는 직선</b>(보정곡선)이 만들어져요. 이 곡선만 있으면, 이제 미지 용액은 <b>간이 염분계로 높이만 재도 염분을 알 수 있습니다!</b></p>
+    <div class="calflow">
+      <div class="cf-box">여러 소금물<small>진하기가 다른 용액들</small></div>
+      <div class="cf-arrow">→</div>
+      <div class="cf-col"><div class="cf-box ref">굴절 염분계<small>농도(g/100g) · 기준값</small></div><div class="cf-box ours">간이 염분계<small>높이(cm) · 우리값</small></div></div>
+      <div class="cf-arrow">→</div>
+      <div class="cf-box curve">보정곡선<small>높이 ↔ 염분</small></div>
+      <div class="cf-arrow">→</div>
+      <div class="cf-box goal">미지 용액의<small>염분 알아내기</small></div>
+    </div>
+    <div class="note">💡 <b>오늘의 흐름</b> — ① 굴절 염분계 사용법 익히기 → ② 간이 염분계 만들기 → ③ 기준 용액을 두 도구로 측정 → ④ <b>보정곡선 만들기</b> → ⑤ 미지 용액의 염분 맞히고 굴절 염분계로 확인!</div>
+    <div class="nav-btns"><button class="btn ghost" data-go="1">← 이전</button><button class="btn primary" data-go="3">다음 → 굴절 염분계 배우기</button></div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="panel hide" data-step="3">
+    <div class="secHead"><span class="secNo">STEP 3</span><h2>굴절 염분계 — 원리와 사용법</h2></div>
+    <h3 class="sec">🌈 원리 — 빛의 '굴절'을 이용해요</h3>
+    <p>빛이 공기에서 물(용액)로 들어갈 때 진행 방향이 꺾이는데, 이것을 <b>굴절</b>이라고 해요(중2 '빛과 파동' 단원과 이어져요). 💭 <b>예측 먼저!</b> 그렇다면 소금물이 <b>진할수록</b> 빛은 더 꺾일까요, 덜 꺾일까요? 예측한 뒤 아래 그림으로 확인하세요 — <b>소금이 많이 녹아 있을수록 빛이 더 많이 꺾입니다.</b> 굴절 염분계는 이 '꺾이는 정도'를 읽어서 염분(‰)으로 바꿔 보여줘요. 그래서 맛보지 않고도 빛만으로 염분을 알 수 있는 거예요.</p>
+    <div class="labsim">
+      <h3>🔬 굴절 시뮬레이터 — 소금 농도를 바꿔 빛을 꺾어 보자</h3>
+      <div class="subhint">슬라이더로 소금 농도를 바꾸면 용액의 <b>굴절률(n)</b>이 커지고, 들어온 빛(노랑)이 <b>더 많이 꺾여</b> 굴절광(주황)이 법선 쪽으로 붙습니다. 노란 광자가 실제로 흐르는 걸 지켜보세요.</div>
+      <div class="simrow">
+        <canvas id="refrCanvas" width="400" height="300"></canvas>
+        <div class="simctrl">
+          <div class="ctrl-row"><label style="margin:0">용액의 소금 농도</label><span class="v" id="refr-cv">3.5 g/100g</span></div>
+          <input type="range" id="refrConc" min="0" max="28" step="0.5" value="3.5">
+          <div class="metrics">
+            <div class="metric"><div class="l">굴절률 n</div><div class="v" id="m-n">1.339</div></div>
+            <div class="metric"><div class="l">입사각 θ₁</div><div class="v" id="m-th1">60°</div></div>
+            <div class="metric"><div class="l">굴절각 θ₂</div><div class="v" id="m-th2">40.3°</div></div>
+            <div class="metric"><div class="l">꺾인 정도 θ₁−θ₂</div><div class="v" id="m-bend">19.7<small>°</small></div></div>
+          </div>
+          <div class="note" style="margin-top:12px">입사각은 60°로 고정했어요. 농도가 커질수록 <b>n이 커지고 굴절각 θ₂가 작아져</b> — 빛이 더 세게 꺾입니다. 변화가 작아 보이면 <b>각도 숫자</b>를 함께 보세요. 굴절 염분계는 바로 이 <b>꺾이는 정도</b>를 읽어 농도로 바꿔 줍니다.</div>
+        </div>
+      </div>
+      <details class="toggle-deep">
+        <summary>더 깊이 — 접안렌즈의 ‘경계선’은 왜 생길까? (임계각·전반사)</summary>
+        <div class="deepbody">
+          <div class="subhint">굴절 염분계 안에서는 빛이 <b>유리 프리즘(n≈1.52)</b>에서 <b>시료(소금물)</b>로 나갑니다. 이때 어떤 각도보다 크게 들어온 빛은 시료로 못 나가고 <b>모두 되튀어요(전반사)</b>. 그 경계가 되는 각을 <b>임계각 θ<sub>c</sub></b>라 하고, 이것이 접안렌즈의 <b>밝음/어두움 경계선</b>을 만듭니다. 소금이 많을수록 시료 n이 커져 θ<sub>c</sub>가 커지고 → 경계선이 이동해요.</div>
+          <div class="simrow" style="grid-template-columns:1fr 1fr">
+            <canvas id="critCanvas" width="360" height="260"></canvas>
+            <div class="simctrl" style="align-self:center">
+              <div class="metrics" style="grid-template-columns:1fr">
+                <div class="metric"><div class="l">시료 굴절률 n<sub>시료</sub></div><div class="v" id="m-ns">1.339</div></div>
+                <div class="metric"><div class="l">임계각 θ<sub>c</sub></div><div class="v" id="m-crit">61.8<small>°</small></div></div>
+              </div>
+              <div class="note" style="margin-top:10px">위 슬라이더(농도)를 움직이면 여기 임계각과 <b>경계선 위치</b>도 함께 바뀝니다. 이 경계선을 아래 접안렌즈 연습에서 실제 눈금으로 읽어요.</div>
+            </div>
+          </div>
+        </div>
+      </details>
+    </div>
+    <div class="em">📟 <b>우리 기기 — ATAGO MASTER-BX/S28M.</b> 접안 화면에 눈금이 <b>두 줄</b> 있어요: <b>Brix(0~33%)</b>는 설탕물용, <b>염화나트륨(0~28 g/100g)</b>이 소금물용입니다. 우리는 반드시 <b>염화나트륨 눈금</b>을 읽어요. 실물 접안 화면에서 어느 쪽이 염화나트륨 눈금인지 먼저 확인하세요! 💭 같은 경계선인데 왜 두 눈금의 숫자가 다를까요? 조에서 이야기해 보세요.</div>
+    <div class="note" style="margin:0 0 10px">🌡 <b>온도 주의.</b> 이 모델은 자동 온도 보정(ATC)이 없어요. 용액과 기기를 <b>실온</b>에 두고 재고, 프리즘 부분을 손으로 오래 감싸지 마세요. 온도가 달라지면 측정값이 어떻게 될지 — 나중에 오차 분석에서 다시 만나요.</div>
+    <div class="note" style="margin:0 0 14px">🔎 <b>단위 탐정.</b> 바닷물 평균 염분 <b>35‰</b>(1000분의 35)를 우리 굴절계 눈금 <b>g/100g</b>(100 g당 소금 g)으로 읽으면 얼마일까요? 계산해 보세요. <span class="hint">(힌트: ‰와 g/100g는 10배 관계)</span></div>
+    <h3 class="sec">🔧 사용법 — 순서대로 따라 하세요</h3>
+    <div class="guide">
+      <div class="gcard"><div class="row"><span class="badge">1</span><div><h3>프리즘(시료판) 닦기</h3><p>덮개를 열고, 깨끗한 천(렌즈페이퍼)으로 프리즘 면을 닦아 이전에 묻은 자국을 없앱니다. 긁히지 않게 부드럽게 닦아요.</p></div></div></div>
+      <div class="gcard"><div class="row"><span class="badge">2</span><div><h3>영점 보정 (0점 맞추기) ★중요</h3><p><b>증류수(맹물)</b> 1~2방울을 프리즘에 떨어뜨리고 덮개를 덮은 뒤, 눈금이 <b>0</b>이 되는지 확인합니다. 0이 아니면 영점 조절 나사로 0에 맞춰요. <b>기준이 0부터 정확해야</b> 다른 측정도 믿을 수 있어요.</p></div></div></div>
+      <div class="gcard"><div class="row"><span class="badge">3</span><div><h3>시료(용액) 떨어뜨리기</h3><p>프리즘을 닦은 뒤, 측정할 소금물을 스포이드로 <b>1~2방울</b> 프리즘 위에 올립니다. 너무 많이 올리지 않아도 돼요.</p></div></div></div>
+      <div class="gcard"><div class="row"><span class="badge">4</span><div><h3>덮개 덮기</h3><p>덮개를 살며시 눌러 덮어, 용액이 <b>공기 방울 없이 얇고 고르게</b> 퍼지게 합니다. 방울이 남으면 경계선이 흐릿해져요.</p></div></div></div>
+      <div class="gcard"><div class="row"><span class="badge">5</span><div><h3>빛을 향해 들여다보기</h3><p>밝은 쪽(창문·전등)을 향하게 하고 접안렌즈로 봅니다. 초점 링을 돌려 눈금이 <b>또렷하게</b> 보이도록 맞춰요.</p></div></div></div>
+      <div class="gcard"><div class="row"><span class="badge">6</span><div><h3>경계선이 닿는 눈금 읽기</h3><p>파란색과 흰색이 나뉘는 <b>경계선</b>이 닿는 눈금을 <b>염화나트륨(g/100g) 눈금</b>에서 읽습니다. 이 값이 용액의 농도예요. 다 쓰면 프리즘을 닦아 말려 보관합니다.</p></div></div></div>
+    </div>
+    <h3 class="sec">👁 접안렌즈 연습 — 경계선 읽어 보기</h3>
+    <p>슬라이더로 용액의 농도를 바꿔 보세요. <b>농도가 커질수록 파란 영역이 넓어지고 경계선이 아래로 내려갑니다.</b> 실물처럼 눈금이 두 줄이에요 — 흐린 쪽은 Brix(설탕용), 진한 쪽이 <b>염화나트륨(우리가 읽는 쪽!)</b>. 경계선이 닿는 염화나트륨 눈금을 읽는 연습을 해 봐요.</p>
+    <div class="eyewrap">
+      <div>
+        <div class="eye-stage"><canvas id="eyepiece" width="360" height="360"></canvas></div>
+        <div class="eye-read"><div class="lab">경계선이 가리키는 농도</div><div class="num"><span id="r-eyeSal">3.5</span><span class="unit"> g/100g</span></div></div>
+      </div>
+      <div>
+        <div class="ctrl"><div class="ctrl-row"><label style="margin:0">용액의 농도</label><span class="v" id="eye-v">3.5 g/100g</span></div><input type="range" id="eyeSal" min="0" max="28" step="0.5" value="3.5"></div>
+        <div class="ok" style="margin-top:14px"><b>읽는 법.</b> 경계선(파랑과 흰색의 경계)이 <b>염화나트륨 눈금</b>의 어느 숫자에 닿아 있는지 보면 그게 바로 농도(g/100g)예요. 점선으로 표시된 <b>3.5 g/100g(=35‰)</b>은 바닷물 평균입니다 — 비교해 보세요.</div>
+        <div class="note" style="margin-top:10px">⚠️ <b>영점 보정을 빠뜨리면?</b> 맹물에서 0이 아니라면, 모든 측정값이 그만큼 어긋나요. 그래서 측정 전 0점 맞추기가 가장 중요합니다.</div>
+      </div>
+    </div>
+    <div class="report-field"><label for="rk-ref">📝 굴절 염분계를 써 보고 — 알게 된 점·주의할 점</label>
+      <textarea id="rk-ref" data-rkey="obsRefracto" placeholder="예: 측정 전에 증류수로 0점을 맞춰야 했다. 경계선이 또렷하게 보이도록 초점을 맞추는 것이 중요했다."></textarea></div>
+    <div class="photo-block"><label>📷 굴절 염분계 눈금(경계선) 사진</label>
+      <div class="photo-grid"><div class="photo-slot" data-slot="refracto"></div></div></div>
+    <div class="nav-btns"><button class="btn ghost" data-go="2">← 이전</button><button class="btn primary" data-go="4">다음 → 간이 염분계 만들기</button></div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="panel hide" data-step="4">
+    <div class="secHead"><span class="secNo">STEP 4</span><h2>간이 염분계 만들기</h2></div>
+    <p>스포이드 안에 <b>쇠구슬</b>을 넣어 무게추로 삼아, 물 위에서 <b>똑바로 서서</b> 떠 있도록 만듭니다. 이것이 우리가 <b>보정할 도구</b>예요. 그런데 <b>쇠구슬은 몇 개</b> 넣어야 할까요? 정답은 정해져 있지 않아요 — 아래 <b>‘쇠구슬 수 찾기’</b>에서 시뮬레이터로 예측하고 실물로 확인해, <b>우리 조가 직접 정합니다.</b></p>
+    <div class="guide">
+      <div class="gcard">
+        <div class="row"><span class="badge">1</span><div><h3>스포이드 자르기</h3><p>스포이드의 가는 부분 일부를 가위로 자릅니다. 윗부분이 너무 길면 측정이 어렵고, 너무 짧으면 잘 떠 있지 않으니 손가락 두세 마디 정도가 적당합니다.</p></div></div>
+        <svg viewBox="0 0 200 80" width="180" height="72" aria-hidden="true">
+          <defs><marker id="ar1" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#C75A2E"/></marker></defs>
+          <ellipse cx="40" cy="40" rx="22" ry="18" fill="#fff" stroke="#0A3D4F" stroke-width="2"/>
+          <rect x="60" y="34" width="100" height="12" rx="3" fill="#fff" stroke="#0A3D4F" stroke-width="2"/>
+          <line x1="120" y1="22" x2="120" y2="58" stroke="#C75A2E" stroke-width="2" stroke-dasharray="3 3" marker-end="url(#ar1)"/>
+          <text x="124" y="20" font-size="10" fill="#C75A2E" font-family="Pretendard">자르기</text>
+        </svg>
+      </div>
+      <div class="gcard">
+        <div class="row"><span class="badge">2</span><div><h3>쇠구슬 넣어 무게추 만들기</h3><p>잘라낸 스포이드를 거꾸로 세워, 가는 쪽이 위로 가게 한 뒤 둥근 부분(벌브)에 <b>쇠구슬을 넣어</b> 무게추로 만듭니다. <b>몇 개가 좋을지</b>는 바로 아래 ‘쇠구슬 수 찾기’에서 찾아요. 한 번 정한 개수는 <b>끝까지 유지</b>합니다.</p></div></div>
+        <svg viewBox="0 0 200 80" width="180" height="72" aria-hidden="true">
+          <ellipse cx="40" cy="50" rx="22" ry="18" fill="#fff" stroke="#0A3D4F" stroke-width="2"/>
+          <circle cx="34" cy="55" r="4" fill="#5B7178"/><circle cx="44" cy="56" r="4" fill="#5B7178"/><circle cx="40" cy="48" r="4" fill="#5B7178"/><circle cx="50" cy="50" r="4" fill="#5B7178"/><circle cx="32" cy="46" r="4" fill="#5B7178"/><circle cx="38" cy="58" r="4" fill="#5B7178"/>
+          <rect x="60" y="44" width="120" height="12" rx="3" fill="#fff" stroke="#0A3D4F" stroke-width="2"/>
+          <text x="100" y="30" font-size="10" fill="#0A3D4F" font-family="Pretendard">쇠구슬 무게추</text>
+        </svg>
+      </div>
+      <div class="gcard">
+        <div class="row"><span class="badge">3</span><div><h3>좁은 통에서 점검하기</h3><p><b>좁고 긴 눈금실린더(또는 시험관)</b>에 맹물을 담고 측정기를 넣어, 바닥에서 살짝 떨어진 채 <b>똑바로 서서</b> 안정적으로 떠 있는지 확인합니다. 잘 서지 못하면 스포이드 윗부분을 조금 더 잘라 길이를 맞춰요.</p></div></div>
+        <svg viewBox="0 0 200 120" width="150" height="108" aria-hidden="true">
+          <rect x="78" y="10" width="44" height="104" rx="6" fill="none" stroke="#0A3D4F" stroke-width="2"/>
+          <rect x="80" y="42" width="40" height="70" fill="#1AA7A0" fill-opacity=".18"/>
+          <line x1="80" y1="42" x2="120" y2="42" stroke="#1AA7A0" stroke-width="2"/>
+          <g stroke="#9FC4C9" stroke-width="1"><line x1="78" y1="54" x2="86" y2="54"/><line x1="78" y1="68" x2="86" y2="68"/><line x1="78" y1="82" x2="86" y2="82"/><line x1="78" y1="96" x2="86" y2="96"/></g>
+          <rect x="96" y="28" width="8" height="54" rx="2" fill="#fff" stroke="#0A3D4F" stroke-width="2"/>
+          <ellipse cx="100" cy="86" rx="11" ry="9" fill="#fff" stroke="#0A3D4F" stroke-width="2"/>
+          <circle cx="98" cy="86" r="2.5" fill="#5B7178"/><circle cx="102" cy="88" r="2.5" fill="#5B7178"/>
+        </svg>
+      </div>
+      <div class="gcard">
+        <div class="row"><span class="badge">4</span><div><h3>측정기에 눈금 표시 (선택)</h3><p>측정기에 <b>네임펜과 자로 눈금을 그려 두면</b> 떠오른 높이를 읽기 편해요(위쪽 끝을 0으로, 0.5 cm 간격). 꼭 그리지 않아도 됩니다 — <b>눈금실린더의 눈금</b>을 그대로 기준으로 써도 돼요. 측정 기준은 다음 단계에서 <b>우리 조가 정합니다.</b></p></div></div>
+        <svg viewBox="0 0 200 110" width="180" height="100" aria-hidden="true">
+          <rect x="78" y="14" width="14" height="78" rx="3" fill="#fff" stroke="#0A3D4F" stroke-width="2"/>
+          <ellipse cx="85" cy="96" rx="15" ry="11" fill="#fff" stroke="#0A3D4F" stroke-width="2"/>
+          <g stroke="#0A3D4F" stroke-width="1.4"><line x1="92" y1="20" x2="104" y2="20"/><line x1="92" y1="28" x2="100" y2="28"/><line x1="92" y1="36" x2="104" y2="36"/><line x1="92" y1="44" x2="100" y2="44"/><line x1="92" y1="52" x2="104" y2="52"/><line x1="92" y1="60" x2="100" y2="60"/><line x1="92" y1="68" x2="104" y2="68"/></g>
+          <g fill="#0A3D4F" font-size="8" font-family="Pretendard" font-weight="700"><text x="107" y="23">0</text><text x="107" y="39">1</text><text x="107" y="55">2</text><text x="107" y="71">3</text></g>
+          <rect x="120" y="14" width="10" height="80" rx="2" fill="#FBE3D3" stroke="#C75A2E" stroke-width="1.5"/>
+          <text x="138" y="56" font-size="9" fill="#C75A2E" font-family="Pretendard" font-weight="700">자</text>
+        </svg>
+      </div>
+    </div>
+    <div class="labsim" style="border-color:#F0CE97;background:linear-gradient(180deg,#FFFBF2,#FBF2DE)">
+      <h3>🎯 적절한 쇠구슬 수 찾기 — 몇 개가 딱 좋을까?</h3>
+      <div class="subhint">쇠구슬이 <b>너무 적으면</b> 무게중심이 높아 <b>기울어지고</b>, 너무 높이 떠 눈금이 안 보여요. <b>너무 많으면 가라앉습니다.</b> 아래 시뮬레이터로 개수를 바꿔 가며, <b>싱거운 물부터 짠 물까지(0~17 g/100g) 모두</b>에서 똑바로 서서 눈금이 읽히는 개수를 스스로 찾아보세요.</div>
+      <div class="simrow" style="grid-template-columns:300px 1fr">
+        <canvas id="ballCanvas" width="300" height="360"></canvas>
+        <div class="simctrl">
+          <div class="ballpick" style="border-color:var(--gold);background:#FFF9EC">
+            <label style="margin:0">쇠구슬</label>
+            <button class="btn ghost" id="ballMinus" style="padding:5px 15px;font-size:1.2rem">−</button>
+            <span id="ballN" style="font-size:1.6rem;font-weight:800;color:var(--navy);min-width:34px;text-align:center">5</span>
+            <button class="btn ghost" id="ballPlus" style="padding:5px 15px;font-size:1.2rem">＋</button>
+            <span style="font-size:.9rem;color:var(--soft)">개</span>
+          </div>
+          <div class="ctrl" style="margin-top:14px"><div class="ctrl-row"><label style="margin:0">시험 소금물 농도</label><span class="v" id="ball-cv">8.5 g/100g</span></div><input type="range" id="ballConc" min="0" max="17" step="0.5" value="8.5"></div>
+          <div class="ballstate good" id="ballState">양호<small>—</small></div>
+          <button class="btn primary" id="ballSweep" style="margin-top:12px;width:100%">▶ 염분 스윕 검사 — 0~17 전 구간 자동 확인</button>
+          <div id="ballSweepResult" class="note" style="display:none;margin-top:10px"></div>
+        </div>
+      </div>
+      <div class="selfcheck">
+        <div class="t">🔍 스스로 발견하기 — 세 가지를 꼭 관찰하세요</div>
+        <label><input type="checkbox"> 쇠구슬이 <b>적을 때</b>(1~2개) 어떻게 되는지 봤다 — 기울어지고 너무 높이 뜸</label>
+        <label><input type="checkbox"> 쇠구슬이 <b>너무 많을 때</b> 어떻게 되는지 봤다 — 가라앉음</label>
+        <label><input type="checkbox"> <b>‘염분 스윕 검사’</b>로 전 구간 ‘양호’인 개수를 찾았다</label>
+      </div>
+      <details class="hint-d"><summary>왜 개수에 ‘딱 하나’가 아니라 ‘범위’가 있을까?</summary><div class="hb">어떤 개수는 <b>싱거운 물에선 좋은데 짠 물에선 너무 높이</b> 뜨거나, 그 반대일 수 있어요. 그래서 <b>가장 짠 물과 가장 싱거운 물 모두</b>에서 눈금이 읽히는 개수라야 합니다. 보통 <b>여러 개수</b>가 조건을 만족해요 — 그 중 하나를 고르면 됩니다. (쇠구슬을 아래로 몰수록 무게중심이 낮아져 덜 기울어져요.)</div></details>
+      <div class="ballpick">
+        <label style="margin:0">✅ 우리 조가 정한 쇠구슬 수</label>
+        <input id="ballFinal" type="number" min="1" max="20" placeholder="예: 7">
+        <span style="font-size:.9rem;color:var(--soft)">개 — 이 개수로 실물을 만들고 <b>끝까지 유지</b>합니다.</span>
+      </div>
+      <div class="report-field" style="margin-top:12px"><label for="rk-ball">📝 이 개수로 정한 이유 <span class="hint" style="font-weight:500">(적은 개수·많은 개수는 왜 안 됐나?)</span></label>
+        <textarea id="rk-ball" data-rkey="obsBallCount" placeholder="예: 3개는 짠물에서 너무 높이 떠 눈금 밖으로 나갔고, 11개는 가라앉았다. 6~9개가 전 구간 잘 읽혀서 7개로 정했다."></textarea></div>
+      <div class="trouble"><b>실물에서 시뮬레이터와 다를 때</b> — 실제 스포이드·쇠구슬 크기는 조금씩 달라요. 시뮬레이터에서 찾은 개수로 만들었는데 기울거나 너무 뜨면, 스포이드 <b>윗부분을 조금 더 자르</b>거나 쇠구슬을 <b>±1개</b> 조절해 보세요. 이것도 훌륭한 탐구예요.</div>
+    </div>
+    <div class="connect-card">
+      <div class="cc-text">
+        <h3>🔬 우리 측정기는 진짜 과학 도구 — 액체비중계예요</h3>
+        <p>아래쪽 둥근 부분에 <b>쇠구슬(무게추)</b>을 넣고 위쪽 가는 관으로 떠오른 높이를 읽는 우리 측정기는, 과학자들이 쓰는 <b>액체비중계</b>와 원리가 똑같아요 — 바로 <b>부력</b>이지요. 그리고 우리는 이 비중계를 <b>빛의 굴절</b>을 쓰는 굴절 염분계로 보정합니다. <b>부력과 빛, 서로 다른 두 원리의 도구</b>를 짝지어 쓰는 거예요!</p>
+      </div>
+      <svg class="cc-svg" viewBox="0 0 130 200" width="110" height="170" aria-hidden="true">
+        <rect x="14" y="92" width="102" height="100" rx="8" fill="#1AA7A0" fill-opacity="0.16"/>
+        <line x1="14" y1="92" x2="116" y2="92" stroke="#1AA7A0" stroke-width="2"/>
+        <rect x="59" y="14" width="12" height="96" rx="4" fill="#fff" stroke="#0A3D4F" stroke-width="2"/>
+        <g stroke="#0A3D4F" stroke-width="1.2"><line x1="71" y1="26" x2="79" y2="26"/><line x1="71" y1="34" x2="76" y2="34"/><line x1="71" y1="42" x2="79" y2="42"/><line x1="71" y1="50" x2="76" y2="50"/><line x1="71" y1="58" x2="79" y2="58"/><line x1="71" y1="66" x2="76" y2="66"/></g>
+        <path d="M55 108 Q49 132 58 154 Q65 172 65 172 Q65 172 72 154 Q81 132 75 108 Z" fill="#fff" stroke="#0A3D4F" stroke-width="2"/>
+        <g fill="#5B7178"><circle cx="62" cy="158" r="3.2"/><circle cx="69" cy="160" r="3.2"/><circle cx="65" cy="151" r="3.2"/><circle cx="58" cy="152" r="3.2"/><circle cx="72" cy="153" r="3.2"/><circle cx="66" cy="164" r="3"/></g>
+        <text x="106" y="43" font-size="10" fill="#5B7178" font-family="Pretendard" font-weight="700">눈금</text>
+      </svg>
+    </div>
+    <div class="note">💡 <b>다른 방법도 있어요(교과서 방식).</b> 스포이드·쇠구슬 대신, <b>빨대 한쪽 끝을 투명테이프로 막고 그 안에 고무찰흙을 넣어</b> 무게추로 삼아도 똑같은 측정기가 됩니다. 이때 <b>고무찰흙 사이로 물이 새 들어가지 않도록</b> 끝을 꼼꼼히 막는 것만 주의하세요.</div>
+    <div class="report-field"><label for="rk-build">📝 간이 염분계를 만들며 — 메모</label>
+      <textarea id="rk-build" data-rkey="obsBuild" placeholder="예: 스포이드를 너무 많이 자르면 잘 서지 못했다. 쇠구슬 ○개로 안정적으로 떠올랐다."></textarea></div>
+    <div class="photo-block"><label>📷 완성한 간이 염분계 사진</label>
+      <div class="photo-grid"><div class="photo-slot" data-slot="device"></div></div></div>
+    <div class="nav-btns"><button class="btn ghost" data-go="3">← 이전</button><button class="btn primary" data-go="5">다음 → 시뮬레이터로 원리 보기</button></div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="panel hide" data-step="6">
+    <div class="secHead"><span class="secNo">STEP 6</span><h2>떠오른 높이 측정하기 — 눈금실린더에 넣고</h2></div>
+    <p>비커는 넓어서 떠오른 차이가 잘 안 보여요. <b>좁고 긴 눈금실린더</b>에 넣으면 훨씬 또렷하게 보입니다. 떠오른 높이를 <b>어디서 잴지(기준)는 우리 조가 정해서</b>, 모든 용액에 똑같이 적용해요.</p>
+    <div class="guide">
+      <div class="gcard"><div class="row"><span class="badge">1</span><div><h3>소금물을 눈금실린더에 붓기</h3><p>측정할 소금물을 눈금실린더에 옮겨 담습니다. 측정기가 잠길 만큼 충분히 부어 주세요. 용액이 바뀔 때마다 측정기를 헹궈요.</p></div></div></div>
+      <div class="gcard"><div class="row"><span class="badge">2</span><div><h3>측정기 띄우기</h3><p>측정기(우리 조가 정한 쇠구슬 수)를 살며시 넣고 흔들림이 멈출 때까지 기다립니다. <b>모든 용액에 같은 측정기를 그대로</b> 사용하세요 — 그래야 용액끼리 공정하게 비교할 수 있어요.</p></div></div></div>
+      <div class="gcard">
+        <div class="row"><span class="badge">3</span><div><h3>우리 조의 '기준' 정하기</h3><p>떠오른 높이를 <b>어디를 기준으로 잴지</b> 조가 정합니다. 무엇이든 <b>한 가지로 정해 끝까지 똑같이</b> 적용하면 돼요.<br>예: ① 수면이 닿는 <b>눈금실린더 눈금(mL)</b> 읽기 · ② 측정기 <b>윗끝이 닿는</b> 눈금 읽기 · ③ 측정기에 그린 눈금에서 수면 위치 읽기 · ④ 물 위로 나온 길이를 자로 재기</p></div></div>
+        <svg viewBox="0 0 230 130" width="210" height="118" aria-hidden="true">
+          <rect x="92" y="8" width="46" height="116" rx="6" fill="none" stroke="#0A3D4F" stroke-width="2"/>
+          <rect x="94" y="50" width="42" height="72" fill="#1AA7A0" fill-opacity=".22"/>
+          <line x1="94" y1="50" x2="136" y2="50" stroke="#1AA7A0" stroke-width="2"/>
+          <text x="140" y="53" font-size="10" fill="#1AA7A0" font-family="Pretendard" font-weight="700">수면</text>
+          <g stroke="#9FC4C9" stroke-width="1"><line x1="92" y1="34" x2="100" y2="34"/><line x1="92" y1="50" x2="102" y2="50"/><line x1="92" y1="66" x2="100" y2="66"/><line x1="92" y1="82" x2="100" y2="82"/><line x1="92" y1="98" x2="100" y2="98"/></g>
+          <rect x="111" y="24" width="8" height="64" rx="2" fill="#fff" stroke="#0A3D4F" stroke-width="2"/>
+          <ellipse cx="115" cy="92" rx="10" ry="8" fill="#fff" stroke="#0A3D4F" stroke-width="2"/>
+          <line x1="70" y1="50" x2="92" y2="50" stroke="#C75A2E" stroke-width="2.5"/>
+          <text x="20" y="53" font-size="10" fill="#C75A2E" font-family="Pretendard" font-weight="700">기준 읽기</text>
+        </svg>
+      </div>
+      <div class="gcard"><div class="row"><span class="badge">4</span><div><h3>소금물마다 떠오른 높이 측정</h3><p>정한 기준으로 <b>각 소금물의 떠오른 높이</b>를 읽어 STEP 9 표에 적습니다. 눈을 <b>수면과 같은 높이</b>에 두고 0.1 단위까지 읽어요. 짠 물일수록 측정기가 더 높이 떠올라 값이 커집니다.</p></div></div></div>
+    </div>
+    <div class="refbox"><label for="refRule">📌 우리 조가 정한 '떠오른 높이' 측정 기준</label><input id="refRule" type="text" placeholder="예: 수면이 닿는 눈금실린더 눈금(mL)을 읽는다"></div>
+    <div class="em">같은 측정기 · 같은 기준으로 모든 용액을 측정해야 비교가 정확해요. 한 번 정한 기준은 끝까지 바꾸지 않습니다.</div>
+    <div class="nav-btns"><button class="btn ghost" data-go="5">← 이전</button><button class="btn primary" data-go="7">다음 → 기준 용액 만들기</button></div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="panel hide" data-step="5">
+    <div class="secHead"><span class="secNo">STEP 5</span><h2>시뮬레이터로 원리 이해하기</h2></div>
+    <p>실제 측정 전에, <b>왜 짠 물에서 측정기가 더 높이 떠오르는지</b>를 시뮬레이터로 탐구해 봅시다. 💭 <b>예측 먼저!</b> 소금 양을 늘리면 ① 측정기의 위치, ② 중력·부력 화살표의 길이, ③ 물에 잠긴 부피는 각각 어떻게 될까요? 조에서 예측을 정한 뒤 슬라이더로 확인하세요. 같은 용액을 <b>굴절 염분계로 재면 몇 g/100g</b>인지도 함께 보여줘요 — 소금 양(g)과 농도(g/100g)는 같은 진하기를 다르게 나타낸 것이에요.</p>
+    <div class="simgrid">
+      <canvas id="sim" class="stage" width="600" height="800"></canvas>
+      <div>
+        <div class="ctrl"><div class="ctrl-row"><label style="margin:0">용액의 소금 양 (100 mL 물 기준)</label><span class="v" id="salt-v">4.0 g</span></div><input type="range" id="salt" min="0" max="12" step="0.5" value="4"></div>
+        <div class="reads">
+          <div class="read t"><div class="lab">소금 양</div><div class="num"><span id="r-salt">4.0</span><span class="unit"> g</span></div></div>
+          <div class="read c"><div class="lab">간이 염분계<br>떠오른 높이</div><div class="num"><span id="r-h">2.6</span><span class="unit"> cm</span></div></div>
+          <div class="read s"><div class="lab">굴절 염분계<br>예상 농도</div><div class="num"><span id="r-sal">3.8</span><span class="unit"> g/100g</span></div></div>
+          <div class="read s"><div class="lab">소금물<br>밀도 ρ</div><div class="num"><span id="r-rho">1.023</span><span class="unit"> g/mL</span></div></div>
+        </div>
+        <div class="callout" style="margin-top:12px;background:var(--mint-soft);border:1.5px solid var(--teal2);border-radius:10px;padding:11px 14px;font-size:.92rem;line-height:1.5;color:var(--ink)">🔗 <b>원리 사슬:</b> 소금 양 ↑ → <b>밀도 ρ ↑</b> → 같은 부력을 얻는 데 필요한 <b>잠긴 부피 ↓</b> → 측정기가 <b>더 높이</b> 뜸. (밀도 = 질량 ÷ 부피 — 소금을 넣으면 질량은 확 늘고 부피는 조금만 늘어 밀도가 커져요.)</div>
+        <div class="ok" style="margin-top:14px"><b>관찰 포인트.</b> (1) 측정기는 위로 떠오르지만, (2) <b>중력·부력 화살표의 길이는 변하지 않아요</b> — 떠 있는 동안 두 힘은 항상 균형(부력 = 무게)! (3) 대신 <b>물에 잠긴 부피가 줄어듭니다.</b> 예측과 달랐다면 왜 그런지 조에서 설명을 만들어 보고, 아래 물리 카드와 비교해 보세요. 바닷물은 약 3.5 g/100g이에요.</div>
+      </div>
+    </div>
+    <div class="phys-card">
+      <h3>🌊 왜 짠 물에서 측정기가 더 높이 떠오를까?</h3>
+      <ol>
+        <li><b>측정기의 무게는 변하지 않습니다.</b> 어떤 물에 넣어도 측정기에 작용하는 중력은 똑같아요.</li>
+        <li><b>부력은 측정기가 밀어낸 물의 무게입니다.</b> 측정기가 잠기면 그 부피만큼 물이 밀려나고, 그 물이 <i>"내 자리 돌려줘!"</i> 하며 측정기를 위로 밀어 올려요. <span class="hint">(아르키메데스의 원리)</span></li>
+        <li><b>짠 물은 같은 부피라도 더 무거워요(밀도가 큼).</b> 그래서 짠 물에서는 측정기가 <b>적게 잠겨도</b> 그 적은 부피의 물 무게로 측정기를 받쳐 줄 수 있어요.</li>
+        <li><b>측정기는 부력 = 자기 무게가 되는 곳에서 멈춥니다.</b> 짠 물에서는 적게 잠겨도 충분하니 더 위로 떠올라요. 그래서 <b>짠 정도가 클수록 떠오른 높이가 커집니다.</b></li>
+      </ol>
+      <p class="hint" style="margin-top:8px">🌟 <b>도전(심화)</b> — 측정기의 무게를 W, 관의 단면적을 A, 용액의 밀도를 ρ라 할 때, 물에 잠긴 깊이 d를 식으로 나타내 볼까요? <i>(힌트: 떠 있는 동안 W = ρ × g × 잠긴 부피)</i></p>
+    </div>
+    <div class="nav-btns"><button class="btn ghost" data-go="4">← 이전</button><button class="btn primary" data-go="6">다음 → 높이 측정법</button></div>
+  </div>
+
+  <!-- STEP 7 -->
+  <div class="panel hide" data-step="7">
+    <div class="secHead"><span class="secNo">STEP 7</span><h2>기준 용액 만들고 두 도구로 측정하기</h2></div>
+    <p>보정에 쓸 <b>기준 용액 4개</b>를 만듭니다. 모두 <b>물 100 mL</b>로 같게 하고, 소금만 <b>5 · 10 · 15 · 20 g</b>으로 다르게 넣어요. 이렇게 만든 각 용액을 <b>굴절 염분계(농도 g/100g)</b>와 <b>간이 염분계(높이 cm)</b>로 모두 측정해 STEP 9 표에 적습니다.</p>
+    <div class="guide">
+      <div class="gcard"><div class="row"><span class="badge">1</span><div><h3>전자저울 영점 맞추기</h3><p>전자저울에 <b>빈 비커</b>를 올린 뒤 '영점(Tare/0)' 버튼을 눌러 <b>0.0 g</b>으로 만듭니다. 비커 무게를 빼고 소금 무게만 잴 수 있어요.</p></div></div></div>
+      <div class="gcard"><div class="row"><span class="badge">2</span><div><h3>소금 정량하기</h3><p>약수저로 소금을 비커에 조금씩 넣어 <b>5 g / 10 g / 15 g / 20 g</b>에 정확히 맞춥니다. 너무 많으면 살짝 덜어내요.</p></div></div></div>
+      <div class="gcard"><div class="row"><span class="badge">3</span><div><h3>물 100 mL 재서 녹이기</h3><p>눈금실린더로 물 <b>100 mL</b>를 정확히 재어 비커에 붓고, 유리 막대로 소금이 <b>완전히 녹을 때까지</b> 젓습니다. <b style="color:var(--coral)">비커마다 '5 g·10 g·15 g·20 g'을 꼭 적어 두세요.</b></p></div></div></div>
+      <div class="gcard"><div class="row"><span class="badge">4</span><div><h3>두 도구로 측정하기</h3><p>각 용액을 <b>① 굴절 염분계</b>로 재서 농도(g/100g)를 읽고(측정 전 증류수로 영점 보정!),<b>② 간이 염분계</b>를 눈금실린더에 띄워 높이(cm)를 읽습니다. 두 값을 STEP 9 표에 적어요.</p></div></div></div>
+    </div>
+    <div class="em"><b>가장 중요한 약속!</b> 물은 네 용액 모두 <b>똑같이 100 mL</b>로 맞춥니다. 그리고 굴절 염분계는 <b>용액을 바꿀 때마다 프리즘을 닦고</b>, 처음에 <b>증류수로 0점</b>을 맞춰야 정확해요. 또 이 굴절계는 <b>온도 자동 보정이 없으니</b>, 용액을 실온에 두고 재요.</div>
+    <div class="ok" style="margin-top:8px">✅ <b>좋은 점!</b> 염분을 굴절 염분계로 <b>직접</b> 재니까, 소금이 조금 덜 녹았거나 양이 살짝 어긋나도 <b>실제 염분(기준값)</b>을 그대로 알 수 있어요. 보정의 핵심이 바로 이것!</div>
+    <h3 class="sec">💧 참고 — 소금은 얼마나 녹을까? (용해도 곡선)</h3>
+    <p class="hint" style="margin:0 0 6px">소금이 다 녹지 않고 바닥에 남으면 정확히 잴 수 없어요. 아래 곡선으로 "내가 넣는 양이 다 녹는지" 확인해 보세요.</p>
+    <canvas id="solubility" class="stage" width="720" height="430" style="max-width:560px"></canvas>
+    <div class="note" style="margin-top:10px">소금(NaCl)은 <b>온도를 높여도 용해도가 거의 변하지 않아요</b> — 물 100 g에 약 36 g 근처입니다. 그래서 우리가 쓰는 <b>5~20 g은 실온에서도 충분히 다 녹아요</b>.</div>
+    <div class="note" style="margin-top:8px">📏 <b>예측 먼저!</b> 우리 굴절계는 염화나트륨 <b>0~28 g/100g</b>까지 재요. 물 100 mL(≈100 g)에 소금 20 g을 녹이면 눈금이 얼마쯤 나올까요? <span class="hint">(힌트: 용액 전체의 질량은 물 + 소금 = 120 g)</span> 먼저 계산해 예측하고, 실제 측정값과 비교해 보세요 — 예측과 실측이 다르다면 그 까닭을 찾는 것도 훌륭한 탐구!</div>
+    <div class="report-field"><label for="rk-sol">📝 기준 용액을 만들며 — 관찰한 점</label>
+      <textarea id="rk-sol" data-rkey="obsSolution" placeholder="예: 소금이 다 녹을 때까지 오래 저어야 했다. 진한 용액일수록 녹는 데 시간이 더 걸렸다."></textarea></div>
+    <div class="photo-block"><label>📷 만든 기준 용액 사진 (소금 5·10·15·20 g)</label>
+      <div class="photo-grid"><div class="photo-slot" data-slot="solutions"></div></div></div>
+    <div class="nav-btns"><button class="btn ghost" data-go="6">← 이전</button><button class="btn primary" data-go="8">다음 → 왜 보정곡선?</button></div>
+  </div>
+
+  <!-- STEP 8: 왜 보정곡선 -->
+  <div class="panel hide" data-step="8">
+    <div class="secHead"><span class="secNo">STEP 8</span><h2>왜 보정곡선을 만들까? — 이 탐구의 진짜 목표</h2></div>
+    <div class="hook">🤔 <b>잠깐!</b> 굴절 염분계가 이미 염분을 정확히 알려주는데, <b>왜 굳이 간이 염분계를 만들고 보정곡선까지 그릴까요?</b> 지금부터 그 까닭을 알아봅시다.</div>
+    <h3 class="sec">🔍 두 도구의 장단점을 다시 보면</h3>
+    <div class="compare2">
+      <div class="icard ref">
+        <span class="tag">정밀하지만…</span>
+        <h3>굴절 염분계</h3>
+        <ul>
+          <li>👍 염분을 <b>정확하게</b> 바로 알려줘요</li>
+          <li>👎 <b>비싸고</b>(우리 기기는 수십만 원대!), <b>깨지기 쉬워요</b></li>
+          <li>👎 학교에 <b>몇 대밖에 없어</b> 모두가 동시에 쓰기 어려워요</li>
+        </ul>
+      </div>
+      <div class="icard ours">
+        <span class="tag">값싸지만…</span>
+        <h3>간이 염분계</h3>
+        <ul>
+          <li>👍 <b>누구나 싸게</b> 만들 수 있고 <b>튼튼해요</b></li>
+          <li>👍 부력 원리를 눈으로 볼 수 있어요</li>
+          <li>👎 떠오른 <b>'높이'만</b> 알려줄 뿐, <b>염분이 얼마인지는 몰라요</b></li>
+        </ul>
+      </div>
+    </div>
+    <h3 class="sec">🎯 그래서, 보정곡선을 만드는 목표는?</h3>
+    <div class="ok"><b>보정곡선을 한 번만 만들어 두면</b> — 이제부터는 <b>굴절 염분계 없이</b>, 값싸고 튼튼한 <b>간이 염분계로 '높이'만 재도 염분을 알 수 있어요!</b> 정밀한 도구의 도움을 딱 한 번 받아서, 값싼 도구를 <b>'똑똑하게'</b> 바꾸는 것이지요.</div>
+    <div class="eye-stage" style="margin:10px 0 2px">
+      <svg viewBox="0 0 620 176" width="100%" style="max-width:620px" aria-hidden="true">
+        <rect x="6" y="28" width="200" height="124" rx="14" fill="#FFF6EF" stroke="#E1733E" stroke-width="2"/>
+        <text x="106" y="50" font-size="12.5" font-weight="800" fill="#A8431D" text-anchor="middle" font-family="Pretendard">보정 전 — 간이 염분계만</text>
+        <rect x="40" y="70" width="9" height="50" rx="2" fill="#fff" stroke="#0A3D4F" stroke-width="2"/>
+        <ellipse cx="44.5" cy="122" rx="11" ry="9" fill="#fff" stroke="#0A3D4F" stroke-width="2"/>
+        <circle cx="41" cy="122" r="2.2" fill="#5B7178"/><circle cx="48" cy="124" r="2.2" fill="#5B7178"/>
+        <text x="68" y="94" font-size="13" font-weight="700" fill="#16313A" font-family="Pretendard">높이 2.3 cm</text>
+        <text x="68" y="120" font-size="15" font-weight="800" fill="#E1733E" font-family="Pretendard">염분 = ❓</text>
+        <path d="M210 88 L255 88" stroke="#1AA7A0" stroke-width="3" stroke-linecap="round"/>
+        <polygon points="258,88 247,82 247,94" fill="#1AA7A0"/>
+        <text x="309" y="44" font-size="12.5" font-weight="800" fill="#0A3D4F" text-anchor="middle" font-family="Pretendard">보정곡선</text>
+        <rect x="268" y="52" width="82" height="64" rx="7" fill="#fff" stroke="#1AA7A0" stroke-width="2"/>
+        <line x1="278" y1="108" x2="342" y2="108" stroke="#9FC4C9" stroke-width="1.5"/>
+        <line x1="278" y1="108" x2="278" y2="60" stroke="#9FC4C9" stroke-width="1.5"/>
+        <line x1="280" y1="104" x2="342" y2="66" stroke="#12808C" stroke-width="2.6"/>
+        <circle cx="294" cy="96" r="2.6" fill="#0A3D4F"/><circle cx="311" cy="86" r="2.6" fill="#0A3D4F"/><circle cx="328" cy="76" r="2.6" fill="#0A3D4F"/>
+        <path d="M354 88 L399 88" stroke="#1AA7A0" stroke-width="3" stroke-linecap="round"/>
+        <polygon points="402,88 391,82 391,94" fill="#1AA7A0"/>
+        <rect x="412" y="28" width="202" height="124" rx="14" fill="#EFF9F8" stroke="#12808C" stroke-width="2"/>
+        <text x="513" y="50" font-size="12.5" font-weight="800" fill="#0A6B66" text-anchor="middle" font-family="Pretendard">보정 후 — 높이만 재도!</text>
+        <text x="432" y="94" font-size="13" font-weight="700" fill="#16313A" font-family="Pretendard">높이 2.3 cm</text>
+        <text x="432" y="120" font-size="15" font-weight="800" fill="#12808C" font-family="Pretendard">농도 4.8 g/100g ✅</text>
+      </svg>
+    </div>
+    <p class="hint" style="text-align:center;margin:2px 0 8px">보정곡선이 '높이 → 염분'을 바꿔 주는 <b>변환표</b>가 되어 줍니다.</p>
+    <h3 class="sec">🔬 그럼 오늘 굴절 염분계로 하는 일은?</h3>
+    <p>오늘 굴절 염분계는 기준 용액들의 <b>'정답(염분 기준값)'</b>을 알려주는 역할을 해요. 그 정답과 우리 간이 염분계의 '높이'를 짝지으면, 우리 측정기에 <b>'염분 눈금'이 새겨지는</b> 셈이에요. 즉 —</p>
+    <div class="em" style="text-align:center;font-size:1.04rem"><b>오늘 굴절 염분계로 하는 일 = 우리 간이 염분계를 '가르치는' 일!</b><br><span style="font-size:.9rem;color:var(--soft)">굴절 염분계 = 모범 답안 · 보정곡선 = 우리 간이 염분계의 '염분 변환표'</span></div>
+    <div class="note">🌊 <b>실제로도 이렇게 해요.</b> 양식장이나 해양 연구에서도 값싼 센서 여러 개를 비싼 정밀 기기로 <b>가끔 보정</b>해 두고, 평소에는 값싼 센서로 넓은 바다를 측정한답니다. 우리가 하는 일이 바로 그 원리예요!</div>
+    <div class="report-field"><label for="rk-predict">🔮 예측 — 곧 그릴 그래프(가로: 농도, 세로: 높이)는 어떤 모양이 될까요? 그리고 점이 몇 개면 믿을 만할까요?</label>
+      <textarea id="rk-predict" data-rkey="predictCurve" placeholder="예: 오른쪽 위로 올라가는 직선일 것이다. 점 2개로도 직선은 그릴 수 있지만, 4개는 있어야 진짜 직선인지 확인할 수 있을 것 같다…"></textarea></div>
+    <div class="nav-btns"><button class="btn ghost" data-go="7">← 이전</button><button class="btn primary" data-go="9">다음 → 보정곡선 그리기</button></div>
+  </div>
+
+  <!-- STEP 9 -->
+  <div class="panel hide" data-step="9">
+    <div class="secHead"><span class="secNo">STEP 9</span><h2>보정곡선 그리기 — 두 도구의 값을 짝짓기</h2></div>
+    <p>STEP 7에서 잰 값을 표에 입력하세요. 각 용액마다 <b>굴절 염분계로 읽은 농도(g/100g)</b>와 <b>간이 염분계로 읽은 높이(cm)</b>를 적으면, 오른쪽에 <b>보정곡선</b>이 자동으로 그려집니다. 높이는 <b>두 번 재서 평균</b>을 쓰면 더 믿을 만해요 — 왜 그럴까요?</p>
+    <div id="refHint" class="refhint" style="display:none"></div>
+    <div class="row2">
+      <div>
+        <table>
+          <thead><tr><th>용액</th><th>굴절 염분계<br>농도 (g/100g)<br><span style="font-weight:500;font-size:.78rem">기준값</span></th><th>높이 1차<br>(cm)</th><th>높이 2차<br>(cm)<br><span style="font-weight:500;font-size:.78rem">선택</span></th><th>평균<br>(cm)</th></tr></thead>
+          <tbody id="caltbody"></tbody>
+        </table>
+        <div class="hint" style="margin-top:8px">* 굴절 염분계는 측정 전 증류수로 0점을 맞추고, 용액마다 프리즘을 닦으세요. 점이 2개만 있어도 직선을 그릴 수 있지만, <b>4개</b>면 더 믿을 만해요. 같은 용액을 <b>두 번 재서 평균</b>하면 우연한 흔들림(우연 오차)도 줄어요.</div>
+      </div>
+      <div>
+        <canvas id="graph" class="stage" width="700" height="500"></canvas>
+        <div class="equ" id="fit-text" style="display:none">
+          <div class="lab" style="font-size:.78rem;color:var(--mint);font-weight:700">우리 모둠의 보정곡선</div>
+          <div id="fit-eq" style="font-weight:800;margin-top:3px">높이 = a × 농도 + b</div>
+          <div class="r2" id="fit-r2"></div>
+        </div>
+      </div>
+    </div>
+    <div class="photo-block"><label>📷 염도(소금 양)별 간이 염분계 떠오른 높이 사진</label>
+      <p class="hint" style="margin:2px 0 0">각 용액에 측정기를 띄운 모습을 찍어 올리면, 진할수록 더 높이 뜨는 것을 한눈에 볼 수 있어요.</p>
+      <div class="photo-grid">
+        <div class="photo-slot" data-slot="h_5" data-label="소금 5 g"></div>
+        <div class="photo-slot" data-slot="h_10" data-label="소금 10 g"></div>
+        <div class="photo-slot" data-slot="h_15" data-label="소금 15 g"></div>
+        <div class="photo-slot" data-slot="h_20" data-label="소금 20 g"></div>
+      </div></div>
+    <div class="report-field"><label for="rk-graph">📝 보정곡선을 보고 — 알게 된 점 (염분과 높이의 관계, 직선 모양 등)</label>
+      <textarea id="rk-graph" data-rkey="obsGraph" placeholder="예: 염분이 커질수록 떠오른 높이도 일정하게 커졌다. 점들이 거의 직선 위에 놓여 R²가 1에 가까웠다."></textarea></div>
+    <div class="ok" style="margin-top:12px">📈 <b>이 직선이 보정곡선이에요!</b> 직선을 거꾸로 풀면 <b>높이만 알아도 염분을 계산</b>할 수 있어요. 이제 미지 용액은 간이 염분계로 높이만 재면 됩니다.</div>
+    <div class="nav-btns"><button class="btn ghost" data-go="8">← 이전</button><button class="btn primary" data-go="10">다음 → 미지 용액 맞히기</button></div>
+  </div>
+
+  <!-- STEP 9 -->
+  <div class="panel hide" data-step="10">
+    <div class="secHead"><span class="secNo">STEP 10 · 모둠 미션</span><h2>미지 용액의 염분을 맞혀라!</h2></div>
+    <div class="em"><b>🎯 모둠 미션.</b> 선생님이 나눠준 미지 용액에 <b>간이 염분계</b>를 넣어 떠오른 높이를 재고, 우리 <b>보정곡선</b>으로 염분을 추정하세요. 그런 다음 <b>굴절 염분계</b>로 직접 재서 얼마나 정확했는지 확인합니다. 가장 가깝게 맞힌 모둠이 우승!</div>
+    <label for="mystery-h">① 미지 용액의 떠오른 높이 (간이 염분계, cm)</label>
+    <input id="mystery-h" type="number" step="0.1" placeholder="예: 2.3">
+    <div class="result-card">
+      <div class="lab">보정곡선으로 추정한 농도</div>
+      <div class="big" id="estimate">— g/100g</div>
+    </div>
+    <label for="mystery-ref" style="margin-top:18px">② (확인) 굴절 염분계로 직접 잰 미지 용액의 농도 (g/100g)</label>
+    <input id="mystery-ref" type="number" step="0.1" placeholder="예: 7.5 — 굴절 염분계로 재서 입력">
+    <div class="cmpbox" id="errBox" style="display:none"></div>
+    <label for="reason" style="margin-top:18px">우리 모둠의 최종 답과 그 이유 (한두 줄로)</label>
+    <textarea id="reason" placeholder="예: 떠오른 높이 2.3 cm를 보정곡선에 넣어 약 ○.○ g/100g로 추정했고, 굴절 염분계로는 ○.○이었다. 차이는 약 ○.○."></textarea>
+    <div class="report-field"><label for="rk-err">📝 오차 분석 — 추정값과 실제값의 차이는 어디서 왔을까? <span class="hint" style="font-weight:500">(항상 한쪽으로 치우치게 만드는 원인 = 계통 오차 / 잴 때마다 들쭉날쭉하게 만드는 원인 = 우연 오차로 나눠 보세요)</span></label>
+      <textarea id="rk-err" data-rkey="errAnalysis" placeholder="예: 눈높이를 수면에 못 맞춰 높이를 매번 조금 크게 읽은 것 같다(계통 오차). 측정기가 흔들려 값이 오르내렸다(우연 오차). 더 정확히 하려면 …"></textarea></div>
+    <div class="photo-block"><label>📷 미지 용액 측정 사진</label>
+      <div class="photo-grid"><div class="photo-slot" data-slot="mystery"></div></div></div>
+    <div class="nav-btns"><button class="btn ghost" data-go="9">← 이전</button><button class="btn primary" data-go="11">다음 → 바이브 코딩 도전</button></div>
+  </div>
+
+  <!-- STEP 10 -->
+  <div class="panel hide" data-step="11">
+    <div class="secHead"><span class="secNo">STEP 11</span><h2>바이브 코딩으로 나만의 보정 변환기 만들기</h2></div>
+    <p>바이브 코딩은 <b>만들고 싶은 것을 말로 설명하면 AI가 코드를 만들어 주는</b> 방법입니다(우리는 <b>Gemini(제미나이)</b>를 사용해요). 우리 보정 데이터로 "떠오른 높이 → 염분"을 알려주는 나만의 도구를 만들어, 간이 염분계를 디지털로 보정해 봅시다. 자기 수준에 맞는 난이도를 골라 도전하세요!</p>
+    <div class="vibe-levels" id="vibeLevels">
+      <button class="vlv" data-lv="low"><span class="t">하 · 기초</span><span class="d">준비된 프롬프트를 그대로 사용</span></button>
+      <button class="vlv" data-lv="mid"><span class="t">중 · 도전</span><span class="d">프롬프트에 기능 한 가지 더 추가</span></button>
+      <button class="vlv" data-lv="high"><span class="t">상 · 심화</span><span class="d">나만의 프롬프트를 직접 작성</span></button>
+    </div>
+    <div class="vibe-body" id="vibeBody"></div>
+    <div class="sandbox">
+      <label for="vibe-code">② AI가 만들어 준 코드를 여기에 붙여넣으세요</label>
+      <textarea id="vibe-code" spellcheck="false" placeholder="Gemini(제미나이)에게 받은 HTML 코드를 통째로 붙여넣고 아래 '실행하기'를 누르세요."></textarea>
+      <button class="btn primary" id="run-code">▶ 실행하기</button>
+      <div class="frame-wrap"><div class="frame-tag">실행 결과 미리보기</div><iframe id="vibe-frame" sandbox="allow-scripts" title="실행 결과"></iframe></div>
+      <div class="hint" style="margin-top:8px">* 코드가 마음에 안 들면 Gemini에게 "이렇게 바꿔 줘"라고 다시 요청해 보세요. 바이브 코딩은 고치고 또 고치며 완성하는 거예요.</div>
+    </div>
+    <div class="nav-btns"><button class="btn ghost" data-go="10">← 이전</button><button class="btn primary" data-go="12">다음 → 마무리</button></div>
+  </div>
+
+  <!-- STEP 11 -->
+  <div class="panel hide" data-step="12">
+    <div class="secHead"><span class="secNo">STEP 12</span><h2>마무리 — 돌아보고, 결과 정리하기</h2></div>
+    <h3 style="font-size:1rem;font-weight:800;color:var(--navy);margin:4px 0 8px">🗣 함께 이야기 나눠 보기</h3>
+    <div class="discuss">
+      <ol>
+        <li>보정이 왜 필요할까요? 굴절 염분계 없이 <b>간이 염분계만으로</b> 염분을 알 수 있을지, 친구에게 설명해 봅시다.</li>
+        <li>굴절 염분계는 어떻게 <b>맛보지 않고도</b> 염분을 알아낼까요? (빛의 <b>굴절</b>과 연결해서)</li>
+        <li>측정 전에 <b>증류수로 0점(영점 보정)</b>을 맞추지 않으면 어떤 일이 생길까요?</li>
+        <li>보정곡선으로 추정한 염분과 굴절 염분계의 실제값에 <b>차이</b>가 났다면, 그 까닭은 무엇일까요?</li>
+        <li>짠 물에서 측정기가 더 높이 떠오른 까닭을 <b>부력</b>으로 설명해 볼까요?</li>
+        <li>우리 간이 염분계로 소금물 말고 <b>설탕물</b>의 진하기도 잴 수 있을까요? 그렇다면 보정곡선을 다시 만들어야 할까요? (우리 굴절계의 <b>Brix 눈금</b>은 이때 어떤 도움이 될까요?)</li>
+        <li>바닷물의 염분을 재는 일은 어디에 쓰일까요? (어업·양식·기후·해양 연구 등) 소금 호수인 <b>사해</b>에서 사람이 잘 뜨는 것과 오늘 실험은 어떻게 연결될까요?</li>
+      </ol>
+    </div>
+    <label for="reflect">✍️ 오늘 새롭게 알게 된 점</label>
+    <textarea id="reflect" placeholder="예: 정밀한 도구를 기준으로 우리 도구를 보정한다는 개념을 알게 되었다."></textarea>
+    <label for="reflect2">✍️ 가장 어려웠던 점과, 더 정확히 재기 위한 우리 모둠의 아이디어</label>
+    <textarea id="reflect2" placeholder="예: 경계선을 읽기가 까다로웠다. 점을 더 많이 찍으면 보정곡선이 더 정확해질 것 같다."></textarea>
+    <label for="reflect3">✍️ 더 알아보고 싶은 점 (궁금한 것)</label>
+    <textarea id="reflect3" placeholder="예: 우리나라 바다의 염분은 계절에 따라 어떻게 달라질까?"></textarea>
+    <h3 style="font-size:1rem;font-weight:800;color:var(--navy);margin:20px 0 10px">📋 우리 모둠 결과 요약</h3>
+    <div class="summary" id="summary"></div>
+    <div id="checklist"></div>
+    <div class="report-cta">
+      <h3>📄 우리 모둠 탐구 보고서 만들기</h3>
+      <p>지금까지 입력한 내용과 올린 사진, 그리고 보정곡선 그래프가 <b>하나의 Word 문서로</b> 자동 정리됩니다.</p>
+      <button class="btn report" id="makeReport">📄 보고서(Word) 내려받기</button>
+      <div class="report-note">💡 내려받은 <b>.doc 파일</b>은 한글(HWP)·MS Word·구글 문서에서 바로 열려요. 더 채우고 싶은 칸이 있으면 각 단계로 돌아가 작성한 뒤 다시 눌러도 됩니다. 사진이 많으면 만드는 데 몇 초 걸릴 수 있어요.</div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn ghost" data-go="11">← 이전</button>
+      <div style="display:flex;gap:10px"><button class="btn ghost" onclick="window.print()">🖨 결과 인쇄/저장</button><button class="btn primary" id="resetBtn">새로 시작</button></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ===== 상태 관리 ===== */
+const KEY = 'salinity-refracto-v3';
+const state = loadState() || {
+  group:'', memberCount:0, members:[],
+  cal:[ {salt:5, sal:'', h:'', h2:''}, {salt:10, sal:'', h:'', h2:''}, {salt:15, sal:'', h:'', h2:''}, {salt:20, sal:'', h:'', h2:''} ],
+  mystery:{ h:'', refSal:'' },
+  refRule:'', reason:'', reflect:'', reflect2:'', reflect3:'', ballCount:'',
+  vibe:{ level:'', code:'', prompt:'' },
+  report:{}, captions:{},
+  step:1,
+};
+function saveState(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+function loadState(){ try{ const v=localStorage.getItem(KEY); return v?JSON.parse(v):null; }catch(e){ return null; } }
+
+/* 저장본 정규화 */
+if (!Array.isArray(state.members)) state.members = [];
+if (typeof state.memberCount !== 'number') state.memberCount = state.members.length;
+(function(){
+  const STD=[5,10,15,20];
+  const prev = Array.isArray(state.cal)?state.cal:[];
+  state.cal = STD.map((salt,i)=>{ const old=prev[i]||{}; return {salt, sal: old.sal||'', h: old.h||'', h2: old.h2||''}; });
+})();
+if (!state.mystery || typeof state.mystery!=='object') state.mystery={h:'',refSal:''};
+if (state.mystery.refSal===undefined) state.mystery.refSal='';
+if (!state.vibe || typeof state.vibe!=='object') state.vibe={level:'',code:'',prompt:''};
+if (!state.report || typeof state.report!=='object') state.report={};
+if (!state.captions || typeof state.captions!=='object') state.captions={};
+if (state.ballCount===undefined || state.ballCount===null) state.ballCount='';
+
+const $ = id => document.getElementById(id);
+function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ===== 단계 전환 ===== */
+const stepBtns = document.querySelectorAll('.step');
+const panels = document.querySelectorAll('[data-step]');
+function goto(n){
+  state.step = n;
+  panels.forEach(p => p.classList.toggle('hide', +p.dataset.step !== n));
+  stepBtns.forEach(b => { const s=+b.dataset.s; b.classList.toggle('on', s===n); b.classList.toggle('done', s<n); });
+  window.scrollTo({top:0, behavior:'smooth'});
+  renderSummary();
+  saveState();
+}
+stepBtns.forEach(b => b.addEventListener('click', () => goto(+b.dataset.s)));
+document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => goto(+b.dataset.go)));
+
+/* ===== STEP 1: 모둠 정보 ===== */
+$('grp').value = state.group;
+$('grp').addEventListener('input', e => { state.group = e.target.value; saveState(); });
+function renderMemberRows(){
+  document.querySelectorAll('#countPick button').forEach(b => b.classList.toggle('on', +b.dataset.n === state.memberCount));
+  const wrap = $('memberRows');
+  if (!state.memberCount){ wrap.innerHTML = '<p class="hint" style="margin:2px 2px 0">인원을 먼저 골라 주세요.</p>'; return; }
+  wrap.innerHTML = state.members.map((m,i)=>`
+    <div class="mrow">
+      <span class="mlabel">모둠원 ${i+1}</span>
+      <input type="text" inputmode="numeric" data-i="${i}" data-f="sid" value="${m.sid||''}" placeholder="학번">
+      <input type="text" data-i="${i}" data-f="name" value="${m.name||''}" placeholder="이름">
+    </div>`).join('');
+}
+$('countPick').addEventListener('click', e=>{
+  const b = e.target.closest('button[data-n]'); if(!b) return;
+  const n = +b.dataset.n; state.memberCount = n;
+  const next = []; for (let i=0;i<n;i++) next.push(state.members[i] || {sid:'', name:''});
+  state.members = next; saveState(); renderMemberRows();
+});
+$('memberRows').addEventListener('input', e=>{
+  const i = +e.target.dataset.i, f = e.target.dataset.f;
+  if (!state.members[i]) state.members[i] = {sid:'', name:''};
+  state.members[i][f] = e.target.value; saveState();
+});
+
+/* ===== STEP 3: 굴절 염분계 접안렌즈 시뮬레이터 ===== */
+const eye = $('eyepiece'), ex = eye.getContext('2d');
+let eyeSal = 3.5;
+function rpath(c,x,y,w,h,r){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); }
+function drawEye(){
+  const W=eye.width,H=eye.height,cx=W/2,cy=H/2,R=W/2-5;
+  ex.clearRect(0,0,W,H);
+  ex.save(); ex.beginPath(); ex.arc(cx,cy,R,0,Math.PI*2); ex.clip();
+  ex.fillStyle='#F7FBFC'; ex.fillRect(0,0,W,H);
+  const salMax=28, brixMax=33, y0=cy-R+26, y1=cy+R-26;
+  const yOf=s=> y0+(s/salMax)*(y1-y0);
+  const by=yOf(eyeSal);
+  const grad=ex.createLinearGradient(0,y0,0,by);
+  grad.addColorStop(0,'#6FBFDC'); grad.addColorStop(1,'#A9DCEC');
+  ex.fillStyle=grad; ex.fillRect(0,0,W,by);
+  // 바닷물(3.5 g/100g = 35‰) 기준선
+  const sy=yOf(3.5);
+  ex.strokeStyle='#C75A2E'; ex.lineWidth=1.4; ex.setLineDash([5,4]);
+  ex.beginPath(); ex.moveTo(0,sy); ex.lineTo(W,sy); ex.stroke(); ex.setLineDash([]);
+  ex.fillStyle='#A8431D'; ex.font='bold 11px Pretendard'; ex.textAlign='center';
+  ex.fillText('바닷물 3.5', cx, sy-6);
+  // 왼쪽 눈금: 염화나트륨 g/100g (우리가 읽는 쪽 ★)
+  const sxL=cx-R*0.5;
+  ex.strokeStyle='#16313A'; ex.fillStyle='#16313A'; ex.lineWidth=1.6; ex.font='bold 12px Pretendard'; ex.textAlign='left';
+  ex.beginPath(); ex.moveTo(sxL,y0); ex.lineTo(sxL,y1); ex.stroke();
+  for(let s=0;s<=salMax;s+=1){
+    const yy=yOf(s), lng=(s%5===0);
+    ex.beginPath(); ex.moveTo(sxL,yy); ex.lineTo(sxL+(lng?14:7),yy); ex.stroke();
+    if(lng) ex.fillText(s, sxL+18, yy+4);
+  }
+  // 오른쪽 눈금: Brix % (설탕용 — 참고만!)
+  const bxR=cx+R*0.5;
+  ex.strokeStyle='#A9BDC2'; ex.fillStyle='#93A9AF'; ex.lineWidth=1.2; ex.font='10px Pretendard'; ex.textAlign='right';
+  ex.beginPath(); ex.moveTo(bxR,y0); ex.lineTo(bxR,y1); ex.stroke();
+  for(let b=0;b<=brixMax;b+=5){
+    const yy=y0+(b/brixMax)*(y1-y0);
+    ex.beginPath(); ex.moveTo(bxR,yy); ex.lineTo(bxR-8,yy); ex.stroke();
+    ex.fillText(b, bxR-11, yy+3);
+  }
+  // 경계선
+  ex.strokeStyle='#0A3D4F'; ex.lineWidth=3.5;
+  ex.beginPath(); ex.moveTo(0,by); ex.lineTo(W,by); ex.stroke();
+  // 값 알림(경계선 위) — 염화나트륨 눈금 기준
+  const lbl=eyeSal.toFixed(1);
+  ex.font='bold 16px Pretendard'; ex.textAlign='center';
+  const tw=ex.measureText(lbl).width;
+  ex.fillStyle='rgba(255,255,255,.94)';
+  rpath(ex, cx-tw/2-9, by-31, tw+18, 22, 7); ex.fill();
+  ex.strokeStyle='#C75A2E'; ex.lineWidth=1.5; ex.stroke();
+  ex.fillStyle='#A8431D'; ex.fillText(lbl, cx, by-15);
+  ex.restore();
+}
+$('eyeSal').addEventListener('input', e=>{ eyeSal=+e.target.value; $('eye-v').textContent=eyeSal.toFixed(1)+' g/100g'; $('r-eyeSal').textContent=eyeSal.toFixed(1); drawEye(); });
+
+/* ===== STEP 6: 부력 시뮬레이터 ===== */
+let sim_salt = 4, sim_disp = null;
+const cv = $('sim'), ctx = cv.getContext('2d');
+const SCALE = 30;
+const waterY = 280;
+const beaker = { x:215, y:120, w:170, h:620 };
+function heightOf(saltG){ return 0.16 * saltG; }
+function readingOf(saltG){ return 2 + heightOf(saltG); }
+function salFromG(g){ return g/(100+g)*100; }
+$('salt').addEventListener('input', e => {
+  sim_salt = +e.target.value;
+  $('salt-v').textContent = sim_salt.toFixed(1) + ' g';
+  $('r-salt').textContent = sim_salt.toFixed(1);
+  $('r-h').textContent = readingOf(sim_salt).toFixed(1);
+  $('r-sal').textContent = salFromG(sim_salt).toFixed(1);
+});
+function rRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+function drawSim(){
+  if (cv.offsetParent === null){ requestAnimationFrame(drawSim); return; }
+  ctx.clearRect(0,0,cv.width,cv.height);
+  const target = heightOf(sim_salt);
+  if (sim_disp === null) sim_disp = target;
+  sim_disp += (target - sim_disp) * 0.16;
+  const lift = sim_disp * SCALE;
+  // 눈금실린더
+  ctx.lineWidth = 5; ctx.strokeStyle = '#9FC4C9';
+  rRect(beaker.x, beaker.y, beaker.w, beaker.h, 14); ctx.stroke();
+  ctx.lineWidth = 5; ctx.beginPath();
+  ctx.moveTo(beaker.x-14, beaker.y+beaker.h); ctx.lineTo(beaker.x+beaker.w+14, beaker.y+beaker.h); ctx.stroke();
+  ctx.strokeStyle = '#BFD8DB'; ctx.lineWidth = 1.4;
+  for (let yy = beaker.y+40; yy < beaker.y+beaker.h-20; yy += 15){
+    const lng = (Math.round((yy-beaker.y)/15) % 2 === 0);
+    ctx.beginPath(); ctx.moveTo(beaker.x+2, yy); ctx.lineTo(beaker.x+2+(lng?16:9), yy); ctx.stroke();
+  }
+  // 물
+  ctx.save();
+  rRect(beaker.x+3, waterY, beaker.w-6, beaker.y+beaker.h-waterY-3, 9); ctx.clip();
+  const tint = Math.min(0.45, 0.16 + sim_salt*0.02);
+  ctx.fillStyle = `rgba(26,167,160,${tint})`;
+  ctx.fillRect(beaker.x, waterY, beaker.w, beaker.h);
+  const nDot = Math.round(sim_salt*4);
+  ctx.fillStyle = 'rgba(10,61,79,0.42)';
+  for (let i=0;i<nDot;i++){
+    const px = beaker.x+15 + ((i*47)%(beaker.w-30));
+    const py = waterY+25 + ((i*89)%(beaker.y+beaker.h-waterY-45));
+    ctx.beginPath(); ctx.arc(px,py,2.8,0,7); ctx.fill();
+  }
+  ctx.restore();
+  ctx.strokeStyle = '#1AA7A0'; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(beaker.x+3, waterY); ctx.lineTo(beaker.x+beaker.w-3, waterY); ctx.stroke();
+  ctx.fillStyle = '#1AA7A0'; ctx.font = 'bold 12px Pretendard'; ctx.textAlign = 'left';
+  ctx.fillText('수면', beaker.x + 8, waterY - 7);
+  // 측정기
+  const cx = beaker.x + beaker.w*0.5;
+  const bulbR_h = 28, bulbR_v = 22;
+  const E0 = 2;
+  const stalkAbove = E0 * SCALE;
+  const stalkBelow = 5 * SCALE;
+  const stalkTop    = waterY - stalkAbove - lift;
+  const stalkBottom = waterY + stalkBelow - lift;
+  const bulbCenter  = stalkBottom + bulbR_v - 5;
+  if (lift > 6){
+    ctx.save();
+    ctx.setLineDash([4,4]); ctx.strokeStyle = '#9FB9BC'; ctx.lineWidth = 1.4; ctx.globalAlpha = .55;
+    rRect(cx-7, waterY - stalkAbove, 14, stalkAbove + stalkBelow, 3); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(cx, waterY + stalkBelow + bulbR_v - 5, bulbR_h, bulbR_v, 0, 0, Math.PI*2); ctx.stroke();
+    ctx.restore();
+    ctx.fillStyle = '#9AAFB1'; ctx.font = '11px Pretendard'; ctx.textAlign = 'left';
+    ctx.fillText('← 맹물에서의 위치', cx + bulbR_h + 6, waterY + stalkBelow + bulbR_v);
+  }
+  // 힘 화살표 — 떠 있는 동안 부력과 중력(무게)은 항상 같은 크기(평형)!
+  const FLEN = 52;
+  const fx1 = cx - bulbR_h - 26, fx2 = cx + bulbR_h + 26;
+  ctx.strokeStyle = '#2FD3B6'; ctx.fillStyle = '#2FD3B6'; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(fx1, bulbCenter + FLEN/2); ctx.lineTo(fx1, bulbCenter - FLEN/2 + 8); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(fx1, bulbCenter - FLEN/2); ctx.lineTo(fx1-7, bulbCenter - FLEN/2 + 12); ctx.lineTo(fx1+7, bulbCenter - FLEN/2 + 12); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = '#E1733E'; ctx.fillStyle = '#E1733E';
+  ctx.beginPath(); ctx.moveTo(fx2, bulbCenter - FLEN/2); ctx.lineTo(fx2, bulbCenter + FLEN/2 - 8); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(fx2, bulbCenter + FLEN/2); ctx.lineTo(fx2-7, bulbCenter + FLEN/2 - 12); ctx.lineTo(fx2+7, bulbCenter + FLEN/2 - 12); ctx.closePath(); ctx.fill();
+  ctx.font = 'bold 12px Pretendard'; ctx.textAlign = 'center';
+  ctx.fillStyle = '#0F718C'; ctx.fillText('부력 ↑', fx1, bulbCenter - FLEN/2 - 8);
+  ctx.fillStyle = '#A8431D'; ctx.fillText('중력 ↓', fx2, bulbCenter - FLEN/2 - 8);
+  ctx.font = 'bold 14px Pretendard'; ctx.fillStyle = '#0A3D4F'; ctx.textAlign = 'center';
+  ctx.fillText('두 힘은 항상 균형! (부력 = 무게)', cx, beaker.y + beaker.h - 40);
+  ctx.font = '12px Pretendard'; ctx.fillStyle = '#5B7178';
+  ctx.fillText('진한 물일수록 조금만 잠겨도 같은 부력이 생겨, 더 높이 떠올라요', cx, beaker.y + beaker.h - 20);
+  ctx.fillStyle = '#fff'; ctx.strokeStyle = '#0A3D4F'; ctx.lineWidth = 2.5;
+  if (stalkTop < waterY){ const aboveEnd = Math.min(waterY, stalkBottom); rRect(cx-7, stalkTop, 14, aboveEnd - stalkTop, 3); ctx.fill(); ctx.stroke(); }
+  if (stalkBottom > waterY){ ctx.save(); ctx.globalAlpha = 0.65; const subStart = Math.max(waterY, stalkTop); rRect(cx-7, subStart, 14, stalkBottom - subStart, 3); ctx.fill(); ctx.stroke(); ctx.restore(); }
+  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(cx, bulbCenter, bulbR_h, bulbR_v, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.save(); ctx.globalAlpha = 0.18; ctx.fillStyle = '#1AA7A0'; ctx.beginPath(); ctx.ellipse(cx, bulbCenter, bulbR_h, bulbR_v, 0, 0, Math.PI*2); ctx.fill(); ctx.restore();
+  const balls = [[-11,-12],[8,-10],[-4,2],[12,2],[-12,-1],[0,-5],[6,9]];
+  ctx.fillStyle = '#5B7178';
+  balls.forEach(([dx,dy])=>{ ctx.beginPath(); ctx.arc(cx+dx, bulbCenter+dy, 5.2, 0, 7); ctx.fill(); });
+  ctx.strokeStyle = '#0A3D4F'; ctx.fillStyle = '#0A3D4F'; ctx.lineWidth = 1.5; ctx.font = 'bold 12px Pretendard'; ctx.textAlign = 'left';
+  const scaleMax = (stalkBottom - stalkTop) / SCALE;
+  for (let cm = 0; cm <= scaleMax + 0.01; cm += 0.5){
+    const ty = stalkTop + cm*SCALE; const lng = (Math.round(cm*2) % 2 === 0);
+    ctx.beginPath(); ctx.moveTo(cx+7, ty); ctx.lineTo(cx+7+(lng?11:6), ty); ctx.stroke();
+    if (lng) ctx.fillText(cm.toFixed(0), cx+7+14, ty+4);
+  }
+  ctx.strokeStyle = '#C75A2E'; ctx.lineWidth = 3.5;
+  ctx.beginPath(); ctx.moveTo(cx-10, waterY); ctx.lineTo(cx+10, waterY); ctx.stroke();
+  const reading = (waterY - stalkTop) / SCALE;
+  ctx.fillStyle = '#A8431D'; ctx.font = 'bold 18px Pretendard'; ctx.textAlign = 'right';
+  ctx.fillText(reading.toFixed(1)+' cm', cx-16, waterY+5);
+  ctx.font = '12px Pretendard'; ctx.fillStyle = '#5B7178';
+  ctx.fillText('수면 눈금', cx-16, waterY-13);
+  ctx.fillStyle = '#5B7178'; ctx.font = '15px Pretendard'; ctx.textAlign = 'center';
+  ctx.fillText('소금 '+sim_salt.toFixed(1)+' g  ·  100 mL 물  ·  굴절 염분계 ≈ '+salFromG(sim_salt).toFixed(1)+' g/100g', cx, beaker.y+beaker.h+30);
+  requestAnimationFrame(drawSim);
+}
+drawSim();
+
+/* ===== STEP 7: 용해도 곡선 ===== */
+function drawSolubility(){
+  const c = $('solubility'); if(!c) return;
+  const g = c.getContext('2d'); const W=c.width, H=c.height;
+  const P={l:62,r:24,t:22,b:46};
+  const Tmax=100, Smax=50;
+  const X=t=>P.l + t/Tmax*(W-P.l-P.r);
+  const Y=s=>H-P.b - s/Smax*(H-P.t-P.b);
+  const T=[0,10,20,30,40,50,60,70,80,90,100];
+  const NaCl=[35.7,35.8,36.0,36.3,36.6,37.0,37.3,37.8,38.4,39.0,39.8];
+  g.clearRect(0,0,W,H);
+  g.fillStyle='rgba(47,211,182,0.16)';
+  g.fillRect(P.l, Y(20), W-P.l-P.r, Y(0)-Y(20));
+  g.fillStyle='#0F718C'; g.font='bold 13px Pretendard'; g.textAlign='left';
+  g.fillText('우리 실험에서 쓰는 양 (5~20 g) — 다 녹아요', P.l+10, Y(20)+18);
+  g.strokeStyle='#E2EEEE'; g.lineWidth=1; g.fillStyle='#9AAEB2'; g.font='12px Pretendard'; g.textAlign='center';
+  for(let t=0;t<=Tmax;t+=20){ g.beginPath();g.moveTo(X(t),P.t);g.lineTo(X(t),Y(0));g.stroke(); g.fillText(t+'°C',X(t),Y(0)+20); }
+  g.textAlign='right';
+  for(let s=0;s<=Smax;s+=10){ g.beginPath();g.moveTo(P.l,Y(s));g.lineTo(W-P.r,Y(s));g.stroke(); g.fillText(s,P.l-8,Y(s)+4); }
+  g.strokeStyle='#9FC4C9'; g.lineWidth=2; g.beginPath();g.moveTo(P.l,P.t);g.lineTo(P.l,Y(0));g.lineTo(W-P.r,Y(0));g.stroke();
+  g.fillStyle='#5B7178'; g.textAlign='center'; g.font='bold 13px Pretendard'; g.fillText('온도 (°C)', (P.l+W-P.r)/2, H-10);
+  g.save(); g.translate(16,(P.t+Y(0))/2); g.rotate(-Math.PI/2); g.fillText('용해도 (물 100 g에 녹는 소금 g)',0,0); g.restore();
+  g.strokeStyle='#12808C'; g.lineWidth=3; g.beginPath();
+  T.forEach((t,i)=>{ const x=X(t),y=Y(NaCl[i]); i?g.lineTo(x,y):g.moveTo(x,y); }); g.stroke();
+  g.fillStyle='#0A3D4F'; T.forEach((t,i)=>{ g.beginPath(); g.arc(X(t),Y(NaCl[i]),3.2,0,7); g.fill(); });
+  g.fillStyle='#12808C'; g.font='bold 14px Pretendard'; g.textAlign='left'; g.fillText('소금(NaCl)', X(72), Y(NaCl[7])-12);
+  g.strokeStyle='#C75A2E'; g.lineWidth=1.6; g.setLineDash([5,4]);
+  g.beginPath(); g.moveTo(X(20),Y(0)); g.lineTo(X(20),Y(36)); g.lineTo(P.l,Y(36)); g.stroke(); g.setLineDash([]);
+  g.fillStyle='#C75A2E'; g.beginPath(); g.arc(X(20),Y(36),5,0,7); g.fill(); g.strokeStyle='#fff'; g.lineWidth=2; g.stroke();
+  g.fillStyle='#A8431D'; g.font='bold 12px Pretendard'; g.textAlign='left'; g.fillText('실온(20°C) 약 36 g', X(20)+8, Y(36)-8);
+}
+
+/* ===== STEP 8: 보정곡선 ===== */
+function avgH(r){
+  const vs=[r.h,r.h2].map(v=>parseFloat(v)).filter(isFinite);
+  return vs.length ? vs.reduce((a,b)=>a+b,0)/vs.length : NaN;
+}
+function renderCal(){
+  $('caltbody').innerHTML = state.cal.map((r,i)=>{
+    const av=avgH(r);
+    return `
+    <tr>
+      <td class="lock">${['①','②','③','④'][i]}<small>소금 ${r.salt}g</small></td>
+      <td><input type="text" inputmode="decimal" class="hcell" data-i="${i}" data-f="sal" value="${r.sal}" placeholder="g/100g"></td>
+      <td><input type="text" inputmode="decimal" class="hcell" data-i="${i}" data-f="h" value="${r.h}" placeholder="cm"></td>
+      <td><input type="text" inputmode="decimal" class="hcell" data-i="${i}" data-f="h2" value="${r.h2||''}" placeholder="선택"></td>
+      <td class="lock avgcell" data-avg="${i}">${isFinite(av)?av.toFixed(2):'—'}</td>
+    </tr>`;}).join('');
+}
+$('caltbody').addEventListener('input', e=>{
+  const i=+e.target.dataset.i, f=e.target.dataset.f;
+  state.cal[i][f]=e.target.value; saveState();
+  const av=avgH(state.cal[i]);
+  const ac=document.querySelector('.avgcell[data-avg="'+i+'"]');
+  if(ac) ac.textContent=isFinite(av)?av.toFixed(2):'—';
+  drawGraph(); estimate(); renderSummary();
+});
+function fit(){
+  const pts = state.cal
+    .map(d=>({x:parseFloat(d.sal), y:avgH(d)}))
+    .filter(p=>isFinite(p.x) && isFinite(p.y));
+  if (pts.length < 2) return null;
+  const n=pts.length, sx=pts.reduce((a,b)=>a+b.x,0), sy=pts.reduce((a,b)=>a+b.y,0);
+  const sxy=pts.reduce((a,b)=>a+b.x*b.y,0), sxx=pts.reduce((a,b)=>a+b.x*b.x,0);
+  const den = n*sxx - sx*sx; if (den === 0) return null;
+  const a = (n*sxy - sx*sy)/den, b = (sy - a*sx)/n;
+  const my = sy/n;
+  const ssT = pts.reduce((s,p)=>s+(p.y-my)**2,0);
+  const ssR = pts.reduce((s,p)=>s+(p.y-(a*p.x+b))**2,0);
+  const r2 = ssT===0 ? 1 : 1 - ssR/ssT;
+  return {a,b,r2,pts};
+}
+const gc=$('graph'), gg=gc.getContext('2d');
+const GP={l:56,r:20,t:18,b:46};
+function drawGraph(){
+  const GW=gc.width,GH=gc.height; gg.clearRect(0,0,GW,GH);
+  const sals=state.cal.map(d=>parseFloat(d.sal)).filter(isFinite);
+  const hs=state.cal.map(d=>avgH(d)).filter(isFinite);
+  const mh=parseFloat(state.mystery.h);
+  const rs=parseFloat(state.mystery.refSal);
+  const m=fit();
+  let estSal=NaN; if(m && isFinite(mh)) estSal=(mh-m.b)/m.a;
+  const xsAll=[...sals]; if(isFinite(rs))xsAll.push(rs); if(isFinite(estSal))xsAll.push(estSal);
+  const maxX = xsAll.length?Math.max(...xsAll,5):20;
+  const xMax = Math.max(20, Math.ceil((maxX+3)/5)*5);
+  const maxH = Math.max(2, ...hs, isFinite(mh)?mh:0);
+  const yMax = Math.max(1, Math.ceil((maxH+0.3)*2)/2);
+  const X=v=>GP.l + v/xMax*(GW-GP.l-GP.r);
+  const Y=v=>GH-GP.b - v/yMax*(GH-GP.t-GP.b);
+  const xStep = xMax<=30?5:10;
+  const yStep = yMax<=4?0.5:1;
+  gg.strokeStyle='#E2EEEE'; gg.lineWidth=1; gg.fillStyle='#9AAEB2'; gg.font='13px Pretendard'; gg.textAlign='center';
+  for(let x=0;x<=xMax+0.001;x+=xStep){ gg.beginPath();gg.moveTo(X(x),GP.t);gg.lineTo(X(x),Y(0));gg.stroke(); gg.fillText(x,X(x),Y(0)+19); }
+  gg.textAlign='right';
+  for(let y=0;y<=yMax+0.001;y+=yStep){ gg.beginPath();gg.moveTo(GP.l,Y(y));gg.lineTo(GW-GP.r,Y(y));gg.stroke(); gg.fillText(yStep<1?y.toFixed(1):y, GP.l-7,Y(y)+5); }
+  gg.strokeStyle='#9FC4C9'; gg.lineWidth=2; gg.beginPath();gg.moveTo(GP.l,GP.t);gg.lineTo(GP.l,Y(0));gg.lineTo(GW-GP.r,Y(0));gg.stroke();
+  gg.fillStyle='#5B7178'; gg.textAlign='center'; gg.font='bold 13px Pretendard';
+  gg.fillText('농도 (g/100g) — 굴절 염분계 기준값', (GP.l+GW-GP.r)/2, GH-8);
+  gg.save(); gg.translate(15,(GP.t+Y(0))/2); gg.rotate(-Math.PI/2); gg.fillText('떠오른 높이 (cm) — 간이 염분계',0,0); gg.restore();
+  if(m){ gg.strokeStyle='#1AA7A0'; gg.lineWidth=3; gg.beginPath(); gg.moveTo(X(0),Y(m.b)); gg.lineTo(X(xMax),Y(m.a*xMax+m.b)); gg.stroke(); }
+  gg.fillStyle='#0A3D4F';
+  state.cal.forEach(d=>{ const xx=parseFloat(d.sal), yy=avgH(d); if(isFinite(xx)&&isFinite(yy)){ gg.beginPath(); gg.arc(X(xx),Y(Math.min(yy,yMax)),5.5,0,7); gg.fill(); } });
+  // 심화: 직선에서 가장 멀리 벗어난 점(최대 잔차) 표시
+  if(m && m.pts.length>=3){
+    let worst=null, wr=0;
+    m.pts.forEach(p=>{ const rres=Math.abs(p.y-(m.a*p.x+m.b)); if(rres>wr){wr=rres;worst=p;} });
+    if(worst && wr>0.02){
+      gg.strokeStyle='#D9A441'; gg.lineWidth=1.6; gg.setLineDash([3,3]);
+      gg.beginPath(); gg.moveTo(X(worst.x),Y(worst.y)); gg.lineTo(X(worst.x),Y(m.a*worst.x+m.b)); gg.stroke(); gg.setLineDash([]);
+      gg.strokeStyle='#D9A441'; gg.lineWidth=2.4; gg.beginPath(); gg.arc(X(worst.x),Y(worst.y),9,0,7); gg.stroke();
+      gg.fillStyle='#9A6612'; gg.font='bold 11px Pretendard'; gg.textAlign='center';
+      gg.fillText('직선에서 가장 먼 점 — 왜일까?', X(worst.x), Y(worst.y)-16);
+    }
+  }
+  if(m && isFinite(mh)){
+    if(isFinite(estSal) && estSal>=0 && estSal<=xMax && mh<=yMax){
+      gg.strokeStyle='#E1733E'; gg.lineWidth=1.7; gg.setLineDash([5,4]);
+      gg.beginPath(); gg.moveTo(GP.l,Y(mh)); gg.lineTo(X(estSal),Y(mh)); gg.lineTo(X(estSal),Y(0)); gg.stroke(); gg.setLineDash([]);
+      gg.fillStyle='#E1733E'; gg.beginPath(); gg.arc(X(estSal),Y(mh),7,0,7); gg.fill();
+      gg.strokeStyle='#fff'; gg.lineWidth=2; gg.stroke();
+      gg.fillStyle='#A8431D'; gg.font='bold 12px Pretendard'; gg.textAlign='left'; gg.fillText('추정 '+estSal.toFixed(1), X(estSal)+9, Y(mh)-9);
+    }
+    if(isFinite(rs) && rs>=0 && rs<=xMax && mh<=yMax){
+      const px=X(rs), py=Y(mh); gg.fillStyle='#0A3D4F';
+      gg.beginPath(); gg.moveTo(px,py-7); gg.lineTo(px+7,py); gg.lineTo(px,py+7); gg.lineTo(px-7,py); gg.closePath(); gg.fill();
+      gg.strokeStyle='#fff'; gg.lineWidth=2; gg.stroke();
+      gg.fillStyle='#0A3D4F'; gg.font='bold 12px Pretendard'; gg.textAlign='left'; gg.fillText('실제 '+rs.toFixed(1), px+9, py+16);
+    }
+  }
+  const ft=$('fit-text');
+  if(m){
+    ft.style.display='block';
+    $('fit-eq').textContent = `높이 = ${m.a.toFixed(3)} × 농도 ${m.b>=0?'+':'−'} ${Math.abs(m.b).toFixed(3)}`;
+    $('fit-r2').innerHTML = `거꾸로 풀면 → <b>농도 = (높이 − ${m.b.toFixed(3)}) ÷ ${m.a.toFixed(3)}</b><br>직선에 맞는 정도 R² = ${m.r2.toFixed(4)} — 1에 가까울수록 좋아요. 우리 R²는 왜 1이 아닐까요?`;
+  } else { ft.style.display='none'; }
+}
+
+/* ===== STEP 9: 미지 용액 추정 & 비교 ===== */
+$('mystery-h').value = state.mystery.h;
+$('mystery-h').addEventListener('input', e=>{ state.mystery.h = e.target.value; saveState(); estimate(); drawGraph(); renderSummary(); });
+$('mystery-ref').value = state.mystery.refSal||'';
+$('mystery-ref').addEventListener('input', e=>{ state.mystery.refSal = e.target.value; saveState(); estimate(); drawGraph(); renderSummary(); });
+$('reason').value = state.reason;
+$('reason').addEventListener('input', e=>{ state.reason = e.target.value; saveState(); });
+function estimate(){
+  const m=fit(); const out=$('estimate'); const eb=$('errBox');
+  const h=parseFloat(state.mystery.h);
+  if(!m || Math.abs(m.a)<1e-9){ out.textContent='먼저 보정곡선을 완성하세요 (STEP 9)'; out.classList.add('warn'); eb.style.display='none'; return; }
+  if(!isFinite(h)){ out.textContent='— g/100g'; out.classList.remove('warn'); eb.style.display='none'; return; }
+  const s=(h-m.b)/m.a;
+  const xsArr=m.pts.map(p=>p.x), lo=Math.min(...xsArr), hi=Math.max(...xsArr);
+  const isExtra=(s<lo||s>hi);
+  out.innerHTML=s.toFixed(1)+' g/100g <span style="font-size:1rem;font-weight:700;color:#9A5B2E">(= '+(s*10).toFixed(0)+'‰)</span>'+(isExtra?' ⚠️':'');
+  out.classList.remove('warn');
+  const extraMsg='<div class="cmp-sea">⚠️ 추정값이 보정 범위('+lo.toFixed(1)+'~'+hi.toFixed(1)+' g/100g) 밖이에요 — 범위 밖 추정(외삽)은 왜 믿음이 낮을까요?</div>';
+  const rs=parseFloat(state.mystery.refSal);
+  if(isFinite(rs)){
+    const diff=Math.abs(s-rs);
+    const grade = diff<=0.5?'아주 정확해요! 🎯':(diff<=1.5?'꽤 잘 맞혔어요! 👍':'조금 차이가 나네요 — 무엇 때문일까요? 아래 오차 분석에 적어 보세요.');
+    const seaTxt = rs>3.5?'바닷물 평균(3.5 g/100g = 35‰)보다 진한 소금물이에요.':(rs<3.5?'바닷물 평균(3.5 g/100g = 35‰)보다 연한 소금물이에요.':'바닷물 평균(3.5 g/100g = 35‰)과 비슷해요.');
+    eb.style.display='';
+    eb.innerHTML = `<div class="cmp-row"><span>우리 추정값 (보정곡선)</span><b>${s.toFixed(1)} g/100g</b></div>
+      <div class="cmp-row"><span>굴절 염분계 실제값</span><b>${rs.toFixed(1)} g/100g</b></div>
+      <div class="cmp-row diff"><span>차이(오차)</span><b>${diff.toFixed(1)} g/100g</b></div>
+      <div class="cmp-grade">${grade}</div>
+      ${isExtra?extraMsg:''}
+      <div class="cmp-sea">🌊 ${seaTxt}</div>`;
+  } else if(isExtra){
+    eb.style.display=''; eb.innerHTML=extraMsg;
+  } else { eb.style.display='none'; }
+}
+
+/* ===== STEP 10: 바이브 코딩 ===== */
+function calDataStr(){
+  return state.cal.map(d => { const av=avgH(d); return `농도 ${d.sal!==''&&d.sal!=null?d.sal+' g/100g':'[  ] g/100g'} → 높이 ${isFinite(av)?av.toFixed(2)+'cm':'[  ]cm'}`; }).join(', ');
+}
+function lowPrompt(){
+  return `중학생을 위한 '간이 염분계 보정 변환기'를 HTML 파일 하나로 만들어 줘.
+- 우리 모둠이 두 도구로 측정한 보정 데이터: ${calDataStr()}
+  (농도는 굴절 염분계로 잰 기준값, 높이는 간이 염분계로 잰 값이야.)
+- 이 데이터로 '떠오른 높이(cm)'와 '농도(g/100g)' 사이의 직선 관계(보정곡선)를 찾아 줘.
+- 사용자가 간이 염분계로 잰 '떠오른 높이(cm)'를 입력하면, 보정곡선으로 '농도(g/100g)'를 계산해 큰 글씨로 보여 줘. ‰로도 같이 보여 줘(g/100g의 10배).
+- 바닷물 평균은 3.5 g/100g(=35‰)라는 것도 함께 알려 주면 좋아.
+- 화면은 바다 느낌(파랑·청록)으로 깔끔하고 예쁘게.
+- 설명 없이 HTML 코드 하나로만 출력해 줘.`;
+}
+function midPrompt(){
+  return `중학생을 위한 '간이 염분계 보정곡선 도구'를 HTML 파일 하나로 만들어 줘.
+- 우리 보정 데이터: ${calDataStr()} (농도=굴절 염분계 기준값, 높이=간이 염분계 값)
+- 가로축 농도(g/100g), 세로축 떠오른 높이(cm) 그래프에 점들을 찍고, 보정곡선(직선)도 그려 줘.
+- '떠오른 높이'를 입력하면 농도를 계산해 그래프 위에도 표시해 줘.
+- 바다 느낌으로 예쁘게, HTML 코드 하나로만 출력해 줘.
+
+[직접 추가하기] 마음에 드는 기능을 한 가지 더 적어서 Gemini에게 요청해 보세요.
+예: 추정 농도가 바닷물보다 진한지 연한지 알려주기 / 오차 범위 함께 표시하기 / 결과를 표로도 보여주기`;
+}
+const vibeContent = {
+  low: () => `
+    <div class="vibe-step">
+      <h3>하 · 기초 — 준비된 프롬프트 그대로 쓰기</h3>
+      <p class="hint">아래 프롬프트에는 우리 모둠 보정 데이터가 이미 들어가 있어요. 복사해서 Gemini에 붙여넣고, 받은 코드를 아래 칸에 붙여 실행하면 끝!</p>
+      <div class="prompt-box"><pre id="promptText">${escapeHtml(lowPrompt())}</pre></div>
+      <button class="btn ghost" id="copyPrompt">📋 프롬프트 복사하기</button>
+    </div>`,
+  mid: () => `
+    <div class="vibe-step">
+      <h3>중 · 도전 — 프롬프트에 기능 더하기</h3>
+      <p class="hint">그래프까지 그려 주는 프롬프트예요. 마지막에 원하는 기능을 한 가지 직접 적어 더 멋지게 만들어 보세요.</p>
+      <div class="prompt-box"><pre id="promptText">${escapeHtml(midPrompt())}</pre></div>
+      <button class="btn ghost" id="copyPrompt">📋 프롬프트 복사하기</button>
+    </div>`,
+  high: () => `
+    <div class="vibe-step">
+      <h3>상 · 심화 — 나만의 프롬프트 직접 쓰기</h3>
+      <p class="hint">좋은 프롬프트에는 보통 이런 것들이 들어가요. 아래를 참고해 직접 써 보세요.</p>
+      <ul class="prompt-guide">
+        <li><b>무엇을</b> 만들까? (예: 보정곡선을 자동으로 계산하는 염분계 변환 도구)</li>
+        <li><b>입력</b>은? (예: 기준 용액 4개의 (농도 g/100g, 높이 cm) 데이터, 미지 용액의 높이)</li>
+        <li><b>처리</b>는? (예: 가장 잘 맞는 직선(보정곡선) 찾기, 높이로 농도 계산, 오차 구하기)</li>
+        <li><b>출력</b>은? (예: 그래프, 추정 농도, 직선이 잘 맞는 정도(R²), 바닷물과 비교)</li>
+        <li><b>디자인</b>은? (예: 바다 테마, 큰 글씨)</li>
+      </ul>
+      <div class="em" style="margin:10px 0"><b>도전 과제!</b> 간이 염분계가 짠 물에서 떠오르는 모습을 <b>움직이는 그림(시뮬레이션)</b>으로 모형화하는 것에도 도전해 보세요.</div>
+      <label for="myPrompt">✍️ 내가 만든 프롬프트</label>
+      <textarea id="myPrompt" placeholder="여기에 나만의 프롬프트를 작성하고, Gemini에 붙여넣어 코드를 받아 보세요."></textarea>
+    </div>`,
+};
+function renderVibe(){
+  const lv = state.vibe.level;
+  document.querySelectorAll('.vlv').forEach(b => b.classList.toggle('on', b.dataset.lv===lv));
+  $('vibeBody').innerHTML = lv ? vibeContent[lv]() : '<p class="hint" style="padding:6px 2px">위에서 난이도를 먼저 골라 주세요.</p>';
+  const cp = $('copyPrompt');
+  if (cp) cp.addEventListener('click', ()=>{
+    const txt = (lv==='low') ? lowPrompt() : midPrompt();
+    navigator.clipboard.writeText(txt).then(()=>{ cp.textContent='✓ 복사됨!'; setTimeout(()=>cp.textContent='📋 프롬프트 복사하기',1500); })
+      .catch(()=>{ cp.textContent='복사 실패 — 직접 선택해 복사하세요'; });
+  });
+  const mp = $('myPrompt');
+  if (mp){ mp.value = state.vibe.prompt || ''; mp.addEventListener('input', e=>{ state.vibe.prompt = e.target.value; saveState(); }); }
+}
+$('vibeLevels').addEventListener('click', e=>{ const b=e.target.closest('.vlv'); if(!b) return; state.vibe.level=b.dataset.lv; saveState(); renderVibe(); });
+$('vibe-code').value = state.vibe.code || '';
+$('vibe-code').addEventListener('input', e=>{ state.vibe.code = e.target.value; saveState(); });
+$('run-code').addEventListener('click', ()=>{ $('vibe-frame').srcdoc = $('vibe-code').value || '<p style="font-family:sans-serif;color:#888;padding:20px">코드를 붙여넣고 실행하세요.</p>'; });
+
+/* ===== STEP 11: 회고 & 요약 ===== */
+$('refRule').value = state.refRule || '';
+$('refRule').addEventListener('input', e=>{ state.refRule = e.target.value; saveState(); updateRefHint(); renderSummary(); });
+$('reflect').value = state.reflect;
+$('reflect').addEventListener('input', e=>{ state.reflect = e.target.value; saveState(); });
+$('reflect2').value = state.reflect2 || '';
+$('reflect2').addEventListener('input', e=>{ state.reflect2 = e.target.value; saveState(); });
+$('reflect3').value = state.reflect3 || '';
+$('reflect3').addEventListener('input', e=>{ state.reflect3 = e.target.value; saveState(); });
+function updateRefHint(){
+  const el = $('refHint'); if(!el) return;
+  if (state.refRule && state.refRule.trim()){ el.style.display=''; el.innerHTML = '📌 우리 조의 높이 측정 기준: <b>'+escapeHtml(state.refRule)+'</b> — 모든 용액을 이 기준으로 재세요.'; }
+  else { el.style.display='none'; }
+}
+function renderSummary(){
+  const m=fit(); const mh=parseFloat(state.mystery.h); const rs=parseFloat(state.mystery.refSal);
+  const est=(m&&isFinite(mh))?((mh-m.b)/m.a).toFixed(1)+' g/100g':'—';
+  const calStr=state.cal.map(d=>{const av=avgH(d); return `${d.sal||'—'} / ${isFinite(av)?av.toFixed(2):'—'}cm`;}).join('  ·  ');
+  const eq=m?`높이 = ${m.a.toFixed(3)}×농도 ${m.b>=0?'+':'−'} ${Math.abs(m.b).toFixed(3)}`:'—';
+  const r2=m?`R²=${m.r2.toFixed(4)}`:'—';
+  const diffTxt=(m&&isFinite(mh)&&isFinite(rs))?`· 차이 ${Math.abs((mh-m.b)/m.a - rs).toFixed(1)} g/100g`:'';
+  const names=(state.members||[]).filter(x=>x&&(x.name||x.sid)).map(x=>`${x.sid||''} ${x.name||''}`.trim()).join(', ');
+  $('summary').innerHTML=`
+   <div class="scard"><div class="l">모둠</div><div class="v">${escapeHtml(state.group||'—')}<br><small>${escapeHtml(names)}</small></div></div>
+   <div class="scard"><div class="l">우리 조가 정한 쇠구슬 수</div><div class="v">${state.ballCount?escapeHtml(state.ballCount)+' 개':'—'}</div></div>
+   <div class="scard"><div class="l">기준 용액 (농도 g/100g / 높이 평균)</div><div class="v" style="font-size:1rem">${calStr}</div></div>
+   <div class="scard"><div class="l">우리 조의 높이 측정 기준</div><div class="v" style="font-size:1rem">${state.refRule?escapeHtml(state.refRule):'—'}</div></div>
+   <div class="scard"><div class="l">보정곡선</div><div class="v" style="font-size:1rem">${eq}<br><small>${r2}</small></div></div>
+   <div class="scard"><div class="l">미지 용액 → 추정 농도</div><div class="v">${est}<br><small>높이 ${state.mystery.h||'—'} cm ${diffTxt}</small></div></div>
+  `;
+  renderChecklist();
+}
+function renderChecklist(){
+  const el=$('checklist'); if(!el) return;
+  const r=state.report||{};
+  const nCal=state.cal.filter(d=>isFinite(parseFloat(d.sal))&&isFinite(avgH(d))).length;
+  const nPhoto=Object.keys(photoData).length;
+  const items=[
+    [!!(state.group&&state.group.trim()),'모둠 이름 (STEP 1)'],
+    [!!(r.hypothesis&&r.hypothesis.trim()),'가설 (STEP 1)'],
+    [!!(r.ideaCalib&&r.ideaCalib.trim()),'보정 아이디어 (STEP 2)'],
+    [!!(state.ballCount&&(''+state.ballCount).trim()),'쇠구슬 수 결정 (STEP 4)'],
+    [!!(state.refRule&&state.refRule.trim()),'높이 측정 기준 (STEP 6)'],
+    [!!(r.predictCurve&&r.predictCurve.trim()),'그래프 예측 (STEP 8)'],
+    [nCal>=2,'기준 용액 측정값 '+nCal+'/4 (STEP 9)'],
+    [isFinite(parseFloat(state.mystery.h)),'미지 용액 높이 (STEP 10)'],
+    [isFinite(parseFloat(state.mystery.refSal)),'미지 용액 확인값 (STEP 10)'],
+    [!!(r.errAnalysis&&r.errAnalysis.trim()),'오차 분석 (STEP 10)'],
+    [!!(state.reflect&&state.reflect.trim()),'알게 된 점 (STEP 12)'],
+    [nPhoto>0,'사진 '+nPhoto+'장'],
+  ];
+  const missing=items.filter(x=>!x[0]);
+  el.innerHTML = missing.length
+    ? '<div class="note" style="margin:14px 0 0">📌 <b>보고서 만들기 전 확인!</b> 아직 비어 있는 항목 — '+missing.map(x=>'<b>'+x[1]+'</b>').join(' · ')+'</div>'
+    : '<div class="ok" style="margin:14px 0 0">✅ 모든 항목이 채워졌어요! 아래에서 보고서를 만들어 보세요.</div>';
+}
+
+/* ===== 새로 시작 ===== */
+$('resetBtn').addEventListener('click', async ()=>{
+  if (!confirm('지금까지 입력한 내용과 올린 사진이 모두 삭제됩니다. 정말 새로 시작할까요?')) return;
+  try{ localStorage.removeItem(KEY); }catch(e){}
+  try{ const ks=await idbKeys(); const db=await idb(); await new Promise(r=>{ const tx=db.transaction(STORE,'readwrite'); ks.forEach(k=>tx.objectStore(STORE).delete(k)); tx.oncomplete=r; tx.onerror=r; }); }catch(e){}
+  location.reload();
+});
+
+/* ===== 보고서 텍스트 필드 연결 ===== */
+function escMl(s){ return escapeHtml(s).replace(/\n/g,'<br>'); }
+function bindReportFields(){
+  document.querySelectorAll('[data-rkey]').forEach(el=>{
+    const k=el.dataset.rkey;
+    if(state.report[k]!=null) el.value=state.report[k];
+    el.addEventListener('input',e=>{ state.report[k]=e.target.value; saveState(); });
+  });
+}
+
+/* ===== 사진 업로드 (이미지 축소 후 IndexedDB 저장) ===== */
+const DB_NAME='salinity_report_db', STORE='photos';
+function idb(){ return new Promise((res,rej)=>{ const rq=indexedDB.open(DB_NAME,1); rq.onupgradeneeded=()=>rq.result.createObjectStore(STORE); rq.onsuccess=()=>res(rq.result); rq.onerror=()=>rej(rq.error); }); }
+function idbSet(k,v){ return idb().then(db=>new Promise((res,rej)=>{ const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).put(v,k); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); })); }
+function idbGet(k){ return idb().then(db=>new Promise((res,rej)=>{ const rq=db.transaction(STORE,'readonly').objectStore(STORE).get(k); rq.onsuccess=()=>res(rq.result); rq.onerror=()=>rej(rq.error); })); }
+function idbDel(k){ return idb().then(db=>new Promise((res,rej)=>{ const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).delete(k); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); })); }
+function idbKeys(){ return idb().then(db=>new Promise((res,rej)=>{ const rq=db.transaction(STORE,'readonly').objectStore(STORE).getAllKeys(); rq.onsuccess=()=>res(rq.result); rq.onerror=()=>rej(rq.error); })); }
+function resizeImage(file,maxDim,quality){ maxDim=maxDim||1280; quality=quality||0.72; return new Promise((res,rej)=>{ const img=new Image(); img.onload=()=>{ let w=img.naturalWidth,h=img.naturalHeight; if(!w||!h){ rej(new Error('size')); return; } if(Math.max(w,h)>maxDim){ const s=maxDim/Math.max(w,h); w=Math.round(w*s); h=Math.round(h*s); } const c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h); res(c.toDataURL('image/jpeg',quality)); }; img.onerror=()=>rej(new Error('img')); const fr=new FileReader(); fr.onload=()=>{ img.src=fr.result; }; fr.onerror=()=>rej(new Error('read')); fr.readAsDataURL(file); }); }
+const photoData={};
+function renderPhotoSlot(slot){
+  const host=document.querySelector('.photo-slot[data-slot="'+slot+'"]'); if(!host) return;
+  const lbl=host.dataset.label||''; const has=!!photoData[slot]; const cap=escapeHtml(state.captions[slot]||'').replace(/"/g,'&quot;');
+  host.innerHTML=(lbl?'<div class="ph-label">'+escapeHtml(lbl)+'</div>':'')
+    +(has?'<div class="ph-have"><img class="ph-thumb" src="'+photoData[slot]+'" alt="photo"><button class="ph-del" type="button">✕ 삭제</button></div>'
+         :'<label class="ph-drop"><input type="file" accept="image/*" hidden><span>📷 사진 선택 / 촬영</span></label>')
+    +'<input type="text" class="ph-cap" placeholder="사진 설명(선택)" value="'+cap+'">';
+  host.querySelector('.ph-cap').addEventListener('input',e=>{ state.captions[slot]=e.target.value; saveState(); });
+  const fi=host.querySelector('input[type=file]');
+  if(fi) fi.addEventListener('change',async e=>{ const f=e.target.files&&e.target.files[0]; if(!f) return; const sp=host.querySelector('.ph-drop span'); if(sp) sp.textContent='⏳ 처리 중...'; try{ const url=await resizeImage(f); photoData[slot]=url; try{ await idbSet(slot,url); }catch(_){} renderPhotoSlot(slot); }catch(err){ alert('사진을 불러오지 못했어요. 다른 사진으로 다시 시도해 주세요.'); renderPhotoSlot(slot); } });
+  const del=host.querySelector('.ph-del');
+  if(del) del.addEventListener('click',async()=>{ if(!confirm('이 사진을 삭제할까요?')) return; delete photoData[slot]; try{ await idbDel(slot); }catch(_){} renderPhotoSlot(slot); });
+  try{ renderChecklist(); }catch(e){}
+}
+function initPhotos(){
+  const slots=[].slice.call(document.querySelectorAll('.photo-slot[data-slot]')).map(el=>el.dataset.slot);
+  idbKeys().then(async keys=>{ for(const k of keys){ if(slots.indexOf(k)>=0){ try{ photoData[k]=await idbGet(k); }catch(_){} } } slots.forEach(renderPhotoSlot); }).catch(()=>{ slots.forEach(renderPhotoSlot); });
+}
+
+/* ===== Word 보고서 자동 생성 ===== */
+function fig(slot,w){ if(!photoData[slot]) return ''; const cap=state.captions[slot]?'<div style="font-size:9pt;color:#666;margin-top:3px">▲ '+escapeHtml(state.captions[slot])+'</div>':''; return '<div style="margin:10px 0;text-align:center"><img src="'+photoData[slot]+'" width="'+(w||460)+'" style="max-width:100%;border:1px solid #ccc"/>'+cap+'</div>'; }
+function heightTbl(){
+  const arr=[['h_5','소금 5 g'],['h_10','소금 10 g'],['h_15','소금 15 g'],['h_20','소금 20 g']].filter(x=>photoData[x[0]]);
+  if(!arr.length) return '<div style="color:#999;font-size:10pt">(올린 사진이 없습니다)</div>';
+  const cells=arr.map(a=>'<td style="width:50%;text-align:center;vertical-align:top;padding:6px"><div style="font-weight:bold;font-size:10pt;margin-bottom:4px">'+a[1]+'</div><img src="'+photoData[a[0]]+'" width="220" style="max-width:100%;border:1px solid #ccc"/>'+(state.captions[a[0]]?'<div style="font-size:9pt;color:#666">'+escapeHtml(state.captions[a[0]])+'</div>':'')+'</td>');
+  let rows=''; for(let i=0;i<cells.length;i+=2){ rows+='<tr>'+cells[i]+(cells[i+1]||'<td></td>')+'</tr>'; }
+  return '<table style="width:100%;border-collapse:collapse;margin:6px 0">'+rows+'</table>';
+}
+function ansBox(v){ return '<div class="ans'+(v?'':' empty')+'">'+(v?escMl(v):'(작성 내용 없음)')+'</div>'; }
+function buildReportHtml(){
+  const r=state.report||{};
+  const d=new Date(); const ds=d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일';
+  const names=(state.members||[]).filter(x=>x&&(x.name||x.sid)).map(x=>((x.sid||'')+' '+(x.name||'')).trim()).join(', ')||'—';
+  const m=fit();
+  let gimg=''; try{ drawGraph(); gimg=document.getElementById('graph').toDataURL('image/png'); }catch(e){}
+  const calRows=state.cal.map(x=>{const av=avgH(x); const hTxt=isFinite(av)?(av.toFixed(2)+(x.h2?' <span style="font-size:9pt;color:#666">(1차 '+x.h+' / 2차 '+x.h2+')</span>':'')):'—'; return '<tr><td>소금 '+x.salt+' g</td><td>'+(x.sal!==''&&x.sal!=null?x.sal:'—')+'</td><td>'+hTxt+'</td></tr>';}).join('');
+  const eq=m?('높이 = '+m.a.toFixed(3)+' × 농도 '+(m.b>=0?'+':'−')+' '+Math.abs(m.b).toFixed(3)+'  (R² = '+m.r2.toFixed(4)+')'):'(보정곡선을 만들 데이터가 아직 부족합니다)';
+  const inv=m?('농도 = (높이 − '+m.b.toFixed(3)+') ÷ '+m.a.toFixed(3)):'';
+  const mh=parseFloat(state.mystery.h), rs=parseFloat(state.mystery.refSal);
+  const est=(m&&isFinite(mh))?((mh-m.b)/m.a).toFixed(1):null;
+  const diff=(est!==null&&isFinite(rs))?Math.abs(parseFloat(est)-rs).toFixed(1):null;
+  return "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>간이 염분계 보정 탐구 보고서</title>"
+  +"<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->"
+  +"<style>@page{size:A4;margin:2cm}"
+  +"body{font-family:'맑은 고딕','Malgun Gothic',sans-serif;font-size:11pt;line-height:1.65;color:#1b2b30}"
+  +"h1{font-size:19pt;color:#0A3D4F;text-align:center;margin:0 0 4px;border-bottom:3px solid #12808C;padding-bottom:8px}"
+  +".meta{text-align:center;color:#555;font-size:10pt;margin-bottom:18px}"
+  +"h2{font-size:13pt;color:#0A3D4F;background:#E7F4F4;border-left:5px solid #12808C;padding:6px 10px;margin:20px 0 8px}"
+  +".sub{color:#0F718C;font-weight:bold;margin:10px 0 3px}"
+  +".ans{background:#FCFEFE;border:1px solid #D6E6E6;border-radius:4px;padding:8px 11px}"
+  +".ans.empty{color:#aaa}"
+  +"table.data{width:100%;border-collapse:collapse;margin:8px 0}"
+  +"table.data th,table.data td{border:1px solid #B7C9CC;padding:7px 8px;text-align:center;font-size:10.5pt}"
+  +"table.data th{background:#12808C;color:#fff}"
+  +".eq{background:#0A3D4F;color:#fff;border-radius:5px;padding:9px 12px;font-weight:bold;margin:6px 0}"
+  +"</style></head><body>"
+  +"<h1>간이 염분계 보정 탐구 보고서</h1>"
+  +"<div class='meta'>— 굴절 염분계로 보정곡선 만들어 미지 용액의 염분 알아내기 —<br>모둠: <b>"+escapeHtml(state.group||'—')+"</b> &nbsp;|&nbsp; 모둠원: "+escapeHtml(names)+" &nbsp;|&nbsp; 작성일: "+ds+"</div>"
+  +"<h2>1. 탐구 주제와 목표</h2><div class='ans'>정밀한 <b>굴절 염분계</b>(ATAGO MASTER-BX/S28M, 염화나트륨 0~28 g/100g)를 기준으로 직접 만든 <b>간이 염분계</b>를 보정하여 <b>보정곡선</b>을 만들고, 그 곡선으로 미지 용액의 농도(g/100g)를 알아낸다.</div>"
+  +"<h2>2. 가설과 보정 아이디어</h2><div class='sub'>가설</div>"+ansBox(r.hypothesis)
+  +"<div class='sub'>보정 아이디어 (우리 조의 처음 생각)</div>"+ansBox(r.ideaCalib)
+  +"<h2>3. 탐구 과정과 관찰</h2>"
+  +"<div class='sub'>① 굴절 염분계 사용</div>"+ansBox(r.obsRefracto)+fig('refracto',440)
+  +"<div class='sub'>② 간이 염분계 제작 · 쇠구슬 수 결정</div><div class='ans'>우리 조가 정한 쇠구슬 수: <b>"+(state.ballCount?escapeHtml(''+state.ballCount)+' 개':'—')+"</b></div>"+ansBox(r.obsBallCount)+ansBox(r.obsBuild)+fig('device',360)
+  +"<div class='sub'>③ 우리 조의 '떠오른 높이' 측정 기준</div>"+ansBox(state.refRule)
+  +"<div class='sub'>④ 기준 용액 제작 (소금 5·10·15·20 g / 물 100 mL)</div>"+ansBox(r.obsSolution)+fig('solutions',440)
+  +"<h2>4. 측정 결과</h2><table class='data'><tr><th>기준 용액</th><th>굴절 염분계 농도 (g/100g)<br>(기준값)</th><th>간이 염분계 높이 (cm)<br>(우리값 · 평균)</th></tr>"+calRows+"</table>"
+  +"<div class='sub'>염도(소금 양)별 간이 염분계가 떠오른 높이</div>"+heightTbl()
+  +"<h2>5. 보정곡선</h2><div class='sub'>그래프 예측 — 그리기 전 우리 생각</div>"+ansBox(r.predictCurve)+(gimg?"<div style='text-align:center;margin:8px 0'><img src='"+gimg+"' width='520' style='max-width:100%'/></div>":"")
+  +"<div class='eq'>"+eq+"</div>"+(inv?"<div class='ans'>거꾸로 풀면 → <b>"+inv+"</b></div>":"")
+  +"<div class='sub'>보정곡선을 보고 알게 된 점</div>"+ansBox(r.obsGraph)
+  +"<h2>6. 미지 용액의 농도 알아내기</h2><table class='data'><tr><th>간이 염분계 높이 (cm)</th><th>보정곡선 추정 농도 (g/100g)</th><th>굴절 염분계 실제 농도 (g/100g)</th><th>차이(오차, g/100g)</th></tr>"
+  +"<tr><td>"+(isFinite(mh)?mh:'—')+"</td><td>"+(est!==null?est:'—')+"</td><td>"+(isFinite(rs)?rs:'—')+"</td><td>"+(diff!==null?diff:'—')+"</td></tr></table>"
+  +fig('mystery',440)
+  +"<div class='sub'>최종 답과 그 이유</div>"+ansBox(state.reason)
+  +"<div class='sub'>오차 분석 (계통 오차 / 우연 오차)</div>"+ansBox(r.errAnalysis)
+  +"<h2>7. 바이브 코딩 도전</h2><div class='sub'>선택한 난이도</div><div class='ans'>"+({low:'하 · 기초',mid:'중 · 도전',high:'상 · 심화'}[state.vibe.level]||'(선택 안 함)')+"</div>"
+  +(state.vibe.level==='high'?"<div class='sub'>내가 만든 프롬프트</div>"+ansBox(state.vibe.prompt):"")
+  +"<div class='sub'>결과물</div><div class='ans'>"+(state.vibe.code?'AI가 만든 코드를 실행해 나만의 보정 변환기를 완성했다.':'(아직 실행한 코드 없음)')+"</div>"
+  +"<h2>8. 결론 및 느낀 점</h2>"
+  +"<div class='sub'>새롭게 알게 된 점</div>"+ansBox(state.reflect)
+  +"<div class='sub'>어려웠던 점과 더 정확히 재기 위한 아이디어</div>"+ansBox(state.reflect2)
+  +"<div class='sub'>더 알아보고 싶은 점</div>"+ansBox(state.reflect3)
+  +"</body></html>";
+}
+function downloadWord(){
+  const btn=document.getElementById('makeReport'); const old=btn.textContent; btn.textContent='⏳ 보고서 만드는 중...'; btn.disabled=true;
+  try{
+    const html=buildReportHtml();
+    const blob=new Blob(['\ufeff',html],{type:'application/msword'});
+    const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url;
+    a.download=(state.group?state.group.replace(/[\\/:*?"<>|]/g,'').trim():'모둠')+'_염분계보정탐구_보고서.doc';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),5000);
+  }catch(e){ alert('보고서를 만드는 중 문제가 생겼어요: '+e.message); }
+  finally{ setTimeout(()=>{ btn.textContent=old; btn.disabled=false; },700); }
+}
+
+/* ===== 물리 공통 (검증된 모델) ===== */
+function nOf(c){ return 1.3330 + 0.00176*c; }            // NaCl 수용액 굴절률(20°C)
+function critOf(c){ return Math.asin(Math.min(1, nOf(c)/1.52)); } // 임계각(rad), 프리즘 n=1.52
+function rhoOf(c){ return 0.9982 + 0.0075*c; }           // 소금물 밀도(g/mL), c=g/100g
+function rr(c,x,y,w,h,r){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); }
+const DEG=180/Math.PI;
+
+/* ===== STEP 3: 굴절(스넬) 시뮬레이터 ===== */
+const REF_TH1 = 60/DEG;
+let refrC = 3.5, refrPhase = 0;
+const rc = $('refrCanvas'), rctx = rc && rc.getContext('2d');
+function setRefrMetrics(){
+  const n=nOf(refrC), th2=Math.asin(Math.sin(REF_TH1)/n);
+  if($('m-n')) $('m-n').textContent=n.toFixed(3);
+  if($('m-th2')) $('m-th2').textContent=(th2*DEG).toFixed(1)+'°';
+  if($('m-bend')) $('m-bend').innerHTML=((REF_TH1-th2)*DEG).toFixed(1)+'<small>°</small>';
+}
+function drawRefr(){
+  if(!rc) return;
+  if(rc.offsetParent===null){ requestAnimationFrame(drawRefr); return; }
+  const W=rc.width,H=rc.height, ix=W*0.5, iy=H*0.40;
+  const n=nOf(refrC), th1=REF_TH1, th2=Math.asin(Math.sin(th1)/n);
+  rctx.clearRect(0,0,W,H);
+  rctx.fillStyle='#F3FAFD'; rctx.fillRect(0,0,W,iy);
+  const tint=Math.min(0.5,0.10+refrC*0.014);
+  rctx.fillStyle='rgba(26,167,160,'+tint+')'; rctx.fillRect(0,iy,W,H-iy);
+  rctx.strokeStyle='#0A3D4F'; rctx.lineWidth=2; rctx.beginPath(); rctx.moveTo(0,iy); rctx.lineTo(W,iy); rctx.stroke();
+  rctx.strokeStyle='#9FB9BC'; rctx.lineWidth=1.3; rctx.setLineDash([5,4]); rctx.beginPath(); rctx.moveTo(ix,iy-96); rctx.lineTo(ix,iy+118); rctx.stroke(); rctx.setLineDash([]);
+  const Lin=150, ix0=ix-Math.sin(th1)*Lin, iy0=iy-Math.cos(th1)*Lin;
+  rctx.strokeStyle='#D9A441'; rctx.lineWidth=3.4; rctx.beginPath(); rctx.moveTo(ix0,iy0); rctx.lineTo(ix,iy); rctx.stroke();
+  const ux=ix+Math.sin(th1)*130, uy=iy+Math.cos(th1)*130;
+  rctx.strokeStyle='#C9D7D9'; rctx.lineWidth=1.6; rctx.setLineDash([4,3]); rctx.beginPath(); rctx.moveTo(ix,iy); rctx.lineTo(ux,uy); rctx.stroke(); rctx.setLineDash([]);
+  const Lr=155, rx=ix+Math.sin(th2)*Lr, ry=iy+Math.cos(th2)*Lr;
+  rctx.strokeStyle='#E1733E'; rctx.lineWidth=3.4; rctx.beginPath(); rctx.moveTo(ix,iy); rctx.lineTo(rx,ry); rctx.stroke();
+  rctx.strokeStyle='#D9A441'; rctx.lineWidth=1.6; rctx.beginPath(); rctx.arc(ix,iy,34,-Math.PI/2-th1,-Math.PI/2); rctx.stroke();
+  rctx.strokeStyle='#E1733E'; rctx.beginPath(); rctx.arc(ix,iy,30,Math.PI/2,Math.PI/2+th2); rctx.stroke();
+  refrPhase=(refrPhase+0.011)%1; const t=refrPhase; let px,py;
+  if(t<0.5){ const u=t/0.5; px=ix0+(ix-ix0)*u; py=iy0+(iy-iy0)*u; } else { const u=(t-0.5)/0.5; px=ix+(rx-ix)*u; py=iy+(ry-iy)*u; }
+  rctx.fillStyle='#FFD24A'; rctx.beginPath(); rctx.arc(px,py,4.6,0,7); rctx.fill(); rctx.strokeStyle='#fff'; rctx.lineWidth=1.2; rctx.stroke();
+  rctx.font='bold 12px Pretendard'; rctx.textAlign='left';
+  rctx.fillStyle='#3A6472'; rctx.fillText('공기 n=1.00', 10, 18);
+  rctx.fillStyle='#0A6B66'; rctx.fillText('용액 n='+n.toFixed(3), 10, H-12);
+  rctx.fillStyle='#A8431D'; rctx.font='bold 13px Pretendard';
+  rctx.fillText('θ₁='+(th1*DEG).toFixed(0)+'°', ix-74, iy-42);
+  rctx.fillText('θ₂='+(th2*DEG).toFixed(1)+'°', ix+14, iy+54);
+  requestAnimationFrame(drawRefr);
+}
+/* ===== STEP 3: 임계각·경계선 시뮬레이터 ===== */
+const cc3 = $('critCanvas'), c3 = cc3 && cc3.getContext('2d');
+function drawCrit(){
+  if(!cc3) return;
+  const W=cc3.width,H=cc3.height, n=nOf(refrC), thc=critOf(refrC), thcd=thc*DEG;
+  c3.clearRect(0,0,W,H);
+  const interY=H*0.52, px=W*0.44;
+  c3.fillStyle='#DCEAF2'; c3.fillRect(0,interY,W,H-interY);
+  c3.fillStyle='rgba(26,167,160,0.18)'; c3.fillRect(0,interY-24,W,24);
+  c3.strokeStyle='#0A3D4F'; c3.lineWidth=2; c3.beginPath(); c3.moveTo(0,interY); c3.lineTo(W,interY); c3.stroke();
+  c3.fillStyle='#5B7178'; c3.font='11px Pretendard'; c3.textAlign='left';
+  c3.fillText('시료(소금물) n='+n.toFixed(3), 8, interY-28);
+  c3.fillText('유리 프리즘 n=1.52', 8, H-8);
+  c3.strokeStyle='#9FB9BC'; c3.setLineDash([5,4]); c3.beginPath(); c3.moveTo(px,interY-52); c3.lineTo(px,interY+86); c3.stroke(); c3.setLineDash([]);
+  [28,44,thcd,68,80].forEach(a=>{
+    const isC=Math.abs(a-thcd)<0.6, rad=a/DEG;
+    const sx=px-Math.sin(rad)*118, sy=interY+Math.cos(rad)*118;
+    const below=a<thcd;
+    c3.strokeStyle=isC?'#E1733E':(below?'#C9A24A':'#12808C'); c3.lineWidth=isC?3.6:1.9;
+    c3.beginPath(); c3.moveTo(sx,sy); c3.lineTo(px,interY); c3.stroke();
+    if(below){ const s2=Math.min(1,1.52*Math.sin(rad)/n), t2=Math.asin(s2); const ex=px+Math.sin(t2)*42, ey=interY-Math.cos(t2)*42;
+      c3.strokeStyle='#C9A24A'; c3.setLineDash([3,3]); c3.beginPath(); c3.moveTo(px,interY); c3.lineTo(ex,ey); c3.stroke(); c3.setLineDash([]); }
+    else { const rx=px+Math.sin(rad)*118, ry=interY+Math.cos(rad)*118; c3.strokeStyle=isC?'#E1733E':'#12808C'; c3.lineWidth=isC?3.6:1.9; c3.beginPath(); c3.moveTo(px,interY); c3.lineTo(rx,ry); c3.stroke(); }
+  });
+  c3.fillStyle='#A8431D'; c3.font='bold 13px Pretendard'; c3.textAlign='left'; c3.fillText('θc='+thcd.toFixed(1)+'°', px+10, interY+46);
+  c3.fillStyle='#0A3D4F'; c3.font='10px Pretendard'; c3.fillText('빠져나감=어두움', px+10, interY-8); c3.fillText('전반사=밝음', px+34, interY+70);
+  if($('m-ns')) $('m-ns').textContent=n.toFixed(3);
+  if($('m-crit')) $('m-crit').innerHTML=thcd.toFixed(1)+'<small>°</small>';
+}
+if($('refrConc')) $('refrConc').addEventListener('input', e=>{ refrC=+e.target.value; $('refr-cv').textContent=refrC.toFixed(1)+' g/100g'; setRefrMetrics(); drawCrit(); });
+
+/* ===== STEP 4: 쇠구슬 수 찾기 시뮬레이터 ===== */
+const B_bulb=2.2, B_r=0.25, B_A=Math.PI*B_r*B_r, B_stem=9, B_Llo=0.5, B_Lhi=8.0, B_Vtot=B_bulb+B_A*B_stem, B_m0=1.0, B_mball=0.28;
+let ballN=5, ballC=8.5;
+function ballCompute(N,c){
+  const W=B_m0+N*B_mball, rho=rhoOf(c), Vsub=W/rho; let st;
+  if(W>rho*B_Vtot) st='sink';
+  else if(N<=2) st='unstable';
+  else if(Vsub < B_bulb+B_A*B_Llo) st='high';
+  else if(Vsub > B_bulb+B_A*B_Lhi) st='low';
+  else st='good';
+  return {W,rho,Vsub,L:(Vsub-B_bulb)/B_A,st};
+}
+function goodAcrossRange(N){ for(let c=0;c<=17.0001;c+=0.5){ if(ballCompute(N,c).st!=='good') return false; } return true; }
+const BALLTXT={ sink:['sink','가라앉음 — 쇠구슬이 너무 많아요','평균 밀도가 물보다 커졌어요. 쇠구슬을 빼세요'],
+  unstable:['unstable','불안정 — 기울어져요','무게중심이 너무 높아요. 쇠구슬을 더 넣어 아래를 무겁게'],
+  high:['high','너무 높이 떠서 눈금 밖','이 소금물에선 벌브가 거의 안 잠겨요. 쇠구슬을 더 넣으세요'],
+  low:['low','너무 낮음 — 관이 거의 다 잠김','이 소금물에선 눈금을 못 읽어요. 쇠구슬을 조금 빼세요'],
+  good:['good','양호 — 똑바로 서서 눈금이 읽혀요','벌브가 잠기고 관의 읽기 구간에 수면이 있어요'] };
+function setBallState(st){ const el=$('ballState'); if(!el) return; const m=BALLTXT[st]; el.className='ballstate '+m[0]; el.innerHTML=m[1]+'<small>'+m[2]+'</small>'; }
+const bc4=$('ballCanvas'), b4=bc4&&bc4.getContext('2d');
+function drawBallSim(){
+  if(!bc4) return;
+  const W=bc4.width,H=bc4.height; b4.clearRect(0,0,W,H);
+  const r=ballCompute(ballN,ballC), SC=16, waterY=120, cx=W*0.5;
+  const bx=64,by=24,bw=172,bh=306, bbot=by+bh;
+  b4.strokeStyle='#9FC4C9'; b4.lineWidth=3; b4.strokeRect(bx,by,bw,bh);
+  const tint=Math.min(0.4,0.10+ballC*0.017);
+  b4.fillStyle='rgba(26,167,160,'+tint+')'; b4.fillRect(bx+2,waterY,bw-4,bbot-waterY-1);
+  b4.strokeStyle='#1AA7A0'; b4.lineWidth=2; b4.beginPath(); b4.moveTo(bx+2,waterY); b4.lineTo(bx+bw-2,waterY); b4.stroke();
+  b4.fillStyle='#1AA7A0'; b4.font='bold 12px Pretendard'; b4.textAlign='left'; b4.fillText('수면',bx+6,waterY-6);
+  const bulbRx=17,bulbRy=15,stemW=13;
+  let L=Math.max(-1.3,Math.min(B_stem-0.4,r.L)), tilt=0, sunk=(r.st==='sink');
+  if(r.st==='unstable') tilt=11/DEG;
+  let stemBottomY = sunk? (bbot-90) : (waterY + L*SC);
+  const bulbCY = stemBottomY + bulbRy;
+  b4.save(); b4.translate(cx,bulbCY); b4.rotate(tilt);
+  b4.fillStyle='#fff'; b4.strokeStyle='#0A3D4F'; b4.lineWidth=2;
+  rr(b4,-stemW/2,-bulbRy-B_stem*SC,stemW,B_stem*SC,3); b4.fill(); b4.stroke();
+  b4.fillStyle='rgba(47,211,182,0.32)'; b4.fillRect(-stemW/2+1,-bulbRy-B_Lhi*SC,stemW-2,(B_Lhi-B_Llo)*SC);
+  b4.strokeStyle='#0A3D4F'; b4.fillStyle='#0A3D4F'; b4.font='9px Pretendard'; b4.textAlign='left';
+  for(let k=0;k<=B_stem;k++){ const yy=-bulbRy-k*SC; b4.lineWidth=1; b4.beginPath(); b4.moveTo(stemW/2,yy); b4.lineTo(stemW/2+(k%2?4:7),yy); b4.stroke(); if(k%2===0) b4.fillText(k,stemW/2+9,yy+3); }
+  b4.fillStyle='#fff'; b4.beginPath(); b4.ellipse(0,0,bulbRx,bulbRy,0,0,7); b4.fill(); b4.stroke();
+  b4.fillStyle='#5B7178'; const shown=Math.min(ballN,18);
+  for(let i=0;i<shown;i++){ const col=i%3, rowi=Math.floor(i/3); const bxx=(col-1)*8 + ((i*7)%3-1)*1.5; const byy=bulbRy-5-rowi*6; b4.beginPath(); b4.arc(bxx,byy,2.9,0,7); b4.fill(); }
+  b4.restore();
+  setBallState(r.st);
+  if($('ballN')) $('ballN').textContent=ballN;
+}
+function ballStep(d){ ballN=Math.max(1,Math.min(20,ballN+d)); drawBallSim(); }
+if($('ballPlus')) $('ballPlus').addEventListener('click',()=>ballStep(1));
+if($('ballMinus')) $('ballMinus').addEventListener('click',()=>ballStep(-1));
+if($('ballConc')) $('ballConc').addEventListener('input',e=>{ ballC=+e.target.value; $('ball-cv').textContent=ballC.toFixed(1)+' g/100g'; drawBallSim(); });
+if($('ballSweep')) $('ballSweep').addEventListener('click',()=>{
+  const N=ballN, res=$('ballSweepResult'); res.style.display=''; res.innerHTML='검사 중… 0~17 g/100g를 훑어봅니다.';
+  const bad=[]; let c=0;
+  const iv=setInterval(()=>{
+    ballC=c; if($('ballConc')) $('ballConc').value=c; if($('ball-cv')) $('ball-cv').textContent=c.toFixed(1)+' g/100g';
+    const st=ballCompute(N,c).st; drawBallSim();
+    if(st!=='good') bad.push(st);
+    c+=1;
+    if(c>17){ clearInterval(iv);
+      if(bad.length===0){ res.innerHTML='✅ <b>쇠구슬 '+N+'개</b> — 0~17 g/100g <b>전 구간에서 양호</b>! 좋은 개수예요. 아래에 기록하세요.'; }
+      else { const nm={sink:'가라앉음',unstable:'불안정',high:'너무높음',low:'너무낮음'}; const kinds=[...new Set(bad)].map(s=>nm[s]).join(', '); res.innerHTML='❌ <b>쇠구슬 '+N+'개</b> — 일부 구간에서 문제('+kinds+'). 개수를 바꿔 다시 검사해 보세요.'; }
+    }
+  },70);
+});
+if($('ballFinal')){ $('ballFinal').value=state.ballCount||''; $('ballFinal').addEventListener('input',e=>{ state.ballCount=e.target.value; saveState(); renderSummary(); }); }
+
+/* ===== STEP 5: 밀도 읽기 연동 ===== */
+function updateDensity(){ const el=$('r-rho'); if(!el) return; const c=salFromG(sim_salt); el.textContent=rhoOf(c).toFixed(3); }
+if($('salt')) $('salt').addEventListener('input',updateDensity);
+
+/* ===== 초기화 ===== */
+renderCal();
+drawGraph();
+estimate();
+renderVibe();
+renderMemberRows();
+drawSolubility();
+drawEye();
+updateRefHint();
+renderSummary();
+bindReportFields();
+initPhotos();
+setRefrMetrics(); drawRefr(); drawCrit();
+drawBallSim(); updateDensity();
+$('makeReport').addEventListener('click', downloadWord);
+if (state.vibe.code) $('vibe-frame').srcdoc = state.vibe.code;
+goto(state.step || 1);
+</script>
+</body>
+</html>
