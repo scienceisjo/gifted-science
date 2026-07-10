@@ -282,6 +282,9 @@
   .ballpick{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;background:#fff;border:1.5px solid var(--teal2);border-radius:12px;padding:12px 15px}
   .ballpick label{margin:0;font-weight:800;color:var(--navy)}
   .ballpick input[type=number]{width:80px;text-align:center;font-size:1.1rem;font-weight:800}
+  .q5{margin:11px 0}
+  .q5>b{display:block;margin-bottom:5px;color:var(--navy);font-size:.96rem}
+  .btn:disabled{opacity:.5;cursor:not-allowed;filter:grayscale(.3)}
 </style>
 </head>
 <body>
@@ -351,7 +354,7 @@
       </div>
     </div>
     <div class="note" style="margin:0 0 14px">🧭 <b>이 자료 혼자서 끝까지!</b> 위 STEP 버튼으로 언제든 오갈 수 있어요. 각 단계에는 <b>예측 → 시뮬레이터로 확인 → 직접 측정 → 스스로 점검</b>이 들어 있고, 막히면 <b>💡힌트</b>를 열어 보세요. 입력한 내용은 자동 저장되고 마지막에 <b>보고서</b>로 정리됩니다.</div>
-    <div class="ok"><b>준비물</b> · <b>굴절 염분계</b>(ATAGO MASTER-BX/S28M — 염화나트륨 0~28 g/100g · Brix 0~33% 이중 눈금), 증류수(영점용), 스포이드, <b>쇠구슬</b>(개수는 STEP 4에서 <b>직접 찾음</b>), 소금, 물, 비커 5개(기준 4 + 미지 1), 눈금실린더, 자, 네임펜(유성 펜)·스티커, 전자저울, 약수저, 유리 막대, 키친타올</div>
+    <div class="ok"><b>준비물</b> · <b>굴절 염분계</b>(ATAGO MASTER-S28M — 염화나트륨 0~28 g/100g), 증류수(영점용), 스포이드, <b>쇠구슬</b>(개수는 STEP 4에서 <b>직접 찾음</b>), 소금, 물, 비커 5개(기준 4 + 미지 1), 눈금실린더, 자, 네임펜(유성 펜)·스티커, 전자저울, 약수저, 유리 막대, 키친타올</div>
     <div style="margin-bottom:4px"><label for="grp">모둠 이름</label><input id="grp" type="text" placeholder="예: 짠물탐험대"></div>
     <label>모둠 인원</label>
     <div class="count-pick" id="countPick">
@@ -459,7 +462,19 @@
         </div>
       </details>
     </div>
-    <div class="em">📟 <b>우리 기기 — ATAGO MASTER-BX/S28M.</b> 접안 화면에 눈금이 <b>두 줄</b> 있어요: <b>Brix(0~33%)</b>는 설탕물용, <b>염화나트륨(0~28 g/100g)</b>이 소금물용입니다. 우리는 반드시 <b>염화나트륨 눈금</b>을 읽어요. 실물 접안 화면에서 어느 쪽이 염화나트륨 눈금인지 먼저 확인하세요! 💭 같은 경계선인데 왜 두 눈금의 숫자가 다를까요? 조에서 이야기해 보세요.</div>
+    <div class="labsim">
+      <h3>🚗 빛은 왜 꺾일까? — 자동차 바퀴 비유</h3>
+      <div class="subhint">빠른 <b>아스팔트</b>에서 느린 <b>진흙</b>으로 <b>비스듬히</b> 들어가는 수레를 보세요. 진흙에 <b>먼저 닿은 바퀴가 느려지면서</b> 수레가 방향을 틀어요. 빛도 똑같이 <b>느린 매질(진한 소금물)</b>로 들어갈 때 <b>법선 쪽으로 꺾입니다.</b></div>
+      <div class="simrow" style="grid-template-columns:320px 1fr">
+        <canvas id="carCanvas" width="320" height="280"></canvas>
+        <div class="simctrl">
+          <div class="ctrl-row"><label style="margin:0">진흙에서 얼마나 느린가</label><span class="v" id="car-cv">보통</span></div>
+          <input type="range" id="carSlow" min="0.4" max="0.9" step="0.05" value="0.6">
+          <div class="note" style="margin-top:12px">더 <b>느릴수록</b>(= 매질이 더 진할수록) 수레가 <b>더 많이 꺾여요.</b> 두 바퀴가 같은 속도(같은 매질)면 <b>안 꺾이고 직진</b>합니다 — 이것이 굴절의 진짜 이유예요.</div>
+        </div>
+      </div>
+    </div>
+    <div class="em">📟 <b>우리 기기 — ATAGO MASTER-S28M.</b> 소금물의 농도(염화나트륨, <b>g/100g</b>)를 빛의 굴절로 재는 굴절 염분계예요. 눈금은 한 줄(0~28)이고, 측정 전 <b>증류수로 0점</b>을 맞추는 것을 잊지 마세요.</div>
     <div class="note" style="margin:0 0 10px">🌡 <b>온도 주의.</b> 이 모델은 자동 온도 보정(ATC)이 없어요. 용액과 기기를 <b>실온</b>에 두고 재고, 프리즘 부분을 손으로 오래 감싸지 마세요. 온도가 달라지면 측정값이 어떻게 될지 — 나중에 오차 분석에서 다시 만나요.</div>
     <div class="note" style="margin:0 0 14px">🔎 <b>단위 탐정.</b> 바닷물 평균 염분 <b>35‰</b>(1000분의 35)를 우리 굴절계 눈금 <b>g/100g</b>(100 g당 소금 g)으로 읽으면 얼마일까요? 계산해 보세요. <span class="hint">(힌트: ‰와 g/100g는 10배 관계)</span></div>
     <h3 class="sec">🔧 사용법 — 순서대로 따라 하세요</h3>
@@ -472,7 +487,7 @@
       <div class="gcard"><div class="row"><span class="badge">6</span><div><h3>경계선이 닿는 눈금 읽기</h3><p>파란색과 흰색이 나뉘는 <b>경계선</b>이 닿는 눈금을 <b>염화나트륨(g/100g) 눈금</b>에서 읽습니다. 이 값이 용액의 농도예요. 다 쓰면 프리즘을 닦아 말려 보관합니다.</p></div></div></div>
     </div>
     <h3 class="sec">👁 접안렌즈 연습 — 경계선 읽어 보기</h3>
-    <p>슬라이더로 용액의 농도를 바꿔 보세요. <b>농도가 커질수록 파란 영역이 넓어지고 경계선이 아래로 내려갑니다.</b> 실물처럼 눈금이 두 줄이에요 — 흐린 쪽은 Brix(설탕용), 진한 쪽이 <b>염화나트륨(우리가 읽는 쪽!)</b>. 경계선이 닿는 염화나트륨 눈금을 읽는 연습을 해 봐요.</p>
+    <p>슬라이더로 용액의 농도를 바꿔 보세요. 눈금은 <b>아래가 0, 위로 갈수록 커집니다(28까지)</b> — 실물 기기와 같은 방향이에요. <b>농도가 커질수록 경계선이 위로 올라가고 아래쪽 파란 영역이 넓어집니다.</b> 경계선이 닿는 눈금(g/100g)을 읽는 연습을 해 봐요.</p>
     <div class="eyewrap">
       <div>
         <div class="eye-stage"><canvas id="eyepiece" width="360" height="360"></canvas></div>
@@ -486,7 +501,8 @@
     </div>
     <div class="report-field"><label for="rk-ref">📝 굴절 염분계를 써 보고 — 알게 된 점·주의할 점</label>
       <textarea id="rk-ref" data-rkey="obsRefracto" placeholder="예: 측정 전에 증류수로 0점을 맞춰야 했다. 경계선이 또렷하게 보이도록 초점을 맞추는 것이 중요했다."></textarea></div>
-    <div class="photo-block"><label>📷 굴절 염분계 눈금(경계선) 사진</label>
+    <div class="photo-block"><label>📷 굴절 염분계 경계선 사진</label>
+      <p class="hint" style="margin:2px 0 0">굴절 염분계의 <b>접안렌즈(들여다보는 입구)</b>에 휴대폰 카메라를 <b>바짝 가져다 대고</b>, 눈금과 파랑·흰색 경계선이 보이게 찍어 올려보자.</p>
       <div class="photo-grid"><div class="photo-slot" data-slot="refracto"></div></div></div>
     <div class="nav-btns"><button class="btn ghost" data-go="2">← 이전</button><button class="btn primary" data-go="4">다음 → 간이 염분계 만들기</button></div>
   </div>
@@ -643,17 +659,74 @@
         <div class="ok" style="margin-top:14px"><b>관찰 포인트.</b> (1) 측정기는 위로 떠오르지만, (2) <b>중력·부력 화살표의 길이는 변하지 않아요</b> — 떠 있는 동안 두 힘은 항상 균형(부력 = 무게)! (3) 대신 <b>물에 잠긴 부피가 줄어듭니다.</b> 예측과 달랐다면 왜 그런지 조에서 설명을 만들어 보고, 아래 물리 카드와 비교해 보세요. 바닷물은 약 3.5 g/100g이에요.</div>
       </div>
     </div>
-    <div class="phys-card">
-      <h3>🌊 왜 짠 물에서 측정기가 더 높이 떠오를까?</h3>
-      <ol>
-        <li><b>측정기의 무게는 변하지 않습니다.</b> 어떤 물에 넣어도 측정기에 작용하는 중력은 똑같아요.</li>
-        <li><b>부력은 측정기가 밀어낸 물의 무게입니다.</b> 측정기가 잠기면 그 부피만큼 물이 밀려나고, 그 물이 <i>"내 자리 돌려줘!"</i> 하며 측정기를 위로 밀어 올려요. <span class="hint">(아르키메데스의 원리)</span></li>
-        <li><b>짠 물은 같은 부피라도 더 무거워요(밀도가 큼).</b> 그래서 짠 물에서는 측정기가 <b>적게 잠겨도</b> 그 적은 부피의 물 무게로 측정기를 받쳐 줄 수 있어요.</li>
-        <li><b>측정기는 부력 = 자기 무게가 되는 곳에서 멈춥니다.</b> 짠 물에서는 적게 잠겨도 충분하니 더 위로 떠올라요. 그래서 <b>짠 정도가 클수록 떠오른 높이가 커집니다.</b></li>
-      </ol>
-      <p class="hint" style="margin-top:8px">🌟 <b>도전(심화)</b> — 측정기의 무게를 W, 관의 단면적을 A, 용액의 밀도를 ρ라 할 때, 물에 잠긴 깊이 d를 식으로 나타내 볼까요? <i>(힌트: 떠 있는 동안 W = ρ × g × 잠긴 부피)</i></p>
+    <div class="selfcheck" id="s5predict" style="border-color:#F0CE97;background:#FFF9EC">
+      <div class="t" style="color:#9A6612">🔮 예측 먼저 — 세 가지에 답하면 아래 ‘원리’가 열려요 <span class="hint" style="font-weight:500">(정답이 아니어도 괜찮아요. 지금은 예상!)</span></div>
+      <div class="q5"><b>① 소금을 더 넣으면 측정기는?</b>
+        <label><input type="radio" name="p1" value="a"> 더 높이 뜬다</label>
+        <label><input type="radio" name="p1" value="b"> 더 가라앉는다</label>
+        <label><input type="radio" name="p1" value="c"> 변화 없다</label></div>
+      <div class="q5"><b>② 떠 있는 측정기에 작용하는 부력과 중력은?</b>
+        <label><input type="radio" name="p2" value="a"> 부력이 더 크다</label>
+        <label><input type="radio" name="p2" value="b"> 똑같다</label>
+        <label><input type="radio" name="p2" value="c"> 중력이 더 크다</label></div>
+      <div class="q5"><b>③ 소금물이 진해지면 밀도는?</b>
+        <label><input type="radio" name="p3" value="a"> 커진다</label>
+        <label><input type="radio" name="p3" value="b"> 작아진다</label>
+        <label><input type="radio" name="p3" value="c"> 그대로다</label></div>
+      <button class="btn primary" id="s5revealBtn" style="margin-top:12px">예측 확인하고 원리 열기 🔓</button>
+      <div id="s5predMsg" class="hint" style="margin-top:8px"></div>
     </div>
-    <div class="nav-btns"><button class="btn ghost" data-go="4">← 이전</button><button class="btn primary" data-go="6">다음 → 높이 측정법</button></div>
+
+    <div id="s5reveal" class="hide">
+      <div class="phys-card">
+        <h3>🌊 왜 짠 물에서 측정기가 더 높이 떠오를까?</h3>
+        <ol>
+          <li><b>측정기의 무게는 변하지 않습니다.</b> 어떤 물에 넣어도 측정기에 작용하는 중력은 똑같아요.</li>
+          <li><b>부력은 측정기가 밀어낸 물의 무게입니다.</b> 측정기가 잠기면 그 부피만큼 물이 밀려나고, 그 물이 <i>"내 자리 돌려줘!"</i> 하며 측정기를 위로 밀어 올려요. <span class="hint">(아르키메데스의 원리)</span></li>
+          <li><b>짠 물은 같은 부피라도 더 무거워요(밀도가 큼).</b> 그래서 짠 물에서는 측정기가 <b>적게 잠겨도</b> 그 적은 부피의 물 무게로 측정기를 받쳐 줄 수 있어요.</li>
+          <li><b>측정기는 부력 = 자기 무게가 되는 곳에서 멈춥니다.</b> 짠 물에서는 적게 잠겨도 충분하니 더 위로 떠올라요. 그래서 <b>짠 정도가 클수록 떠오른 높이가 커집니다.</b></li>
+        </ol>
+        <p class="hint" style="margin-top:8px">🌟 <b>도전(심화)</b> — 측정기의 무게를 W, 관의 단면적을 A, 용액의 밀도를 ρ라 할 때, 물에 잠긴 깊이 d를 식으로 나타내 볼까요? <i>(힌트: 떠 있는 동안 W = ρ × g × 잠긴 부피)</i></p>
+      </div>
+
+      <div class="labsim">
+        <h3>🥚 계란은 언제 떠오를까? — 소금물 부력 실험</h3>
+        <div class="subhint">맹물에선 계란이 <b>가라앉아요</b>(계란이 물보다 무거워서). 소금을 넣어 <b>물의 밀도</b>를 높이면, <b>물 밀도 &gt; 계란 밀도</b>가 되는 순간 계란이 <b>떠오릅니다.</b> 우리 간이 염분계가 뜨는 원리와 똑같아요!</div>
+        <div class="simrow" style="grid-template-columns:260px 1fr">
+          <canvas id="eggCanvas" width="260" height="300"></canvas>
+          <div class="simctrl">
+            <div class="ctrl-row"><label style="margin:0">소금 농도</label><span class="v" id="egg-cv">0.0 g/100g</span></div>
+            <input type="range" id="eggSalt" min="0" max="25" step="0.5" value="0">
+            <div class="metrics">
+              <div class="metric"><div class="l">소금물 밀도 ρ<sub>물</sub></div><div class="v" id="egg-rho">0.998<small> g/mL</small></div></div>
+              <div class="metric"><div class="l">계란 밀도 ρ<sub>계란</sub></div><div class="v">1.05<small> g/mL</small></div></div>
+            </div>
+            <div class="ballstate sink" id="egg-status" style="margin-top:12px">가라앉음 (물 밀도 &lt; 계란 밀도)</div>
+            <div class="note" style="margin-top:10px">힘의 관점: 계란엔 <b>중력(아래)</b>과 <b>부력(위)</b>이 작용해요. 부력 = 밀어낸 <b>물의 무게</b>라, 물이 무거워질수록(밀도↑) 부력이 커져 <b>부력 ≥ 중력</b>이 되면 떠오릅니다.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="selfcheck" id="s5quiz" style="border-color:var(--teal2)">
+        <div class="t">🧩 확인 문제 — <b>3개 모두 맞히면</b> 다음 단계가 열려요</div>
+        <div class="q5"><b>1. 물에 떠서 멈춰 있는 물체는?</b>
+          <label><input type="radio" name="q1" value="a"> 부력 &gt; 무게</label>
+          <label><input type="radio" name="q1" value="b"> 부력 = 무게</label>
+          <label><input type="radio" name="q1" value="c"> 부력 &lt; 무게</label></div>
+        <div class="q5"><b>2. 소금물의 밀도가 커지면, 같은 측정기의 잠긴 부피는?</b>
+          <label><input type="radio" name="q2" value="a"> 늘어난다</label>
+          <label><input type="radio" name="q2" value="b"> 줄어든다</label>
+          <label><input type="radio" name="q2" value="c"> 변화 없다</label></div>
+        <div class="q5"><b>3. 계란이 소금물에서 떠오르는 순간은?</b>
+          <label><input type="radio" name="q3" value="a"> 소금물 밀도가 계란보다 커질 때</label>
+          <label><input type="radio" name="q3" value="b"> 물이 뜨거워질 때</label>
+          <label><input type="radio" name="q3" value="c"> 계란이 저절로 가벼워질 때</label></div>
+        <button class="btn primary" id="s5quizBtn" style="margin-top:12px">채점하기</button>
+        <div id="s5quizMsg" style="margin-top:9px;font-size:.95rem"></div>
+      </div>
+    </div>
+
+    <div class="nav-btns"><button class="btn ghost" data-go="4">← 이전</button><button class="btn primary" id="toStep6" data-go="6" disabled>다음 → 높이 측정법 🔒</button></div>
   </div>
 
   <!-- STEP 7 -->
@@ -831,7 +904,7 @@
         <li>측정 전에 <b>증류수로 0점(영점 보정)</b>을 맞추지 않으면 어떤 일이 생길까요?</li>
         <li>보정곡선으로 추정한 염분과 굴절 염분계의 실제값에 <b>차이</b>가 났다면, 그 까닭은 무엇일까요?</li>
         <li>짠 물에서 측정기가 더 높이 떠오른 까닭을 <b>부력</b>으로 설명해 볼까요?</li>
-        <li>우리 간이 염분계로 소금물 말고 <b>설탕물</b>의 진하기도 잴 수 있을까요? 그렇다면 보정곡선을 다시 만들어야 할까요? (우리 굴절계의 <b>Brix 눈금</b>은 이때 어떤 도움이 될까요?)</li>
+        <li>우리 간이 염분계로 소금물 말고 <b>설탕물</b>의 진하기도 잴 수 있을까요? 그렇다면 보정곡선을 다시 만들어야 할까요?</li>
         <li>바닷물의 염분을 재는 일은 어디에 쓰일까요? (어업·양식·기후·해양 연구 등) 소금 호수인 <b>사해</b>에서 사람이 잘 뜨는 것과 오늘 실험은 어떻게 연결될까요?</li>
       </ol>
     </div>
@@ -865,7 +938,7 @@ const state = loadState() || {
   group:'', memberCount:0, members:[],
   cal:[ {salt:5, sal:'', h:'', h2:''}, {salt:10, sal:'', h:'', h2:''}, {salt:15, sal:'', h:'', h2:''}, {salt:20, sal:'', h:'', h2:''} ],
   mystery:{ h:'', refSal:'' },
-  refRule:'', reason:'', reflect:'', reflect2:'', reflect3:'', ballCount:'',
+  refRule:'', reason:'', reflect:'', reflect2:'', reflect3:'', ballCount:'', s5pass:false,
   vibe:{ level:'', code:'', prompt:'' },
   report:{}, captions:{},
   step:1,
@@ -887,6 +960,7 @@ if (!state.vibe || typeof state.vibe!=='object') state.vibe={level:'',code:'',pr
 if (!state.report || typeof state.report!=='object') state.report={};
 if (!state.captions || typeof state.captions!=='object') state.captions={};
 if (state.ballCount===undefined || state.ballCount===null) state.ballCount='';
+if (state.s5pass===undefined) state.s5pass=false;
 
 const $ = id => document.getElementById(id);
 function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -940,19 +1014,20 @@ function drawEye(){
   ex.clearRect(0,0,W,H);
   ex.save(); ex.beginPath(); ex.arc(cx,cy,R,0,Math.PI*2); ex.clip();
   ex.fillStyle='#F7FBFC'; ex.fillRect(0,0,W,H);
-  const salMax=28, brixMax=33, y0=cy-R+26, y1=cy+R-26;
-  const yOf=s=> y0+(s/salMax)*(y1-y0);
+  const salMax=28, y0=cy-R+26, y1=cy+R-26;   // y0=위(28), y1=아래(0)
+  const yOf=s=> y1-(s/salMax)*(y1-y0);        // 아래가 0, 위로 갈수록 커짐
   const by=yOf(eyeSal);
-  const grad=ex.createLinearGradient(0,y0,0,by);
-  grad.addColorStop(0,'#6FBFDC'); grad.addColorStop(1,'#A9DCEC');
-  ex.fillStyle=grad; ex.fillRect(0,0,W,by);
-  // 바닷물(3.5 g/100g = 35‰) 기준선
+  // 파란(측정) 영역: 아래(0)에서 경계선까지 — 농도↑이면 넓어짐
+  const grad=ex.createLinearGradient(0,y1,0,by);
+  grad.addColorStop(0,'#A9DCEC'); grad.addColorStop(1,'#6FBFDC');
+  ex.fillStyle=grad; ex.fillRect(0,by,W,H-by);
+  // 바닷물(3.5 g/100g) 기준선
   const sy=yOf(3.5);
   ex.strokeStyle='#C75A2E'; ex.lineWidth=1.4; ex.setLineDash([5,4]);
   ex.beginPath(); ex.moveTo(0,sy); ex.lineTo(W,sy); ex.stroke(); ex.setLineDash([]);
   ex.fillStyle='#A8431D'; ex.font='bold 11px Pretendard'; ex.textAlign='center';
   ex.fillText('바닷물 3.5', cx, sy-6);
-  // 왼쪽 눈금: 염화나트륨 g/100g (우리가 읽는 쪽 ★)
+  // 눈금: 염화나트륨 g/100g (아래 0 → 위 28)
   const sxL=cx-R*0.5;
   ex.strokeStyle='#16313A'; ex.fillStyle='#16313A'; ex.lineWidth=1.6; ex.font='bold 12px Pretendard'; ex.textAlign='left';
   ex.beginPath(); ex.moveTo(sxL,y0); ex.lineTo(sxL,y1); ex.stroke();
@@ -961,26 +1036,19 @@ function drawEye(){
     ex.beginPath(); ex.moveTo(sxL,yy); ex.lineTo(sxL+(lng?14:7),yy); ex.stroke();
     if(lng) ex.fillText(s, sxL+18, yy+4);
   }
-  // 오른쪽 눈금: Brix % (설탕용 — 참고만!)
-  const bxR=cx+R*0.5;
-  ex.strokeStyle='#A9BDC2'; ex.fillStyle='#93A9AF'; ex.lineWidth=1.2; ex.font='10px Pretendard'; ex.textAlign='right';
-  ex.beginPath(); ex.moveTo(bxR,y0); ex.lineTo(bxR,y1); ex.stroke();
-  for(let b=0;b<=brixMax;b+=5){
-    const yy=y0+(b/brixMax)*(y1-y0);
-    ex.beginPath(); ex.moveTo(bxR,yy); ex.lineTo(bxR-8,yy); ex.stroke();
-    ex.fillText(b, bxR-11, yy+3);
-  }
   // 경계선
   ex.strokeStyle='#0A3D4F'; ex.lineWidth=3.5;
   ex.beginPath(); ex.moveTo(0,by); ex.lineTo(W,by); ex.stroke();
-  // 값 알림(경계선 위) — 염화나트륨 눈금 기준
+  // 값 알림(경계선 근처, 시야 안쪽으로 위치 보정)
   const lbl=eyeSal.toFixed(1);
   ex.font='bold 16px Pretendard'; ex.textAlign='center';
   const tw=ex.measureText(lbl).width;
+  let ly=by-15, boxY=by-31;
+  if(boxY < y0+4){ ly=by+22; boxY=by+6; }
   ex.fillStyle='rgba(255,255,255,.94)';
-  rpath(ex, cx-tw/2-9, by-31, tw+18, 22, 7); ex.fill();
+  rpath(ex, cx-tw/2-9, boxY, tw+18, 22, 7); ex.fill();
   ex.strokeStyle='#C75A2E'; ex.lineWidth=1.5; ex.stroke();
-  ex.fillStyle='#A8431D'; ex.fillText(lbl, cx, by-15);
+  ex.fillStyle='#A8431D'; ex.fillText(lbl, cx, ly);
   ex.restore();
 }
 $('eyeSal').addEventListener('input', e=>{ eyeSal=+e.target.value; $('eye-v').textContent=eyeSal.toFixed(1)+' g/100g'; $('r-eyeSal').textContent=eyeSal.toFixed(1); drawEye(); });
@@ -1486,7 +1554,7 @@ function buildReportHtml(){
   +"</style></head><body>"
   +"<h1>간이 염분계 보정 탐구 보고서</h1>"
   +"<div class='meta'>— 굴절 염분계로 보정곡선 만들어 미지 용액의 염분 알아내기 —<br>모둠: <b>"+escapeHtml(state.group||'—')+"</b> &nbsp;|&nbsp; 모둠원: "+escapeHtml(names)+" &nbsp;|&nbsp; 작성일: "+ds+"</div>"
-  +"<h2>1. 탐구 주제와 목표</h2><div class='ans'>정밀한 <b>굴절 염분계</b>(ATAGO MASTER-BX/S28M, 염화나트륨 0~28 g/100g)를 기준으로 직접 만든 <b>간이 염분계</b>를 보정하여 <b>보정곡선</b>을 만들고, 그 곡선으로 미지 용액의 농도(g/100g)를 알아낸다.</div>"
+  +"<h2>1. 탐구 주제와 목표</h2><div class='ans'>정밀한 <b>굴절 염분계</b>(ATAGO MASTER-S28M, 염화나트륨 0~28 g/100g)를 기준으로 직접 만든 <b>간이 염분계</b>를 보정하여 <b>보정곡선</b>을 만들고, 그 곡선으로 미지 용액의 농도(g/100g)를 알아낸다.</div>"
   +"<h2>2. 가설과 보정 아이디어</h2><div class='sub'>가설</div>"+ansBox(r.hypothesis)
   +"<div class='sub'>보정 아이디어 (우리 조의 처음 생각)</div>"+ansBox(r.ideaCalib)
   +"<h2>3. 탐구 과정과 관찰</h2>"
@@ -1675,6 +1743,95 @@ if($('ballFinal')){ $('ballFinal').value=state.ballCount||''; $('ballFinal').add
 function updateDensity(){ const el=$('r-rho'); if(!el) return; const c=salFromG(sim_salt); el.textContent=rhoOf(c).toFixed(3); }
 if($('salt')) $('salt').addEventListener('input',updateDensity);
 
+/* ===== STEP 3: 자동차 바퀴 굴절 비유 ===== */
+let carSlowRatio=0.6, carState2=null, carTrail=[];
+const carC=$('carCanvas'), cctxc=carC&&carC.getContext('2d');
+function carInit(W){ const ang=34/DEG; return { cx:W*0.30, cy:-24, h:{x:Math.sin(ang), y:Math.cos(ang)} }; }
+function drawCar(){
+  if(!carC) return;
+  if(carC.offsetParent===null){ requestAnimationFrame(drawCar); return; }
+  const W=carC.width,H=carC.height, by=H*0.5, axleLen=48;
+  cctxc.clearRect(0,0,W,H);
+  cctxc.fillStyle='#E9EDEF'; cctxc.fillRect(0,0,W,by);
+  cctxc.fillStyle='#EAD9A8'; cctxc.fillRect(0,by,W,H-by);
+  cctxc.strokeStyle='#0A3D4F'; cctxc.lineWidth=2; cctxc.beginPath(); cctxc.moveTo(0,by); cctxc.lineTo(W,by); cctxc.stroke();
+  cctxc.fillStyle='#5B7178'; cctxc.font='12px Pretendard'; cctxc.textAlign='left';
+  cctxc.fillText('아스팔트 (빠름)',8,18); cctxc.fillText('진흙 (느림)',8,H-10);
+  if(!carState2){ carState2=carInit(W); carTrail=[]; }
+  const s=carState2, vFast=2.4, vSlow=vFast*carSlowRatio;
+  const perp={x:-s.h.y,y:s.h.x};
+  let wL={x:s.cx-perp.x*axleLen/2, y:s.cy-perp.y*axleLen/2};
+  let wR={x:s.cx+perp.x*axleLen/2, y:s.cy+perp.y*axleLen/2};
+  const vAt=p=> (p.y<by? vFast : vSlow);
+  wL={x:wL.x+s.h.x*vAt(wL), y:wL.y+s.h.y*vAt(wL)};
+  wR={x:wR.x+s.h.x*vAt(wR), y:wR.y+s.h.y*vAt(wR)};
+  const ncx=(wL.x+wR.x)/2, ncy=(wL.y+wR.y)/2;
+  let ax={x:wR.x-wL.x,y:wR.y-wL.y}; const al=Math.hypot(ax.x,ax.y)||1; ax.x/=al; ax.y/=al;
+  let nh={x:ax.y,y:-ax.x};
+  if(nh.x*s.h.x+nh.y*s.h.y<0){ nh.x=-nh.x; nh.y=-nh.y; }
+  s.cx=ncx; s.cy=ncy; s.h=nh;
+  carTrail.push({x:ncx,y:ncy}); if(carTrail.length>260) carTrail.shift();
+  cctxc.strokeStyle='rgba(225,115,62,0.55)'; cctxc.lineWidth=2;
+  cctxc.beginPath(); carTrail.forEach((p,i)=>{ i?cctxc.lineTo(p.x,p.y):cctxc.moveTo(p.x,p.y); }); cctxc.stroke();
+  const p2={x:-s.h.y,y:s.h.x};
+  const Lw={x:s.cx-p2.x*axleLen/2,y:s.cy-p2.y*axleLen/2}, Rw={x:s.cx+p2.x*axleLen/2,y:s.cy+p2.y*axleLen/2};
+  cctxc.strokeStyle='#0A3D4F'; cctxc.lineWidth=4; cctxc.beginPath(); cctxc.moveTo(Lw.x,Lw.y); cctxc.lineTo(Rw.x,Rw.y); cctxc.stroke();
+  [Lw,Rw].forEach(w=>{ cctxc.fillStyle='#12808C'; cctxc.beginPath(); cctxc.arc(w.x,w.y,7,0,7); cctxc.fill(); cctxc.strokeStyle='#0A3D4F'; cctxc.lineWidth=2; cctxc.stroke(); });
+  cctxc.strokeStyle='#E1733E'; cctxc.lineWidth=2.5; cctxc.beginPath(); cctxc.moveTo(s.cx,s.cy); cctxc.lineTo(s.cx+s.h.x*18,s.cy+s.h.y*18); cctxc.stroke();
+  if(s.cy>H+30||s.cx>W+30||s.cx<-30){ carState2=carInit(W); carTrail=[]; }
+  requestAnimationFrame(drawCar);
+}
+if($('carSlow')) $('carSlow').addEventListener('input',e=>{ carSlowRatio=+e.target.value; const t=carSlowRatio; $('car-cv').textContent = t<=0.5?'매우 느림':(t<=0.65?'느림':(t<0.8?'보통':'조금 느림')); carState2=null; });
+
+/* ===== STEP 5: 계란 부력 시뮬레이터 ===== */
+const RHO_EGG=1.05;
+let eggSalt=0, eggDispY=null;
+const eggC=$('eggCanvas'), ectx=eggC&&eggC.getContext('2d');
+function drawEgg(){
+  if(!eggC) return;
+  if(eggC.offsetParent===null){ requestAnimationFrame(drawEgg); return; }
+  const W=eggC.width,H=eggC.height; ectx.clearRect(0,0,W,H);
+  const rho=rhoOf(eggSalt), floats=rho>RHO_EGG;
+  const gx=W*0.5-72, gy=30, gw=144, gh=H-58, wbot=gy+gh, wtop=gy+26, cx=W*0.5, eRx=20, eRy=26;
+  ectx.strokeStyle='#9FC4C9'; ectx.lineWidth=3; ectx.strokeRect(gx,gy,gw,gh);
+  const tint=Math.min(0.42,0.10+eggSalt*0.016);
+  ectx.fillStyle='rgba(26,167,160,'+tint+')'; ectx.fillRect(gx+2,wtop,gw-4,wbot-wtop-1);
+  ectx.strokeStyle='#1AA7A0'; ectx.lineWidth=2; ectx.beginPath(); ectx.moveTo(gx+2,wtop); ectx.lineTo(gx+gw-2,wtop); ectx.stroke();
+  ectx.fillStyle='#1AA7A0'; ectx.font='bold 11px Pretendard'; ectx.textAlign='left'; ectx.fillText('수면',gx+5,wtop-5);
+  let targetY = floats ? (wtop + eRy*(2*Math.min(1,RHO_EGG/rho)-1)) : (wbot - eRy - 4);
+  if(eggDispY===null) eggDispY=targetY;
+  eggDispY += (targetY-eggDispY)*0.12;
+  const gLen=34, bLen=floats? gLen : gLen*(rho/RHO_EGG);
+  ectx.strokeStyle='#E1733E'; ectx.lineWidth=4; ectx.beginPath(); ectx.moveTo(cx+34,eggDispY); ectx.lineTo(cx+34,eggDispY+gLen); ectx.stroke();
+  ectx.fillStyle='#E1733E'; ectx.beginPath(); ectx.moveTo(cx+34,eggDispY+gLen); ectx.lineTo(cx+30,eggDispY+gLen-8); ectx.lineTo(cx+38,eggDispY+gLen-8); ectx.closePath(); ectx.fill();
+  ectx.strokeStyle='#2FD3B6'; ectx.lineWidth=4; ectx.beginPath(); ectx.moveTo(cx-34,eggDispY); ectx.lineTo(cx-34,eggDispY-bLen); ectx.stroke();
+  ectx.fillStyle='#2FD3B6'; ectx.beginPath(); ectx.moveTo(cx-34,eggDispY-bLen); ectx.lineTo(cx-38,eggDispY-bLen+8); ectx.lineTo(cx-30,eggDispY-bLen+8); ectx.closePath(); ectx.fill();
+  ectx.font='bold 10px Pretendard'; ectx.textAlign='center'; ectx.fillStyle='#A8431D'; ectx.fillText('중력',cx+34,eggDispY+gLen+13); ectx.fillStyle='#0A6B66'; ectx.fillText('부력',cx-34,eggDispY-bLen-6);
+  ectx.fillStyle='#FBE9C6'; ectx.strokeStyle='#D9A441'; ectx.lineWidth=2;
+  ectx.beginPath(); ectx.ellipse(cx,eggDispY,eRx,eRy,0,0,7); ectx.fill(); ectx.stroke();
+  ectx.fillStyle='rgba(255,255,255,.6)'; ectx.beginPath(); ectx.ellipse(cx-6,eggDispY-7,5,7,0,0,7); ectx.fill();
+  requestAnimationFrame(drawEgg);
+}
+function eggUpdate(){ const rho=rhoOf(eggSalt), f=rho>RHO_EGG; if($('egg-cv'))$('egg-cv').textContent=eggSalt.toFixed(1)+' g/100g'; if($('egg-rho'))$('egg-rho').innerHTML=rho.toFixed(3)+'<small> g/mL</small>'; const st=$('egg-status'); if(st){ st.className='ballstate '+(f?'good':'sink'); st.textContent=f?'떠오름! (물 밀도 > 계란 밀도)':'가라앉음 (물 밀도 < 계란 밀도)'; } }
+if($('eggSalt')) $('eggSalt').addEventListener('input',e=>{ eggSalt=+e.target.value; eggUpdate(); });
+
+/* ===== STEP 5: 예측 게이트 + 확인 문제 ===== */
+function s5predDone(){ return ['p1','p2','p3'].every(g=>document.querySelector('input[name="'+g+'"]:checked')); }
+function s5unlock(){ const b=$('toStep6'); if(b){ b.disabled=false; b.innerHTML='다음 → 높이 측정법'; } }
+if($('s5revealBtn')) $('s5revealBtn').addEventListener('click',()=>{
+  if(!s5predDone()){ $('s5predMsg').style.color='var(--coral)'; $('s5predMsg').textContent='세 가지 예측에 모두 답해 주세요.'; return; }
+  $('s5reveal').classList.remove('hide'); $('s5revealBtn').disabled=true;
+  $('s5predMsg').style.color='var(--teal)'; $('s5predMsg').textContent='좋아요! 아래 원리와 계란 실험으로 예측을 확인해 보세요.';
+});
+const S5ANS={q1:'b',q2:'b',q3:'a'};
+if($('s5quizBtn')) $('s5quizBtn').addEventListener('click',()=>{
+  let ans=0,ok=0; for(const q in S5ANS){ const s=document.querySelector('input[name="'+q+'"]:checked'); if(s){ans++; if(s.value===S5ANS[q])ok++;} }
+  const m=$('s5quizMsg');
+  if(ans<3){ m.innerHTML='<span style="color:var(--coral);font-weight:700">아직 안 푼 문제가 있어요.</span>'; return; }
+  if(ok===3){ m.innerHTML='<span style="color:var(--teal);font-weight:800">✅ 모두 정답! 다음 단계가 열렸어요.</span>'; s5unlock(); state.s5pass=true; saveState(); }
+  else { m.innerHTML='<span style="color:var(--coral);font-weight:700">'+ok+'/3 정답이에요. 원리 카드를 다시 읽고 틀린 문제를 고쳐 보세요.</span>'; }
+});
+
 /* ===== 초기화 ===== */
 renderCal();
 drawGraph();
@@ -1689,6 +1846,8 @@ bindReportFields();
 initPhotos();
 setRefrMetrics(); drawRefr(); drawCrit();
 drawBallSim(); updateDensity();
+drawCar(); drawEgg(); eggUpdate();
+if(state.s5pass){ var _sr=$('s5reveal'); if(_sr) _sr.classList.remove('hide'); s5unlock(); }
 $('makeReport').addEventListener('click', downloadWord);
 if (state.vibe.code) $('vibe-frame').srcdoc = state.vibe.code;
 goto(state.step || 1);
