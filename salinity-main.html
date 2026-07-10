@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>염분을 찾는 두 실마리, 빛과 부력 — 탐구 시작</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root{
+    --navy:#0A3D4F; --teal:#12808C; --teal2:#1AA7A0; --mint:#2FD3B6; --mint-soft:#C7F2E8;
+    --ink:#16313A; --soft:#5B7178; --line:#D6E6E6; --paper:#EEF7F7; --coral:#E1733E; --gold:#D9A441;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%}
+  body{
+    font-family:"Pretendard","Malgun Gothic","맑은 고딕",sans-serif;color:var(--ink);line-height:1.6;
+    background:linear-gradient(180deg,#BFE7F2 0%,#8FD4E8 26%,#4FB6D8 46%,#1E88B0 62%,#12698F 78%,#0A3D4F 100%);
+    padding-bottom:70px; overflow-x:hidden; position:relative;
+  }
+  /* 하늘 요소 */
+  .sky{position:absolute;left:0;right:0;top:0;height:420px;pointer-events:none;overflow:hidden}
+  .sun{position:absolute;right:9%;top:44px;width:88px;height:88px;border-radius:50%;
+    background:radial-gradient(circle at 38% 34%,#FFF6D8,#FFD96B 62%,#F5B93F);box-shadow:0 0 60px 22px rgba(255,214,110,.55)}
+  .cloud{position:absolute;background:#fff;border-radius:60px;opacity:.92;animation:drift 60s linear infinite}
+  .cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+  .c1{left:6%;top:60px;width:130px;height:38px}
+  .c1::before{width:56px;height:56px;left:16px;top:-26px}.c1::after{width:42px;height:42px;left:62px;top:-18px}
+  .c2{left:46%;top:120px;width:100px;height:30px;opacity:.75;animation-duration:80s}
+  .c2::before{width:44px;height:44px;left:12px;top:-20px}.c2::after{width:34px;height:34px;left:48px;top:-14px}
+  @keyframes drift{from{transform:translateX(0)}50%{transform:translateX(50px)}to{transform:translateX(0)}}
+  .gull{position:absolute;font-size:20px;color:#3A6472;left:26%;top:88px;animation:fly 7s ease-in-out infinite}
+  .gull2{left:32%;top:66px;font-size:14px;animation-delay:1.4s}
+  @keyframes fly{0%,100%{transform:translate(0,0)}50%{transform:translate(26px,-12px)}}
+  /* 파도 라인 */
+  .waves{position:absolute;left:0;right:0;top:330px;pointer-events:none}
+  .waves svg{display:block;width:100%}
+
+  .wrap{position:relative;max-width:900px;margin:0 auto;padding:40px 18px 0;z-index:2}
+
+  header.hero{text-align:center;color:#08313f;margin-bottom:10px}
+  .kick{display:inline-block;font-size:.76rem;letter-spacing:.26em;font-weight:800;color:#0A5B74;background:rgba(255,255,255,.55);border-radius:30px;padding:5px 16px;backdrop-filter:blur(2px)}
+  h1{font-size:clamp(1.7rem,5vw,2.6rem);font-weight:800;line-height:1.22;margin:16px 0 8px;color:#06344a;text-shadow:0 2px 0 rgba(255,255,255,.35)}
+  .sub{font-size:1rem;color:#0A4b63;font-weight:600}
+
+  /* 떠 있는 실험 플랫폼 */
+  .platform{
+    position:relative;margin-top:26px;background:rgba(255,255,255,.94);border-radius:22px;
+    box-shadow:0 30px 60px -30px rgba(4,40,56,.55), 0 0 0 1px rgba(255,255,255,.6) inset;
+    padding:28px 28px 24px;
+  }
+  .platform::before{ /* 부표 다리 느낌 */
+    content:"";position:absolute;left:8%;right:8%;bottom:-16px;height:16px;
+    background:linear-gradient(180deg,#C7794A,#8E4F2B);border-radius:0 0 14px 14px;z-index:-1;
+  }
+  .plabel{position:absolute;top:-14px;left:24px;background:var(--coral);color:#fff;font-size:.76rem;font-weight:800;letter-spacing:.06em;border-radius:20px;padding:4px 13px;box-shadow:0 6px 14px -6px rgba(0,0,0,.3)}
+  .platform h2{font-size:1.15rem;color:var(--navy);font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+
+  .frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:620px){.frow{grid-template-columns:1fr}}
+  label{display:block;font-weight:700;font-size:.9rem;color:var(--navy);margin:10px 0 5px}
+  input[type=text]{width:100%;font-family:inherit;font-size:1rem;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;background:#FCFEFE;outline:none;transition:.2s}
+  input[type=text]:focus{border-color:var(--teal);background:#fff}
+  .count-pick{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 6px}
+  .count-pick button{font-family:inherit;font-weight:700;font-size:.92rem;padding:8px 15px;border-radius:10px;border:1.5px solid var(--line);background:#fff;color:var(--soft);cursor:pointer;transition:.18s}
+  .count-pick button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+  .mrow{display:grid;grid-template-columns:80px 0.9fr 1.1fr;gap:8px;align-items:center;margin-bottom:7px}
+  .mrow .ml{font-weight:700;color:var(--navy);font-size:.88rem}
+  .mrow input{padding:9px 11px;border:1.5px solid var(--line);border-radius:9px;font-family:inherit;font-size:.95rem;background:#FCFEFE;outline:none}
+  .mrow input:focus{border-color:var(--teal)}
+
+  /* 오늘의 항해 지도 (흐름) */
+  .voyage{margin-top:14px}
+  .voyage .steps{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+  @media(max-width:620px){.voyage .steps{grid-template-columns:1fr}}
+  .vstep{display:flex;gap:11px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:11px 13px}
+  .vstep .n{flex-shrink:0;width:27px;height:27px;border-radius:50%;background:var(--teal);color:#fff;font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center;margin-top:1px}
+  .vstep b{color:var(--navy);font-size:.93rem;display:block}
+  .vstep span{font-size:.82rem;color:var(--soft);line-height:1.45;display:block}
+  .vstep.opt{border-style:dashed;border-color:#D9A441;background:#FFF9EC}
+  .vstep.opt .n{background:var(--gold)}
+
+  .cta{margin-top:22px;text-align:center}
+  .btn-start{
+    display:inline-block;font-family:inherit;border:none;cursor:pointer;
+    background:linear-gradient(180deg,#2FD3B6,#17A08E);color:#04352e;font-size:1.25rem;font-weight:800;
+    padding:17px 52px;border-radius:999px;box-shadow:0 16px 34px -12px rgba(23,160,142,.65), 0 0 0 6px rgba(47,211,182,.22);
+    transition:.2s;
+  }
+  .btn-start:hover{transform:translateY(-2px);box-shadow:0 20px 40px -12px rgba(23,160,142,.75), 0 0 0 8px rgba(47,211,182,.28)}
+  .cta .hint{margin-top:10px;font-size:.85rem;color:#OA4b63;color:#0A4b63}
+
+  /* 바닷속 장식 */
+  .sea-deco{position:relative;max-width:900px;margin:34px auto 0;padding:0 18px;z-index:1}
+  .fish{position:absolute;font-size:22px;animation:swim 9s ease-in-out infinite}
+  @keyframes swim{0%,100%{transform:translateX(0)}50%{transform:translateX(-34px)}}
+  footer{position:relative;text-align:center;color:#BFE3EC;font-size:.84rem;margin-top:46px;z-index:2}
+</style>
+</head>
+<body>
+<div class="sky">
+  <div class="sun"></div>
+  <div class="cloud c1"></div>
+  <div class="cloud c2"></div>
+  <div class="gull">〜v〜</div>
+  <div class="gull gull2">〜v〜</div>
+</div>
+<div class="waves">
+  <svg viewBox="0 0 1440 120" preserveAspectRatio="none" height="120">
+    <path d="M0,60 C240,20 480,95 720,60 C960,25 1200,95 1440,55 L1440,120 L0,120 Z" fill="#4FB6D8" opacity=".55"/>
+    <path d="M0,80 C280,45 520,110 800,78 C1060,50 1260,105 1440,75 L1440,120 L0,120 Z" fill="#2E9EC6" opacity=".5"/>
+  </svg>
+</div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="kick">영재 과학 · 바다 위 떠 있는 실험실</span>
+    <h1>염분을 찾는 두 실마리,<br>빛과 부력</h1>
+    <p class="sub">직접 만든 도구에 ‘농도의 의미’를 불어넣는 보정 탐구 — 출항 준비 완료?</p>
+  </header>
+
+  <div class="platform">
+    <span class="plabel">FLOATING LAB · 탑승 명단</span>
+    <h2>👩‍🔬 우리 모둠 등록하기</h2>
+    <div class="frow">
+      <div>
+        <label for="grp">모둠 이름</label>
+        <input id="grp" type="text" placeholder="예: 짠물탐험대">
+        <label>모둠 인원</label>
+        <div class="count-pick" id="countPick">
+          <button type="button" data-n="2">2명</button><button type="button" data-n="3">3명</button><button type="button" data-n="4">4명</button><button type="button" data-n="5">5명</button><button type="button" data-n="6">6명</button>
+        </div>
+      </div>
+      <div id="memberRows"><p style="font-size:.86rem;color:var(--soft);margin-top:34px">← 인원을 고르면 이름 칸이 생겨요.</p></div>
+    </div>
+  </div>
+
+  <div class="platform voyage" style="margin-top:30px">
+    <span class="plabel" style="background:var(--teal)">오늘의 항해 지도</span>
+    <h2>🗺 오늘 우리는 이렇게 탐구해요</h2>
+    <div class="steps">
+      <div class="vstep"><span class="n">1</span><div><b>두 실마리 만나기</b><span>빛의 굴절 × 부력 · 중심 질문: 직접 만든 도구를 어떻게 측정 도구로 만들까?</span></div></div>
+      <div class="vstep"><span class="n">2</span><div><b>보정·교정 이해하기</b><span>지시값 · 기준값 · 30초 교정 체험 게임</span></div></div>
+      <div class="vstep"><span class="n">3</span><div><b>굴절 염분계 배우기</b><span>빛은 왜 꺾일까? · 영점 보정 · 경계선 눈금 읽기</span></div></div>
+      <div class="vstep"><span class="n">4</span><div><b>뜨는 원리 탐험</b><span>밀도 · 힘의 평형 · 계란 띄우기 시뮬레이터</span></div></div>
+      <div class="vstep"><span class="n">5</span><div><b>간이 염분계 만들기</b><span>쇠구슬 수 스스로 찾기 · cm 테이프 · 수면 위 길이 재는 법</span></div></div>
+      <div class="vstep"><span class="n">6</span><div><b>소금물 A~D 만들기</b><span>같은 소금 · 물 100 mL · 두 도구로 각각 측정(2회 평균)</span></div></div>
+      <div class="vstep"><span class="n">7</span><div><b>보정 관계 만들기</b><span>기준값 ↔ 수면 위 길이 그래프 · 직선으로 근사</span></div></div>
+      <div class="vstep"><span class="n">8</span><div><b>미지 소금물 추정!</b><span>간이 염분계로 먼저 추정 → 굴절 염분계 기준값과 비교 → 오차 분석</span></div></div>
+      <div class="vstep opt"><span class="n">＋</span><div><b>바이브 코딩 (선택)</b><span>시간이 남는 모둠만! 우리 보정 관계를 웹 도구로 만들기</span></div></div>
+      <div class="vstep"><span class="n">★</span><div><b>마무리 & 보고서</b><span>핵심 정리 · Word 탐구 보고서 자동 생성</span></div></div>
+    </div>
+  </div>
+
+  <div class="cta">
+    <button class="btn-start" id="startBtn">🚀 탐구 시작하기</button>
+    <div class="hint">모둠 정보는 자동 저장되어 탐구 화면에 그대로 이어져요.</div>
+  </div>
+
+  <footer>승재쌤의 과학실 · Gifted Science Lab — 바다 위 실험실에서</footer>
+</div>
+
+<script>
+const KEY='salinity-refracto-v3';
+function load(){ try{ const v=localStorage.getItem(KEY); return v?JSON.parse(v):null; }catch(e){ return null; } }
+function save(s){ try{ localStorage.setItem(KEY, JSON.stringify(s)); }catch(e){} }
+let st = load() || {};
+if(!Array.isArray(st.members)) st.members=[];
+if(typeof st.memberCount!=='number') st.memberCount=st.members.length||0;
+
+const $=id=>document.getElementById(id);
+$('grp').value = st.group||'';
+$('grp').addEventListener('input',e=>{ st.group=e.target.value; save(st); });
+
+function renderRows(){
+  document.querySelectorAll('#countPick button').forEach(b=>b.classList.toggle('on', +b.dataset.n===st.memberCount));
+  const w=$('memberRows');
+  if(!st.memberCount){ w.innerHTML='<p style="font-size:.86rem;color:var(--soft);margin-top:34px">← 인원을 고르면 이름 칸이 생겨요.</p>'; return; }
+  w.innerHTML = st.members.map((m,i)=>`
+    <div class="mrow">
+      <span class="ml">모둠원 ${i+1}</span>
+      <input type="text" inputmode="numeric" data-i="${i}" data-f="sid" value="${(m.sid||'').replace(/"/g,'&quot;')}" placeholder="학번">
+      <input type="text" data-i="${i}" data-f="name" value="${(m.name||'').replace(/"/g,'&quot;')}" placeholder="이름">
+    </div>`).join('');
+}
+$('countPick').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-n]'); if(!b) return;
+  st.memberCount=+b.dataset.n;
+  const next=[]; for(let i=0;i<st.memberCount;i++) next.push(st.members[i]||{sid:'',name:''});
+  st.members=next; save(st); renderRows();
+});
+$('memberRows').addEventListener('input',e=>{
+  const i=+e.target.dataset.i, f=e.target.dataset.f;
+  if(!st.members[i]) st.members[i]={sid:'',name:''};
+  st.members[i][f]=e.target.value; save(st);
+});
+renderRows();
+
+$('startBtn').addEventListener('click',()=>{ save(st); location.href='salinity.html'; });
+</script>
+</body>
+</html>

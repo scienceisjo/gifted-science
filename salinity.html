@@ -285,6 +285,26 @@
   .q5{margin:11px 0}
   .q5>b{display:block;margin-bottom:5px;color:var(--navy);font-size:.96rem}
   .btn:disabled{opacity:.5;cursor:not-allowed;filter:grayscale(.3)}
+  /* ===== 클릭해서 여는 빈칸 ===== */
+  .blank{display:inline-block;min-width:58px;padding:1px 12px;margin:0 2px;border-bottom:2.5px solid var(--teal2);background:var(--mint-soft);border-radius:7px;color:transparent;cursor:pointer;user-select:none;position:relative;text-align:center;transition:.15s;line-height:1.4}
+  .blank::after{content:"👆?";position:absolute;left:50%;top:50%;transform:translate(-50%,-52%);color:var(--teal);font-weight:800;font-size:.82em;white-space:nowrap}
+  .blank:hover{background:#B2ECDE}
+  .blank.on{color:var(--navy);background:#FFF7E6;border-bottom-color:var(--gold);font-weight:800}
+  .blank.on::after{content:""}
+  /* ===== 교정 체험 게임 ===== */
+  .cgame{background:linear-gradient(180deg,#0E2F3A,#12414F);border-radius:16px;padding:20px 22px;margin:14px 0;color:#EAF6F6}
+  .cgame h3{color:#fff;font-size:1.05rem;font-weight:800;margin-bottom:4px}
+  .cgame .sub2{font-size:.88rem;color:#A9D7D7;margin-bottom:12px}
+  .cgame .cg-prog{display:flex;gap:6px;margin-bottom:14px}
+  .cgame .cg-prog span{flex:1;height:6px;border-radius:4px;background:rgba(255,255,255,.18);transition:.25s}
+  .cgame .cg-prog span.done{background:var(--mint)}
+  .cgame .cg-q{font-size:1rem;font-weight:700;color:#fff;margin-bottom:11px;line-height:1.5}
+  .cgame .cg-opts{display:flex;gap:9px;flex-wrap:wrap}
+  .cgame .cg-opts button{font-family:inherit;font-weight:700;font-size:.93rem;padding:10px 16px;border-radius:10px;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);color:#EAF6F6;cursor:pointer;transition:.15s}
+  .cgame .cg-opts button:hover{background:rgba(47,211,182,.25);border-color:var(--mint)}
+  .cgame .cg-fb{margin-top:11px;font-size:.9rem;line-height:1.5;min-height:1.2em}
+  .cgame .cg-fb.good{color:var(--mint);font-weight:700}
+  .cgame .cg-fb.bad{color:#FFB08A;font-weight:700}
 </style>
 </head>
 <body>
@@ -310,15 +330,14 @@
     <button class="step on" data-s="1"><span class="n">STEP 1</span><span class="t">시작</span></button>
     <button class="step" data-s="2"><span class="n">STEP 2</span><span class="t">보정이란?</span></button>
     <button class="step" data-s="3"><span class="n">STEP 3</span><span class="t">굴절 염분계</span></button>
-    <button class="step" data-s="4"><span class="n">STEP 4</span><span class="t">측정기 만들기</span></button>
-    <button class="step" data-s="5"><span class="n">STEP 5</span><span class="t">시뮬레이터</span></button>
-    <button class="step" data-s="6"><span class="n">STEP 6</span><span class="t">길이 측정법</span></button>
-    <button class="step" data-s="7"><span class="n">STEP 7</span><span class="t">용액 만들기</span></button>
-    <button class="step" data-s="8"><span class="n">STEP 8</span><span class="t">왜 보정곡선?</span></button>
-    <button class="step" data-s="9"><span class="n">STEP 9</span><span class="t">보정곡선</span></button>
-    <button class="step" data-s="10"><span class="n">STEP 10</span><span class="t">미지 소금물</span></button>
-    <button class="step" data-s="11"><span class="n">STEP 11</span><span class="t">바이브 코딩</span></button>
-    <button class="step" data-s="12"><span class="n">STEP 12</span><span class="t">마무리</span></button>
+    <button class="step" data-s="4"><span class="n">STEP 4</span><span class="t">뜨는 원리</span></button>
+    <button class="step" data-s="5"><span class="n">STEP 5</span><span class="t">측정기 만들기</span></button>
+    <button class="step" data-s="6"><span class="n">STEP 6</span><span class="t">용액 만들기</span></button>
+    <button class="step" data-s="7"><span class="n">STEP 7</span><span class="t">왜 보정?</span></button>
+    <button class="step" data-s="8"><span class="n">STEP 8</span><span class="t">보정 관계</span></button>
+    <button class="step" data-s="9"><span class="n">STEP 9</span><span class="t">미지 소금물</span></button>
+    <button class="step" data-s="10"><span class="n">STEP 10</span><span class="t">바이브(선택)</span></button>
+    <button class="step" data-s="11"><span class="n">STEP 11</span><span class="t">마무리</span></button>
   </nav>
 
   <!-- STEP 1 -->
@@ -354,13 +373,55 @@
       </div>
     </div>
     <div class="note" style="margin:0 0 14px">🧭 <b>이 자료 혼자서 끝까지!</b> 위 STEP 버튼으로 언제든 오갈 수 있어요. 각 단계에는 <b>예측 → 시뮬레이터로 확인 → 직접 측정 → 스스로 점검</b>이 들어 있고, 막히면 <b>💡힌트</b>를 열어 보세요. 입력한 내용은 자동 저장되고 마지막에 <b>보고서</b>로 정리됩니다.</div>
-    <div class="ok"><b>준비물</b> · <b>굴절 염분계</b>(ATAGO MASTER-S28M — 염화나트륨 0~28 g/100g), 증류수(영점용), 스포이드, <b>쇠구슬</b>(개수는 STEP 4에서 <b>직접 찾음</b>), 소금, 물, 비커 5개(기준 4 + 미지 1), 눈금실린더, 자, 네임펜(유성 펜)·스티커, 전자저울, 약수저, 유리 막대, 키친타올</div>
+    <div class="ok"><b>준비물</b> · <b>굴절 염분계</b>(ATAGO MASTER-S28M — 염화나트륨 0~28 g/100g), 증류수(영점용), 스포이드, <b>쇠구슬</b>(개수는 STEP 5에서 <b>직접 찾음</b>), 소금, 물, 비커 5개(기준 4 + 미지 1), 눈금실린더, 자, 네임펜(유성 펜)·스티커, 전자저울, 약수저, 유리 막대, 키친타올</div>
     <div style="margin-bottom:4px"><label for="grp">모둠 이름</label><input id="grp" type="text" placeholder="예: 짠물탐험대"></div>
     <label>모둠 인원</label>
     <div class="count-pick" id="countPick">
       <button type="button" data-n="2">2명</button><button type="button" data-n="3">3명</button><button type="button" data-n="4">4명</button><button type="button" data-n="5">5명</button><button type="button" data-n="6">6명</button>
     </div>
     <div id="memberRows"></div>
+    <div class="eye-stage" style="margin:16px 0 4px">
+      <svg viewBox="0 0 560 210" width="100%" style="max-width:560px" aria-hidden="true">
+        <!-- ① 간이 염분계 -->
+        <g>
+          <text x="70" y="18" font-size="12" font-weight="800" fill="#0A3D4F" text-anchor="middle" font-family="Pretendard">① 간이 염분계</text>
+          <rect x="63" y="36" width="13" height="92" rx="3" fill="#fff" stroke="#0A3D4F" stroke-width="2.2"/>
+          <g stroke="#0A3D4F" stroke-width="1.1"><line x1="76" y1="44" x2="84" y2="44"/><line x1="76" y1="56" x2="81" y2="56"/><line x1="76" y1="68" x2="84" y2="68"/><line x1="76" y1="80" x2="81" y2="80"/><line x1="76" y1="92" x2="84" y2="92"/></g>
+          <ellipse cx="69.5" cy="140" rx="17" ry="13" fill="#fff" stroke="#0A3D4F" stroke-width="2.2"/>
+          <circle cx="64" cy="140" r="3" fill="#5B7178"/><circle cx="74" cy="143" r="3" fill="#5B7178"/><circle cx="69" cy="134" r="3" fill="#5B7178"/>
+          <text x="70" y="175" font-size="10" fill="#5B7178" text-anchor="middle" font-family="Pretendard">cm 테이프 + 쇠구슬</text>
+        </g>
+        <text x="150" y="105" font-size="24" fill="#1AA7A0" font-weight="800" text-anchor="middle" font-family="Pretendard">＋</text>
+        <!-- ② 소금물 -->
+        <g>
+          <text x="235" y="18" font-size="12" font-weight="800" fill="#0A3D4F" text-anchor="middle" font-family="Pretendard">② 소금물</text>
+          <path d="M198 36 L198 118 Q198 132 212 132 L258 132 Q272 132 272 118 L272 36" fill="none" stroke="#0A3D4F" stroke-width="2.2"/>
+          <rect x="200" y="64" width="70" height="66" rx="4" fill="#12808C" fill-opacity=".25"/>
+          <line x1="200" y1="64" x2="270" y2="64" stroke="#12808C" stroke-width="2"/>
+          <g fill="#0A3D4F" fill-opacity=".5"><circle cx="215" cy="85" r="2.4"/><circle cx="240" cy="100" r="2.4"/><circle cx="255" cy="80" r="2.4"/><circle cx="228" cy="115" r="2.4"/><circle cx="250" cy="118" r="2.4"/></g>
+          <text x="235" y="152" font-size="10" fill="#5B7178" text-anchor="middle" font-family="Pretendard">소금 ○ g + 물 100 mL</text>
+        </g>
+        <path d="M300 100 L336 100" stroke="#1AA7A0" stroke-width="3.5" stroke-linecap="round"/>
+        <polygon points="342,100 330,93 330,107" fill="#1AA7A0"/>
+        <!-- ③ 띄우면? -->
+        <g>
+          <text x="455" y="18" font-size="12" font-weight="800" fill="#0A3D4F" text-anchor="middle" font-family="Pretendard">③ 띄우면 — 수면 위 길이는?</text>
+          <rect x="418" y="30" width="52" height="140" rx="7" fill="none" stroke="#0A3D4F" stroke-width="2.2"/>
+          <rect x="420" y="72" width="48" height="96" fill="#12808C" fill-opacity=".25"/>
+          <line x1="420" y1="72" x2="468" y2="72" stroke="#12808C" stroke-width="2"/>
+          <rect x="438" y="42" width="11" height="82" rx="3" fill="#fff" stroke="#0A3D4F" stroke-width="2.2"/>
+          <ellipse cx="443.5" cy="132" rx="14" ry="11" fill="#fff" stroke="#0A3D4F" stroke-width="2.2"/>
+          <circle cx="439" cy="132" r="2.6" fill="#5B7178"/><circle cx="448" cy="134" r="2.6" fill="#5B7178"/>
+          <line x1="404" y1="42" x2="404" y2="72" stroke="#E1733E" stroke-width="2.6"/>
+          <line x1="399" y1="42" x2="409" y2="42" stroke="#E1733E" stroke-width="2.6"/>
+          <line x1="399" y1="72" x2="409" y2="72" stroke="#E1733E" stroke-width="2.6"/>
+          <line x1="409" y1="42" x2="438" y2="42" stroke="#E1733E" stroke-width="1.2" stroke-dasharray="3 2"/>
+          <text x="396" y="60" font-size="10.5" fill="#C75A2E" font-weight="800" text-anchor="end" font-family="Pretendard">수면 위 길이</text>
+          <text x="497" y="105" font-size="18" fill="#C75A2E" font-weight="800" font-family="Pretendard">?</text>
+        </g>
+      </svg>
+    </div>
+    <p class="hint" style="text-align:center;margin:0 0 10px">오늘의 실험 한눈에 — 직접 만든 간이 염분계를 소금물에 띄워 <b>수면 위 길이</b>를 잰다. 소금물이 진해지면 이 길이는 어떻게 될까?</p>
     <div class="report-field"><label for="rk-hyp">🔮 우리 모둠의 가설 <span class="hint" style="font-weight:500">— 소금물의 진하기와 간이 염분계의 수면 위 길이는 어떤 관계일까?</span></label>
       <textarea id="rk-hyp" data-rkey="hypothesis" placeholder="예: 소금물이 진할수록 간이 염분계가 덜 잠겨서, 수면 위로 나온 길이가 길어질 것이다."></textarea></div>
     <div class="em"><b>기억해 두세요.</b> 모둠 이름·측정 결과·올린 사진은 이 기기(브라우저)에 자동 저장됩니다. 같은 기기에서 다시 열면 이어서 할 수 있어요. 탐구하면서 칸을 채우고 사진을 올리면, 마지막 단계에서 <b>Word 보고서</b>로 자동 정리됩니다.</div>
@@ -373,7 +434,7 @@
     <p>측정 도구는 <b>믿을 수 있는 기준</b>이 있어야 정확해집니다. 우리에게는 성격이 다른 두 도구가 있어요.</p>
     <div class="compare2">
       <div class="icard ours">
-        <span class="tag">우리가 만든 도구</span>
+        <span class="tag">우리가 만들 도구</span>
         <h3>간이 염분계</h3>
         <svg viewBox="0 0 120 70" width="120" height="62" aria-hidden="true">
           <rect x="8" y="30" width="104" height="34" rx="6" fill="#1AA7A0" fill-opacity=".16"/>
@@ -402,13 +463,23 @@
         <ul><li>용액의 <b>굴절률</b>을 이용해 농도 눈금을 읽음</li><li>세밀한 눈금 · 일정한 방법 → 이번 탐구의 <b>기준 도구</b></li><li>맛보지 않고도 빛으로 농도를 알아봄</li></ul>
       </div>
     </div>
+    <div class="note" style="margin:0 0 12px">🔎 <b>‘지시값’이 뭐예요?</b> 측정 도구가 <b>가리켜 보여주는 값 그 자체</b>예요. 저울 바늘이 가리키는 눈금, 우리 염분계의 "수면 위 <span class="blank">2.3 cm</span>" 같은 것. 지시값은 아직 <b>무엇을 뜻하는지 정해지기 전의 ‘날것의 숫자’</b>랍니다.</div>
+    <div class="em">🔔 <b>오늘만 빌려 쓰는 굴절 염분계.</b> 굴절 염분계는 값비싼 장비라 <b>오늘 하루만 쓰고 선생님께 돌아가요.</b> 그래서 오늘의 진짜 목표는 — 굴절 염분계가 있는 동안 그 <b>기준값</b>을 이용해, 우리가 만들 <b>간이 염분계를 더 정밀하고 믿을 만한 도구로 업그레이드</b>해 두는 것! 그러면 내일부터는 간이 염분계만으로도 농도를 추정할 수 있어요.</div>
     <div class="hook">💭 <b>우리 조 아이디어 먼저!</b> — 두 도구를 어떻게 함께 쓰면, 간이 염분계의 '수면 위 길이'에 믿을 수 있는 '농도'의 의미를 붙일 수 있을까요? 아래 설명을 읽기 전에 조의 아이디어를 먼저 적어 보세요.</div>
     <div class="report-field" style="margin-top:0"><textarea id="rk-idea" data-rkey="ideaCalib" placeholder="예: 두 도구로 같은 소금물을 재서, 수면 위 길이가 몇 cm일 때 기준값이 얼마인지 짝을 지어 둔다…"></textarea></div>
     <h3 class="sec">📐 보정이란? — 기준과 비교해 의미를 부여하는 일</h3>
-    <p><b>기준이 되는 값</b>과 <b>우리 도구의 지시값</b>을 짝지어, 둘 사이의 <b>관계</b>를 찾는 일이에요. 두 가지 비유로 이해해 봐요.</p>
+    <p><b><span class="blank">기준</span>이 되는 값</b>과 <b>우리 도구의 <span class="blank">지시값</span></b>을 짝지어, 둘 사이의 <b><span class="blank">관계</span></b>를 찾는 일이에요. 두 가지 비유로 이해해 봐요.</p>
     <div class="ok">🪵 <b>눈금 없는 막대에 눈금 새기기</b> — 우리 간이 염분계는 "눈금 없는 막대" 같아요. 기준이 되는 값과 비교해 가며, 어디가 얼마인지 눈금을 새겨 넣는 것이 보정입니다.</div>
     <div class="ok" style="margin-top:8px">⚖️ <b>새 체중계 맞춰보기</b> — 새로 산 체중계가 잘 맞는지 모를 때, <b>무게를 정확히 알고 있는 추(기준)</b>를 올려 보고 맞춰보죠. 그것과 같은 원리예요.</div>
-    <div class="note" style="margin-top:10px">🔬 <b>과학자 용어 TIP.</b> 엄밀하게는, 기준값과 측정 도구의 지시값 사이의 <b>관계를 정하는 과정</b>을 <b>‘교정(calibration)’</b>이라고 해요. 이번 탐구에서는 이 교정 관계를 이용해 간이 염분계의 값을 해석해 봅니다. (이 자료에서는 친숙한 ‘보정’이라는 말을 함께 써요.)</div>
+    <div class="note" style="margin-top:10px">🔬 <b>과학자 용어 TIP.</b> 엄밀하게는, 기준값과 측정 도구의 지시값 사이의 <b>관계를 정하는 과정</b>을 <b>‘교정(calibration)’</b>이라고 해요. (이 자료에서는 친숙한 ‘보정’이라는 말을 함께 써요.)<br>💡 <b>교정의 실제 예</b> — 전자저울은 질량을 정확히 아는 <b>분동(표준 추)</b>을 올려 교정하고, 체온계는 <b>표준 온도</b>와 비교해 교정하고, pH 측정기는 pH를 정확히 아는 <b>표준용액</b>에 담가 교정해요. 주유소 주유기도 정기적으로 <b>기준 용기</b>와 비교 검사를 받는답니다.</div>
+    <div class="cgame" id="calibGame">
+      <h3>🎮 30초 교정 체험 — 실제 과학의 정석 따라가기</h3>
+      <div class="sub2">가상의 '무게 저울'을 교정해 봅시다. 버튼을 눌러 단계를 따라가요!</div>
+      <div class="cg-prog"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="cg-q" id="cgQ"></div>
+      <div class="cg-opts" id="cgOpts"></div>
+      <div class="cg-fb" id="cgFb"></div>
+    </div>
     <h3 class="sec">🧪 실제 과학의 정석 vs 이번 탐구</h3>
     <div class="compare2">
       <div class="icard ref">
@@ -450,8 +521,33 @@
   <!-- STEP 3 -->
   <div class="panel hide" data-step="3">
     <div class="secHead"><span class="secNo">STEP 3</span><h2>굴절 염분계 — 원리와 사용법</h2></div>
-    <h3 class="sec">🌈 원리 — 빛의 '굴절'을 이용해요</h3>
-    <p>빛이 공기에서 물(용액)로 들어갈 때 진행 방향이 꺾이는데, 이것을 <b>굴절</b>이라고 해요(중2 '빛과 파동' 단원과 이어져요). 💭 <b>예측 먼저!</b> 그렇다면 소금물이 <b>진할수록</b> 빛은 더 꺾일까요, 덜 꺾일까요? 예측한 뒤 아래 시뮬레이터로 확인하세요. 소금물의 조성과 농도가 달라지면 <b>굴절률</b>이 달라지고, 빛의 진행 경로도 달라집니다. 굴절 염분계는 이 <b>굴절률의 차이</b>를 광학적으로 감지해, 미리 정해 둔 <b>농도 눈금</b>으로 보여주는 도구예요.</p>
+    <h3 class="sec">🌈 먼저 — 빛은 왜 꺾일까?</h3>
+    <p>빛이 공기에서 물(용액)로 들어갈 때 진행 방향이 꺾이는 것을 <b>굴절</b>이라고 해요(중2 '빛과 파동' 단원과 이어져요). 왜 꺾일까요? 아래 수레 비유부터 봅시다.</p>
+    <div class="labsim">
+      <h3>🚗 빛은 왜 꺾일까? — 자동차 바퀴 비유</h3>
+      <div class="subhint">빠른 <b>아스팔트</b>에서 느린 <b>진흙</b>으로 <b>비스듬히</b> 들어가는 수레를 보세요. 진흙에 <b>먼저 닿은 바퀴가 느려지면서</b> 수레가 방향을 틀어요. 빛도 <b>느린 매질(진한 소금물)</b>로 들어갈 때 진행 방향이 법선 쪽으로 꺾입니다.</div>
+      <div class="simrow" style="grid-template-columns:320px 1fr">
+        <canvas id="carCanvas" width="320" height="280"></canvas>
+        <div class="simctrl">
+          <div class="ctrl-row"><label style="margin:0">진흙에서 얼마나 느린가</label><span class="v" id="car-cv">보통</span></div>
+          <input type="range" id="carSlow" min="0.4" max="0.9" step="0.05" value="0.6">
+          <div class="note" style="margin-top:12px">더 <b>느릴수록</b>(= 매질이 더 진할수록) 수레가 <b>더 많이 꺾여요.</b> 두 바퀴가 같은 속도(같은 매질)면 <b>안 꺾이고 직진</b>합니다.</div>
+          <div class="hint" style="margin-top:8px">⚠️ <b>비유의 한계</b> — 이 비유는 진행 방향이 꺾이는 <b>모습</b>을 이해하는 데 도움을 줄 뿐, 빛의 굴절이 실제로 바퀴 때문에 일어나는 것은 아니에요. 핵심은 <b>매질에 따라 빛의 속력이 달라진다</b>는 점!</div>
+        </div>
+      </div>
+    </div>
+    <div class="note" style="margin:0 0 12px">💡 <b>그럼 소금물에서는?</b> 빛은 <b>진공에서 가장 빠르고, 물질 속에서는 물질과 상호작용하며 느려져요.</b> 소금이 많이 녹은 물일수록 빛이 <b>더 많이 상호작용해 더 느려진다</b>고 이해할 수 있어요 — 그래서 굴절률 n이 커집니다.</div>
+    <div class="selfcheck" id="s3predict" style="border-color:#F0CE97;background:#FFF9EC">
+      <div class="t" style="color:#9A6612">🔮 예측 먼저! — 답해야 다음 내용이 열려요</div>
+      <div class="q5"><b>수레 비유처럼, 진한 소금물일수록 빛이 더 느려진다면 — 소금물이 진할수록 빛은?</b>
+        <label><input type="radio" name="s3p" value="a"> 더 많이 꺾인다</label>
+        <label><input type="radio" name="s3p" value="b"> 덜 꺾인다</label>
+        <label><input type="radio" name="s3p" value="c"> 똑같이 꺾인다</label></div>
+      <button class="btn primary" id="s3revealBtn" style="margin-top:8px">예측 완료 — 시뮬레이터로 확인하기 🔓</button>
+      <div id="s3predMsg" class="hint" style="margin-top:8px"></div>
+    </div>
+    <div id="s3reveal" class="hide">
+    <p>소금물의 조성과 농도가 달라지면 <b>굴절률</b>이 달라지고, 빛의 진행 경로도 달라집니다. 굴절 염분계는 이 <b>굴절률의 차이</b>를 광학적으로 감지해, 미리 정해 둔 <b>농도 눈금</b>으로 보여주는 도구예요.</p>
     <div class="calflow" style="margin:10px 0 14px">
       <div class="cf-box">소금물의<small>조성·농도 변화</small></div>
       <div class="cf-arrow">→</div>
@@ -481,7 +577,14 @@
       <details class="toggle-deep">
         <summary>더 깊이 — 접안렌즈의 ‘경계선’은 왜 생길까? (임계각·전반사)</summary>
         <div class="deepbody">
-          <div class="subhint">굴절 염분계 안에서는 빛이 <b>유리 프리즘(n≈1.52)</b>에서 <b>시료(소금물)</b>로 나갑니다. 이때 어떤 각도보다 크게 들어온 빛은 시료로 못 나가고 <b>모두 되튀어요(전반사)</b>. 그 경계가 되는 각을 <b>임계각 θ<sub>c</sub></b>라 하고, 이것이 접안렌즈의 <b>밝음/어두움 경계선</b>을 만듭니다. 소금이 많을수록 시료 n이 커져 θ<sub>c</sub>가 커지고 → 경계선이 이동해요.</div>
+          <div class="subhint">접안렌즈에서 보이는 <b>밝은 부분과 어두운 부분의 경계선</b> — 대체 어떻게 생기는 걸까요? 차근차근 따라가 봐요.</div>
+          <ol style="margin:0 0 12px 20px;font-size:.92rem;line-height:1.65;color:var(--ink)">
+            <li>기기 안에서 빛은 <b>유리 프리즘(n≈1.52)</b>을 지나, 프리즘과 <b>시료(소금물)</b>가 만나는 면에 <b>여러 각도로</b> 부딪혀요.</li>
+            <li><b>완만한 각도</b>로 부딪힌 빛은 소금물 쪽으로 <b>빠져나가요</b> → 빛이 새어 나간 그 방향은 <b>어둡게</b> 보여요.</li>
+            <li><b>아주 비스듬한 각도</b>로 부딪힌 빛은 빠져나가지 못하고 <b>거울처럼 전부 되튀어요</b> — 이것이 <b><span class="blank">전반사</span></b>! 되튄 빛이 모이는 방향은 <b>밝게</b> 보여요.</li>
+            <li>빠져나감/되튐이 갈리는 <b>딱 그 경계의 각도</b>가 <b>임계각 θ<sub>c</sub></b> — 화면의 밝음/어둠 <b>경계선</b>이 바로 이 각도가 만드는 자리예요.</li>
+            <li>소금이 많을수록 시료의 n이 커져 <b>θ<sub>c</sub>가 커지고 → 경계선이 이동</b>해요. 기기에는 이 위치에 맞는 <b>농도 눈금이 미리 새겨져</b> 있어서, 우리는 각도를 잴 필요 없이 <b>경계선이 닿는 숫자만 읽으면</b> 됩니다!</li>
+          </ol>
           <div class="simrow" style="grid-template-columns:1fr 1fr">
             <canvas id="critCanvas" width="360" height="260"></canvas>
             <div class="simctrl" style="align-self:center">
@@ -489,29 +592,15 @@
                 <div class="metric"><div class="l">시료 굴절률 n<sub>시료</sub></div><div class="v" id="m-ns">1.339</div></div>
                 <div class="metric"><div class="l">임계각 θ<sub>c</sub></div><div class="v" id="m-crit">61.8<small>°</small></div></div>
               </div>
-              <div class="note" style="margin-top:10px">위 슬라이더(농도)를 움직이면 여기 임계각과 <b>경계선 위치</b>도 함께 바뀝니다. 이 경계선을 아래 접안렌즈 연습에서 실제 눈금으로 읽어요.</div>
+              <div class="note" style="margin-top:10px">그림 읽는 법: 프리즘 안에서 여러 각도로 나온 <b>부챗살 빛</b> 중, <b>노란빛(완만)</b>은 시료로 빠져나가 그 방향이 어두워지고, <b>청록빛(비스듬)</b>은 전부 되튀어 밝아져요. 굵은 <b>주황 빛</b>이 딱 경계 — 임계각이에요. 위 슬라이더(농도)를 움직여 보세요: 시료 n이 커지면 θ<sub>c</sub>가 커지고 <b>경계선이 이동</b>합니다. 이 경계선을 아래 접안렌즈 연습에서 실제 눈금으로 읽어요.</div>
             </div>
           </div>
         </div>
       </details>
     </div>
-    <div class="labsim">
-      <h3>🚗 빛은 왜 꺾일까? — 자동차 바퀴 비유</h3>
-      <div class="subhint">빠른 <b>아스팔트</b>에서 느린 <b>진흙</b>으로 <b>비스듬히</b> 들어가는 수레를 보세요. 진흙에 <b>먼저 닿은 바퀴가 느려지면서</b> 수레가 방향을 틀어요. 빛도 <b>느린 매질(진한 소금물)</b>로 들어갈 때 진행 방향이 법선 쪽으로 꺾입니다.</div>
-      <div class="simrow" style="grid-template-columns:320px 1fr">
-        <canvas id="carCanvas" width="320" height="280"></canvas>
-        <div class="simctrl">
-          <div class="ctrl-row"><label style="margin:0">진흙에서 얼마나 느린가</label><span class="v" id="car-cv">보통</span></div>
-          <input type="range" id="carSlow" min="0.4" max="0.9" step="0.05" value="0.6">
-          <div class="note" style="margin-top:12px">더 <b>느릴수록</b>(= 매질이 더 진할수록) 수레가 <b>더 많이 꺾여요.</b> 두 바퀴가 같은 속도(같은 매질)면 <b>안 꺾이고 직진</b>합니다.</div>
-          <div class="hint" style="margin-top:8px">⚠️ <b>비유의 한계</b> — 이 비유는 진행 방향이 꺾이는 <b>모습</b>을 이해하는 데 도움을 줄 뿐, 빛의 굴절이 실제로 바퀴 때문에 일어나는 것은 아니에요. 핵심은 <b>매질에 따라 빛의 속력이 달라진다</b>는 점!</div>
-        </div>
-      </div>
-    </div>
     <div class="em">📟 <b>우리 기기 — ATAGO MASTER-S28M.</b> 용액의 <b>굴절률</b>을 이용해 농도를 알아보는 굴절 염분계예요. 이 기기의 눈금(0~28)은 <b>NaCl(염화나트륨) 수용액을 기준으로 만든 g/100g 눈금</b>입니다. 측정 전 <b>증류수로 0점</b>을 맞추는 것을 잊지 마세요.</div>
     <div class="note" style="margin:0 0 14px">💡 <b>잠깐, 오해 금지!</b> 이 기계가 소금물 속 <b>NaCl 입자를 하나하나 세는 게 아니에요.</b> 여러 물질이 녹으면 용액의 굴절률이 달라질 수 있는데, 기기는 각각의 물질을 따로 알아내는 게 아니라 <b>용액 전체의 굴절률</b>을 감지해서, 미리 정해진 <b>NaCl 기준 눈금</b>으로 보여주는 거예요.</div>
     <div class="note" style="margin:0 0 10px">🌡 <b>온도 주의.</b> 이 모델은 자동 온도 보정(ATC)이 없어요. 용액과 기기를 <b>실온</b>에 두고 재고, 프리즘 부분을 손으로 오래 감싸지 마세요. 온도가 달라지면 측정값이 어떻게 될지 — 나중에 오차 분석에서 다시 만나요.</div>
-    <div class="note" style="margin:0 0 14px">🔎 <b>단위 탐정.</b> 우리 굴절계 눈금 <b>g/100g</b>는 "용액 100 g 속 소금 g" — 곧 <b>퍼센트 농도(%)</b>와 같은 뜻이에요. 그럼 어떤 용액이 ‰(퍼밀, 1000분의 몇) 단위로 <b>35‰</b>라면, g/100g으로는 얼마일까요? <span class="hint">(힌트: ‰와 g/100g는 10배 관계)</span></div>
     <h3 class="sec">🔧 사용법 — 순서대로 따라 하세요</h3>
     <div class="guide">
       <div class="gcard"><div class="row"><span class="badge">1</span><div><h3>프리즘(시료판) 닦기</h3><p>덮개를 열고, 깨끗한 천(렌즈페이퍼)으로 프리즘 면을 닦아 이전에 묻은 자국을 없앱니다. 긁히지 않게 부드럽게 닦아요.</p></div></div></div>
@@ -539,12 +628,13 @@
     <div class="photo-block"><label>📷 굴절 염분계 경계선 사진</label>
       <p class="hint" style="margin:2px 0 0">굴절 염분계의 <b>접안렌즈(들여다보는 입구)</b>에 휴대폰 카메라를 <b>바짝 가져다 대고</b>, 눈금과 파랑·흰색 경계선이 보이게 찍어 올려보자.</p>
       <div class="photo-grid"><div class="photo-slot" data-slot="refracto"></div></div></div>
-    <div class="nav-btns"><button class="btn ghost" data-go="2">← 이전</button><button class="btn primary" data-go="4">다음 → 간이 염분계 만들기</button></div>
+    </div><!-- /s3reveal -->
+    <div class="nav-btns"><button class="btn ghost" data-go="2">← 이전</button><button class="btn primary" data-go="4">다음 → 뜨는 원리 보기</button></div>
   </div>
 
   <!-- STEP 4 -->
-  <div class="panel hide" data-step="4">
-    <div class="secHead"><span class="secNo">STEP 4</span><h2>간이 염분계 만들기</h2></div>
+  <div class="panel hide" data-step="5">
+    <div class="secHead"><span class="secNo">STEP 5</span><h2>간이 염분계 만들기 — 그리고 재는 법까지</h2></div>
     <p>스포이드 안에 <b>쇠구슬</b>을 넣어 무게추로 삼아, 물 위에서 <b>똑바로 서서</b> 떠 있도록 만듭니다. 이것이 우리가 <b>보정할 도구</b>예요. 그런데 <b>쇠구슬은 몇 개</b> 넣어야 할까요? 정답은 정해져 있지 않아요 — 아래 <b>‘쇠구슬 수 찾기’</b>에서 시뮬레이터로 예측하고 실물로 확인해, <b>우리 조가 직접 정합니다.</b></p>
     <div class="guide">
       <div class="gcard">
@@ -567,7 +657,7 @@
         </svg>
       </div>
       <div class="gcard">
-        <div class="row"><span class="badge">3</span><div><h3>좁은 통에서 점검하기</h3><p><b>좁고 긴 눈금실린더(또는 시험관)</b>에 맹물을 담고 측정기를 넣어, 바닥에서 살짝 떨어진 채 <b>똑바로 서서</b> 안정적으로 떠 있는지 확인합니다. 잘 서지 못하면 스포이드 윗부분을 조금 더 잘라 길이를 맞춰요.</p></div></div>
+        <div class="row"><span class="badge">3</span><div><h3>100 mL 눈금실린더에서 점검하기</h3><p><b>100 mL 눈금실린더</b>에 맹물을 담고 측정기를 넣어, 바닥에서 살짝 떨어진 채 <b>똑바로 서서</b> 안정적으로 떠 있는지 확인합니다. 벽에 닿지 않게 가운데에! 잘 서지 못하면 스포이드 윗부분을 조금 더 잘라 길이를 맞춰요.</p></div></div>
         <svg viewBox="0 0 200 120" width="150" height="108" aria-hidden="true">
           <rect x="78" y="10" width="44" height="104" rx="6" fill="none" stroke="#0A3D4F" stroke-width="2"/>
           <rect x="80" y="42" width="40" height="70" fill="#1AA7A0" fill-opacity=".18"/>
@@ -607,6 +697,7 @@
           <div class="ballstate good" id="ballState">양호<small>—</small></div>
           <button class="btn primary" id="ballSweep" style="margin-top:12px;width:100%">▶ 싱거운 물 ~ 짠 물, 전 구간 자동 검사</button>
           <div id="ballSweepResult" class="note" style="display:none;margin-top:10px"></div>
+          <div class="hint" style="margin-top:10px">🎮 <b>시뮬레이터 속 개수와 실제 개수는 다를 수 있어요!</b> 스포이드·쇠구슬 크기가 제각각이거든요. 시뮬레이터로는 <b>"적으면 기울고, 많으면 가라앉는" 원리</b>를 확인하고, 실제 개수는 <b>실물을 물에 띄워 보며 조절해서</b> 찾으세요.</div>
         </div>
       </div>
       <div class="selfcheck">
@@ -646,13 +737,9 @@
       <textarea id="rk-build" data-rkey="obsBuild" placeholder="예: 스포이드를 너무 많이 자르면 잘 서지 못했다. 쇠구슬 ○개로 안정적으로 떠올랐다."></textarea></div>
     <div class="photo-block"><label>📷 완성한 간이 염분계 사진</label>
       <div class="photo-grid"><div class="photo-slot" data-slot="device"></div></div></div>
-    <div class="nav-btns"><button class="btn ghost" data-go="3">← 이전</button><button class="btn primary" data-go="5">다음 → 시뮬레이터로 원리 보기</button></div>
-  </div>
 
-  <!-- STEP 5 -->
-  <div class="panel hide" data-step="6">
-    <div class="secHead"><span class="secNo">STEP 6</span><h2>수면 위 길이 측정하기 — 모두 같은 방법으로</h2></div>
-    <p>이번 탐구에서 재는 값은 딱 하나 — <b>수면 위 길이(cm)</b>: <b>수면에서 간이 염분계의 가장 위쪽 끝까지의 수직 거리</b>예요. 측정기가 <b>자유롭게 떠 있을 수 있도록 충분히 깊은 용기</b>를 쓰고, <b>벽이나 바닥에 닿지 않는지</b> 꼭 확인하세요(눈금실린더를 쓴다면 벽에 닿기 쉬우니 특히 주의!).</p>
+    <h3 class="sec" style="margin-top:24px">📏 완성했다면 — 수면 위 길이 재는 법 (모두 같은 방법으로!)</h3>
+    <p>우리가 방금 <b>cm 테이프</b>를 붙이고 <b>똑바로 서게</b> 만든 이유가 바로 이것! 이번 탐구에서 재는 값은 딱 하나 — <b>수면 위 길이(cm)</b>: <b>수면에서 간이 염분계의 가장 위쪽 끝까지의 수직 거리</b>예요. 측정기가 <b>자유롭게 떠 있을 수 있도록 충분히 깊은 용기</b>를 쓰고, <b>벽이나 바닥에 닿지 않는지</b> 꼭 확인하세요(눈금실린더를 쓴다면 벽에 닿기 쉬우니 특히 주의!).</p>
     <div class="guide">
       <div class="gcard"><div class="row"><span class="badge">1</span><div><h3>소금물을 눈금실린더에 붓기</h3><p>측정할 소금물을 눈금실린더에 옮겨 담습니다. 측정기가 잠길 만큼 충분히 부어 주세요. 용액이 바뀔 때마다 측정기를 헹궈요.</p></div></div></div>
       <div class="gcard"><div class="row"><span class="badge">2</span><div><h3>측정기 띄우기</h3><p>측정기(우리 조가 정한 쇠구슬 수)를 살며시 넣고 흔들림이 멈출 때까지 기다립니다. <b>모든 용액에 같은 측정기를 그대로</b> 사용하세요 — 그래야 용액끼리 공정하게 비교할 수 있어요.</p></div></div></div>
@@ -673,26 +760,23 @@
           <text x="123" y="20" font-size="9" fill="#0A3D4F" font-family="Pretendard" font-weight="700">윗끝</text>
         </svg>
       </div>
-      <div class="gcard"><div class="row"><span class="badge">4</span><div><h3>소금물마다 2회 측정 → 평균</h3><p>각 소금물에서 <b>수면 위 길이를 두 번</b> 재어 STEP 9 표에 적고 <b>평균</b>을 씁니다. 💭 같은 소금물인데 두 번 잰 값이 완전히 똑같을까요? 자 읽는 위치·흔들림·눈높이 때문에 조금씩 다를 수 있어요 — 그래서 여러 번 재고 대표값을 정하는 거예요. 진한 소금물일수록 측정기가 덜 잠겨 <b>수면 위 길이가 길어집니다.</b></p></div></div></div>
+      <div class="gcard"><div class="row"><span class="badge">4</span><div><h3>소금물마다 2회 측정 → 평균</h3><p>각 소금물에서 <b>수면 위 길이를 두 번</b> 재어 STEP 8 표에 적고 <b>평균</b>을 씁니다. 💭 같은 소금물인데 두 번 잰 값이 완전히 똑같을까요? 자 읽는 위치·흔들림·눈높이 때문에 조금씩 다를 수 있어요 — 그래서 여러 번 재고 대표값을 정하는 거예요. 진한 소금물일수록 측정기가 덜 잠겨 <b>수면 위 길이가 길어집니다.</b></p></div></div></div>
     </div>
-    <h3 class="sec">🎯 수면 위 길이를 정확히 읽는 법</h3>
-    <div class="ok">
-      <ul style="margin:0 0 0 18px">
-        <li>눈을 반드시 <b>수면과 같은 높이</b>에 두고 읽어요. 위나 아래에서 비스듬히 보면 값이 달라져요(<b>계통 오차</b>!).</li>
-        <li>물이 관 벽을 타고 살짝 올라오는 <b>메니스커스(오목한 곡면)</b>가 생겨요. 항상 <b>곡면의 가장 아랫부분</b>을 기준으로 읽어요.</li>
-        <li>측정기가 <b>완전히 멈춘 뒤</b> 읽고, <b>2번 재서 평균</b>을 내면 우연 오차가 줄어요.</li>
-        <li>측정기가 <b>실린더 벽에 닿지 않게</b> 한가운데에 띄워요.</li>
+    <details class="hint-d"><summary>수면 위 길이를 정확히 읽는 법 · 문제가 생겼을 때 (꼭 열어 보기!)</summary><div class="hb">
+      <b>🎯 정확히 읽기</b>
+      <ul style="margin:6px 0 10px 17px">
+        <li>눈을 반드시 <b>수면과 같은 높이</b>에 두고 읽어요. 비스듬히 보면 값이 달라져요(<b>계통 오차</b>!).</li>
+        <li>물이 관 벽을 타고 살짝 올라오는 <b>메니스커스(오목한 곡면)</b>는 <b>가장 아랫부분</b>을 기준으로.</li>
+        <li>측정기가 <b>완전히 멈춘 뒤</b>, 벽에 닿지 않게 <b>한가운데</b>에서.</li>
       </ul>
-    </div>
-    <div class="trouble" style="margin-top:12px"><b>측정기가 기울거나 문제가 생기면</b>
+      <b>🛠 문제가 생기면</b>
       <ul style="margin:6px 0 0 17px">
-        <li><b>기울어질 때</b> → 쇠구슬이 벌브 <b>맨 아래로 모이도록</b> 톡톡 쳐서 무게중심을 낮춰요. 그래도 기울면 <b>쇠구슬을 조금 더</b> 넣어요.</li>
-        <li><b>관 속에 물이 들어갔을 때</b> → 꺼내서 물기를 털고 <b>입구를 잘 막은 뒤</b> 다시 띄워요.</li>
-        <li><b>기포(공기방울)가 붙었을 때</b> → 살짝 흔들거나 톡 쳐서 떼어내요(기포가 있으면 더 높이 떠요).</li>
-        <li><b>벽에 붙어 안 움직일 때</b> → 유리막대로 살살 밀어 가운데로 옮겨요.</li>
-        <li>용액을 바꿀 때는 측정기를 <b>맹물로 헹궈</b> 앞 소금물이 섞이지 않게 해요.</li>
+        <li><b>기울어질 때</b> → 쇠구슬을 벌브 <b>맨 아래로</b> 톡톡 모으고, 그래도 기울면 <b>작은 쇠구슬 추가</b>.</li>
+        <li><b>관에 물이 들어감</b> → 물기 털고 입구 막은 뒤 다시 띄우기.</li>
+        <li><b>기포가 붙음</b> → 살짝 흔들어 떼기(기포가 있으면 더 높이 떠요).</li>
+        <li><b>벽에 붙음</b> → 유리막대로 살살 가운데로. 용액 바꿀 땐 <b>맹물로 헹구기</b>.</li>
       </ul>
-    </div>
+    </div></details>
     <div class="selfcheck">
       <div class="t">✅ 측정할 때마다 확인! (하나라도 어긋나면 다시 띄워 측정)</div>
       <label><input type="checkbox"> 측정기가 용기의 <b>벽에 닿지 않았다</b></label>
@@ -702,12 +786,13 @@
     </div>
     <div class="refbox"><label for="refRule">📌 우리 조의 측정 약속 <span class="hint" style="font-weight:500">(모두 같은 방법으로! 추가로 지킬 것을 적어요)</span></label><input id="refRule" type="text" placeholder="예: 항상 같은 사람이 읽는다 / cm 테이프의 수면 눈금을 읽는다 / 2회 측정 후 평균"></div>
     <div class="em">같은 측정기 · 같은 방법으로 모든 용액을 측정해야 비교할 수 있어요. 측정기가 <b>벽에 기대거나 바닥에 닿았다면</b> 부력만으로 떠 있는 게 아니므로, 그 값은 쓰지 말고 <b>다시 띄워 측정</b>합니다.</div>
-    <div class="nav-btns"><button class="btn ghost" data-go="5">← 이전</button><button class="btn primary" data-go="7">다음 → 기준 용액 만들기</button></div>
+    <div class="nav-btns"><button class="btn ghost" data-go="4">← 이전</button><button class="btn primary" data-go="6">다음 → 기준 용액 만들기</button></div>
   </div>
 
+
   <!-- STEP 6 -->
-  <div class="panel hide" data-step="5">
-    <div class="secHead"><span class="secNo">STEP 5</span><h2>시뮬레이터로 원리 이해하기</h2></div>
+  <div class="panel hide" data-step="4">
+    <div class="secHead"><span class="secNo">STEP 4</span><h2>뜨는 원리 — 시뮬레이터로 이해하기</h2></div>
     <p>실제 측정 전에, <b>왜 짠 물에서 측정기가 더 높이 떠오르는지</b>를 시뮬레이터로 탐구해 봅시다. 💭 <b>예측 먼저!</b> 소금 양을 늘리면 ① 측정기의 위치, ② 중력·부력 화살표의 길이, ③ 물에 잠긴 부피는 각각 어떻게 될까요? 조에서 예측을 정한 뒤 슬라이더로 확인하세요. 같은 용액을 굴절 염분계로 재면 눈금이 얼마쯤 나올지도 <b>모형으로 예측</b>해 함께 보여줘요.</p>
     <div class="warn" style="background:#FBEFE7;border:1.5px solid var(--coral);border-radius:12px;padding:12px 15px;font-size:.93rem;line-height:1.55;margin:0 0 12px">⚠️ <b>헷갈리기 쉬워요!</b> <b>넣은 소금의 양(g)</b>과 <b>소금물의 농도(g/100g)</b>는 같은 것이 아니에요. 농도는 소금의 양뿐 아니라 <b>용액 전체의 양</b>과도 관련되거든요(같은 소금 10 g도 물이 다르면 농도가 달라져요). 그래서 실제 실험에서는 각 소금물의 기준값을 <b>굴절 염분계로 직접 측정</b>합니다.</div>
     <div class="simgrid">
@@ -748,10 +833,16 @@
         <ol>
           <li><b>측정기의 무게는 변하지 않습니다.</b> 어떤 물에 넣어도 측정기에 작용하는 중력은 똑같아요.</li>
           <li><b>부력은 측정기가 밀어낸 물의 무게입니다.</b> 측정기가 잠기면 그 부피만큼 물이 밀려나고, 그 물이 <i>"내 자리 돌려줘!"</i> 하며 측정기를 위로 밀어 올려요. <span class="hint">(아르키메데스의 원리)</span></li>
-          <li><b>짠 물은 같은 부피라도 더 무거워요(밀도가 큼).</b> 그래서 짠 물에서는 측정기가 <b>적게 잠겨도</b> 그 적은 부피의 물 무게로 측정기를 받쳐 줄 수 있어요.</li>
-          <li><b>측정기는 부력 = 자기 무게가 되는 곳에서 멈춥니다.</b> 짠 물에서는 적게 잠겨도 충분하니 더 위로 떠올라요. 그래서 <b>진한 소금물일수록 수면 위로 나온 길이가 길어집니다.</b></li>
+          <li><b>짠 물은 같은 부피라도 더 무거워요(<span class="blank">밀도</span>가 큼).</b> 그래서 짠 물에서는 측정기가 <b>적게 잠겨도</b> 그 적은 부피의 물 무게로 측정기를 받쳐 줄 수 있어요.</li>
+          <li><b>측정기는 부력 = <span class="blank">자기 무게</span>가 되는 곳에서 멈춥니다.</b> 짠 물에서는 적게 잠겨도 충분하니 더 위로 떠올라요. 그래서 <b>진한 소금물일수록 수면 위로 나온 <span class="blank">길이가 길어</span>집니다.</b></li>
         </ol>
         <p class="hint" style="margin-top:8px">🌟 <b>도전(심화)</b> — 측정기의 무게를 W, 관의 단면적을 A, 용액의 밀도를 ρ라 할 때, 물에 잠긴 깊이 d를 식으로 나타내 볼까요? <i>(힌트: 떠 있는 동안 W = ρ × g × 잠긴 부피)</i></p>
+      </div>
+      <div class="labsim" style="text-align:center">
+        <h3>🎬 힘의 평형, 영상으로 한 번 더! — 승재쌤의 릴스</h3>
+        <div class="subhint">떠 있는 물체에 작용하는 <b>중력과 부력의 균형</b>, 영상으로 확인해 보세요.</div>
+        <iframe src="https://www.instagram.com/reel/DOqnl65id3C/embed" width="330" height="500" style="border:0;border-radius:14px;max-width:100%;background:#fff" allowfullscreen loading="lazy" title="힘의 평형 릴스"></iframe>
+        <div class="hint" style="margin-top:8px">영상이 안 보이면 → <a href="https://www.instagram.com/reel/DOqnl65id3C/" target="_blank" rel="noopener" style="color:var(--teal);font-weight:700">인스타그램에서 열기 ↗</a></div>
       </div>
 
       <div class="labsim">
@@ -791,13 +882,13 @@
       </div>
     </div>
 
-    <div class="nav-btns"><button class="btn ghost" data-go="4">← 이전</button><button class="btn primary" id="toStep6" data-go="6" disabled>다음 → 길이 측정법 🔒</button></div>
+    <div class="nav-btns"><button class="btn ghost" data-go="3">← 이전</button><button class="btn primary" id="toStep6" data-go="5" disabled>다음 → 측정기 만들기 🔒</button></div>
   </div>
 
   <!-- STEP 7 -->
-  <div class="panel hide" data-step="7">
-    <div class="secHead"><span class="secNo">STEP 7</span><h2>기준 용액 만들고 두 도구로 측정하기</h2></div>
-    <p>보정에 쓸 <b>소금물 4가지</b>를 만듭니다. 물은 모두 <b>100 mL</b>로 같게 하고, <b>넣는 소금의 양만</b> 다르게 해요 — <b>A</b>(소금 5 g) · <b>B</b>(소금 10 g) · <b>C</b>(소금 15 g) · <b>D</b>(소금 20 g). 각 소금물을 <b>굴절 염분계(기준값 g/100g)</b>와 <b>간이 염분계(수면 위 길이 cm)</b>로 모두 측정해 STEP 9 표에 적습니다.</p>
+  <div class="panel hide" data-step="6">
+    <div class="secHead"><span class="secNo">STEP 6</span><h2>기준 용액 만들고 두 도구로 측정하기</h2></div>
+    <p>보정에 쓸 <b>소금물 4가지</b>를 만듭니다. 물은 모두 <b>100 mL</b>로 같게 하고, <b>넣는 소금의 양만</b> 다르게 해요 — <b>A</b>(소금 5 g) · <b>B</b>(소금 10 g) · <b>C</b>(소금 15 g) · <b>D</b>(소금 20 g). 각 소금물을 <b>굴절 염분계(기준값 g/100g)</b>와 <b>간이 염분계(수면 위 길이 cm)</b>로 모두 측정해 STEP 8 표에 적습니다.</p>
     <div class="warn" style="background:#FBEFE7;border:1.5px solid var(--coral);border-radius:12px;padding:12px 15px;font-size:.93rem;line-height:1.55;margin:0 0 12px">⚠️ <b>부르는 법 주의!</b> A 용액은 "소금 5 g을 넣은 소금물"이지, <b>"5% 용액"이 아니에요.</b> 넣은 소금의 양은 우리가 <b>직접 조작한 조건</b>일 뿐, 그 숫자가 곧 농도는 아닙니다. 각 소금물의 <b>기준값은 굴절 염분계로 직접 측정</b>해요.</div>
     <div class="compare2" style="margin:0 0 12px">
       <div class="icard ours">
@@ -820,7 +911,7 @@
       <div class="gcard"><div class="row"><span class="badge">1</span><div><h3>전자저울 영점 맞추기</h3><p>전자저울에 <b>빈 비커</b>를 올린 뒤 '영점(Tare/0)' 버튼을 눌러 <b>0.0 g</b>으로 만듭니다. 비커 무게를 빼고 소금 무게만 잴 수 있어요.</p></div></div></div>
       <div class="gcard"><div class="row"><span class="badge">2</span><div><h3>소금 정량하기</h3><p>약수저로 소금을 비커에 조금씩 넣어 <b>5 g / 10 g / 15 g / 20 g</b>에 정확히 맞춥니다. 너무 많으면 살짝 덜어내요.</p></div></div></div>
       <div class="gcard"><div class="row"><span class="badge">3</span><div><h3>물 100 mL 재서 녹이기</h3><p>눈금실린더로 물 <b>100 mL</b>를 정확히 재어 비커에 붓고, 유리 막대로 소금이 <b>완전히 녹을 때까지</b> 젓습니다. <b style="color:var(--coral)">비커마다 'A(5 g)·B(10 g)·C(15 g)·D(20 g)'를 꼭 적어 두세요.</b></p></div></div></div>
-      <div class="gcard"><div class="row"><span class="badge">4</span><div><h3>두 도구로 측정하기</h3><p>각 소금물을 <b>① 굴절 염분계</b>로 재서 기준값(g/100g)을 읽고(측정 전 증류수로 영점 보정!), <b>② 간이 염분계</b>를 띄워 수면 위 길이(cm)를 읽습니다. 두 값을 STEP 9 표에 적어요.</p></div></div></div>
+      <div class="gcard"><div class="row"><span class="badge">4</span><div><h3>두 도구로 측정하기</h3><p>각 소금물을 <b>① 굴절 염분계</b>로 재서 기준값(g/100g)을 읽고(측정 전 증류수로 영점 보정!), <b>② 간이 염분계</b>를 띄워 수면 위 길이(cm)를 읽습니다. 두 값을 STEP 8 표에 적어요.</p></div></div></div>
     </div>
     <div class="em"><b>가장 중요한 약속!</b> 물은 네 용액 모두 <b>똑같이 100 mL</b>로 맞춥니다. 그리고 굴절 염분계는 <b>용액을 바꿀 때마다 프리즘을 닦고</b>, 처음에 <b>증류수로 0점</b>을 맞춰야 정확해요. 또 이 굴절계는 <b>온도 자동 보정이 없으니</b>, 용액을 실온에 두고 재요.</div>
     <div class="ok" style="margin-top:8px">✅ <b>좋은 점!</b> 각 소금물의 기준값을 굴절 염분계로 <b>직접 측정</b>하니까, 소금이 조금 덜 녹았거나 양이 살짝 어긋나도 괜찮아요 — 우리는 그 소금물의 <b>기준값을 그대로 얻으면</b> 되거든요. 이것이 이번 탐구 설계의 핵심!</div>
@@ -833,12 +924,12 @@
       <textarea id="rk-sol" data-rkey="obsSolution" placeholder="예: 소금이 다 녹을 때까지 오래 저어야 했다. 진한 용액일수록 녹는 데 시간이 더 걸렸다."></textarea></div>
     <div class="photo-block"><label>📷 만든 기준 용액 사진 (소금 5·10·15·20 g)</label>
       <div class="photo-grid"><div class="photo-slot" data-slot="solutions"></div></div></div>
-    <div class="nav-btns"><button class="btn ghost" data-go="6">← 이전</button><button class="btn primary" data-go="8">다음 → 왜 보정곡선?</button></div>
+    <div class="nav-btns"><button class="btn ghost" data-go="5">← 이전</button><button class="btn primary" data-go="7">다음 → 왜 보정?</button></div>
   </div>
 
   <!-- STEP 8: 왜 보정곡선 -->
-  <div class="panel hide" data-step="8">
-    <div class="secHead"><span class="secNo">STEP 8</span><h2>숫자에 의미를 붙이는 순간 — 이 탐구의 진짜 목표</h2></div>
+  <div class="panel hide" data-step="7">
+    <div class="secHead"><span class="secNo">STEP 7</span><h2>숫자에 의미를 붙이는 순간 — 이 탐구의 진짜 목표</h2></div>
     <div class="hook">🤔 <b>잠깐!</b> 우리 간이 염분계가 알려주는 "2.3 cm"는 아직 <b>농도의 의미가 없는 지시값</b>이에요. <b>이 숫자에 어떻게 농도의 의미를 붙일 수 있을까요?</b> 지금부터 그 방법을 알아봅시다.</div>
     <h3 class="sec">🔍 두 도구의 역할을 다시 보면</h3>
     <div class="compare2">
@@ -892,17 +983,33 @@
     <p class="hint" style="text-align:center;margin:2px 0 8px">기준과 비교하고 관계를 찾으면, 단순한 지시값에 <b>측정의 의미</b>가 생깁니다.</p>
     <h3 class="sec">🔬 그럼 오늘 굴절 염분계로 하는 일은?</h3>
     <p>오늘 굴절 염분계는 각 소금물의 <b>기준값</b>을 재는 역할을 해요. 그 기준값과 우리 간이 염분계의 <b>수면 위 길이</b>를 짝지어 관계를 찾으면, 우리 측정기의 지시값을 <b>농도로 해석할 수 있는 눈금</b>이 생기는 셈이에요.</p>
-    <div class="em" style="text-align:center;font-size:1.02rem"><b>측정 도구의 숫자는 저절로 의미를 가지지 않아요.</b><br><span style="font-size:.9rem;color:var(--soft)">어떤 <b>기준</b>과 어떤 <b>관계</b>로 그 값을 해석하는지가 중요합니다.</span></div>
-    <div class="note">🔬 <b>실제로도 이렇게 해요.</b> 과학자들은 측정 도구를 쓰기 전에 <b>기준(측정표준·표준물질)</b>과 비교해 눈금을 확인하는 <b>교정</b>을 해요. 해양 연구에서도 여러 센서를 기준 장비·표준 시료와 비교해 두고 사용한답니다. 우리가 하는 일이 바로 그 원리예요!</div>
+    <div class="em" style="text-align:center;font-size:1.02rem"><b>측정 도구의 숫자는 저절로 <span class="blank">의미</span>를 가지지 않아요.</b><br><span style="font-size:.9rem;color:var(--soft)">어떤 <b><span class="blank">기준</span></b>과 어떤 <b><span class="blank">관계</span></b>로 그 값을 해석하는지가 중요합니다.</span></div>
+    <div class="note">🔬 <b>실제로도 이렇게 해요.</b> 과학자들은 측정 도구를 쓰기 전에 <b>기준(측정표준·표준물질)</b>과 비교해 눈금을 확인하는 <b>교정</b>을 해요. 우리가 하는 일이 바로 그 원리예요! 주변의 실제 사례들 👇</div>
+    <div class="compare2" style="margin-top:10px">
+      <div class="icard" style="border-color:var(--teal2)">
+        <ul style="margin-left:16px">
+          <li>🏥 <b>병원 혈압계·체온계</b> — 표준 기기와 정기적으로 비교 점검</li>
+          <li>⚖️ <b>전자저울</b> — 질량을 정확히 아는 <b>분동</b>을 올려 교정</li>
+          <li>⛽ <b>주유소 주유기</b> — 기준 용기와 비교하는 정기 검사</li>
+        </ul>
+      </div>
+      <div class="icard" style="border-color:var(--teal2)">
+        <ul style="margin-left:16px">
+          <li>🧪 <b>pH 측정기</b> — pH를 정확히 아는 <b>표준용액</b>에 담가 교정</li>
+          <li>🌡 <b>기상관측 온도계</b> — 국가 표준과 이어지는 비교 교정</li>
+          <li>🌊 <b>해양 염분 센서</b> — 표준 해수·기준 장비와 비교해 사용</li>
+        </ul>
+      </div>
+    </div>
     <div class="report-field"><label for="rk-predict">🔮 예측 — 곧 그릴 그래프(가로: 기준값, 세로: 수면 위 길이)는 어떤 모양이 될까요? 그리고 점이 몇 개면 관계를 판단하기 좋을까요?</label>
       <textarea id="rk-predict" data-rkey="predictCurve" placeholder="예: 오른쪽 위로 올라가는 모양일 것이다. 점 2개로도 선은 그릴 수 있지만, 4개는 있어야 관계를 판단할 수 있을 것 같다…"></textarea></div>
-    <div class="nav-btns"><button class="btn ghost" data-go="7">← 이전</button><button class="btn primary" data-go="9">다음 → 보정곡선 그리기</button></div>
+    <div class="nav-btns"><button class="btn ghost" data-go="6">← 이전</button><button class="btn primary" data-go="8">다음 → 보정 관계 만들기</button></div>
   </div>
 
   <!-- STEP 9 -->
-  <div class="panel hide" data-step="9">
-    <div class="secHead"><span class="secNo">STEP 9</span><h2>보정 관계 만들기 — 두 측정값을 짝짓기</h2></div>
-    <p>STEP 7에서 잰 값을 표에 입력하세요. 각 소금물마다 <b>굴절 염분계 기준값(g/100g)</b>과 <b>간이 염분계 수면 위 길이(cm)</b>를 적으면, 오른쪽에 두 값의 관계가 자동으로 그려집니다.</p>
+  <div class="panel hide" data-step="8">
+    <div class="secHead"><span class="secNo">STEP 8</span><h2>보정 관계 만들기 — 두 측정값을 짝짓기</h2></div>
+    <p>STEP 6에서 잰 값을 표에 입력하세요. 각 소금물마다 <b>굴절 염분계 기준값(g/100g)</b>과 <b>간이 염분계 수면 위 길이(cm)</b>를 적으면, 오른쪽에 두 값의 관계가 자동으로 그려집니다.</p>
     <div class="note" style="margin:0 0 10px">📌 소금 5·10·15·20 g은 우리가 <b>직접 조작한 조건</b>이에요 — 이 숫자를 농도라고 부르지 않아요. 각 소금물의 <b>비교 기준값</b>은 굴절 염분계로 측정해 입력합니다.</div>
     <div id="refHint" class="refhint" style="display:none"></div>
     <div class="row2">
@@ -912,6 +1019,8 @@
           <tbody id="caltbody"></tbody>
         </table>
         <div class="hint" style="margin-top:8px">* 굴절 염분계는 측정 전 증류수로 0점을 맞추고, 용액마다 프리즘을 닦으세요. 점이 <b>4개</b>면 2개일 때보다 관계를 판단하기 훨씬 좋아요. 같은 용액을 <b>두 번 재서 평균</b>하면 한 번만 잴 때보다 우연한 차이의 영향을 줄이는 데 도움이 돼요(오차가 완전히 사라지는 건 아니에요).</div>
+        <button class="btn ghost" id="addCalRow" style="margin-top:10px">＋ 측정값 추가 — 시간 남는 조 도전!</button>
+        <div class="hint" style="margin-top:6px">다른 소금 양으로 <b>E, F… 소금물</b>을 더 만들어 점을 추가해 보세요. 점이 많을수록 관계를 더 믿을 수 있어요. 추가한 소금물도 <b>같은 소금 · 물 100 mL</b> 조건으로!</div>
       </div>
       <div>
         <canvas id="graph" class="stage" width="700" height="500"></canvas>
@@ -939,12 +1048,12 @@
     <div class="report-field"><label for="rk-graph">📝 그래프를 보고 — 알게 된 점 (기준값과 수면 위 길이의 관계, 점들의 배열 등)</label>
       <textarea id="rk-graph" data-rkey="obsGraph" placeholder="예: 기준값이 커질수록 수면 위 길이도 일정하게 커졌다. 점들이 직선 주변에 잘 모여 있었다."></textarea></div>
     <div class="ok" style="margin-top:12px">📈 <b>우리가 측정한 범위에서 관계를 직선으로 근사한 것 — 이것이 보정 관계예요!</b> 모든 점이 직선 위에 정확히 놓일 필요는 없어요. 이 관계를 <b>거꾸로 이용</b>하면, 수면 위 길이만 재고도 농도를 <b>추정</b>할 수 있습니다.</div>
-    <div class="nav-btns"><button class="btn ghost" data-go="8">← 이전</button><button class="btn primary" data-go="10">다음 → 미지 소금물 추정하기</button></div>
+    <div class="nav-btns"><button class="btn ghost" data-go="7">← 이전</button><button class="btn primary" data-go="9">다음 → 미지 소금물 추정하기</button></div>
   </div>
 
   <!-- STEP 9 -->
-  <div class="panel hide" data-step="10">
-    <div class="secHead"><span class="secNo">STEP 10 · 모둠 미션</span><h2>미지 소금물의 농도를 추정하라!</h2></div>
+  <div class="panel hide" data-step="9">
+    <div class="secHead"><span class="secNo">STEP 9 · 모둠 미션</span><h2>미지 소금물의 농도를 추정하라!</h2></div>
     <div class="em"><b>🎯 모둠 미션.</b> 미지 소금물에 <b>간이 염분계를 먼저</b> 띄워 수면 위 길이를 <b>2회 재서 평균</b>을 내고, 우리 <b>보정 관계</b>로 농도를 추정하세요. 추정값을 기록한 <b>다음에야</b> 굴절 염분계로 재서 <b>기준값과 비교</b>합니다. 기준값에 가장 가까운 모둠이 우승! <span class="hint">(⚠️ 굴절 염분계는 마지막에! 순서를 지켜야 진짜 추정이에요.)</span></div>
     <div class="note" style="margin:0 0 12px">📌 이 미지 소금물은 <b>같은 종류의 소금</b>으로 만들었고, 기준 소금물들의 <b>측정 범위 안</b>에 있어요. 우리가 만든 보정 관계는 <b>실제로 측정한 범위 안</b>에서 쓰는 것이 가장 적절하답니다.</div>
     <label for="mystery-h">① 미지 소금물의 수면 위 길이 (간이 염분계 · 2회 재서 <b>평균값</b> 입력, cm)</label>
@@ -985,12 +1094,13 @@
       <textarea id="rk-err" data-rkey="errAnalysis" placeholder="예: 눈높이를 수면에 못 맞춰 길이를 매번 조금 크게 읽은 것 같다(측정 과정·계통 오차). 측정기가 흔들려 값이 오르내렸다(우연 오차). 점 4개를 직선으로 근사한 것도 작은 차이를 만들 수 있다(데이터 해석)…"></textarea></div>
     <div class="photo-block"><label>📷 미지 소금물 측정 사진</label>
       <div class="photo-grid"><div class="photo-slot" data-slot="mystery"></div></div></div>
-    <div class="nav-btns"><button class="btn ghost" data-go="9">← 이전</button><button class="btn primary" data-go="11">다음 → 바이브 코딩 도전</button></div>
+    <div class="nav-btns"><button class="btn ghost" data-go="8">← 이전</button><div style="display:flex;gap:10px"><button class="btn ghost" data-go="10">바이브 코딩 (선택)</button><button class="btn primary" data-go="11">다음 → 마무리</button></div></div>
   </div>
 
   <!-- STEP 10 -->
-  <div class="panel hide" data-step="11">
-    <div class="secHead"><span class="secNo">STEP 11</span><h2>바이브 코딩으로 나만의 보정 변환기 만들기</h2></div>
+  <div class="panel hide" data-step="10">
+    <div class="secHead"><span class="secNo">STEP 10 · 선택</span><h2>바이브 코딩으로 나만의 보정 변환기 만들기</h2></div>
+    <div class="note" style="margin:0 0 12px">⏰ <b>이 단계는 선택이에요!</b> 오늘 탐구의 필수 과정은 아니고, <b>시간이 남는 모둠</b>이 도전합니다. 시간이 부족하면 바로 <b>마무리(STEP 11)</b>로 넘어가세요.</div>
     <p>바이브 코딩은 <b>만들고 싶은 것을 말로 설명하면 AI가 코드를 만들어 주는</b> 방법입니다(우리는 <b>Gemini(제미나이)</b>를 사용해요). 우리 보정 데이터로 "수면 위 길이 → 농도 추정"을 해 주는 나만의 도구를 만들어, 우리가 찾은 보정 관계를 디지털 도구로 옮겨 봅시다. 자기 수준에 맞는 난이도를 골라 도전하세요!</p>
     <div class="vibe-levels" id="vibeLevels">
       <button class="vlv" data-lv="low"><span class="t">하 · 기초</span><span class="d">준비된 프롬프트를 그대로 사용</span></button>
@@ -1005,12 +1115,12 @@
       <div class="frame-wrap"><div class="frame-tag">실행 결과 미리보기</div><iframe id="vibe-frame" sandbox="allow-scripts" title="실행 결과"></iframe></div>
       <div class="hint" style="margin-top:8px">* 코드가 마음에 안 들면 Gemini에게 "이렇게 바꿔 줘"라고 다시 요청해 보세요. 바이브 코딩은 고치고 또 고치며 완성하는 거예요.</div>
     </div>
-    <div class="nav-btns"><button class="btn ghost" data-go="10">← 이전</button><button class="btn primary" data-go="12">다음 → 마무리</button></div>
+    <div class="nav-btns"><button class="btn ghost" data-go="9">← 이전</button><button class="btn primary" data-go="11">다음 → 마무리</button></div>
   </div>
 
   <!-- STEP 11 -->
-  <div class="panel hide" data-step="12">
-    <div class="secHead"><span class="secNo">STEP 12</span><h2>마무리 — 돌아보고, 결과 정리하기</h2></div>
+  <div class="panel hide" data-step="11">
+    <div class="secHead"><span class="secNo">STEP 11</span><h2>마무리 — 돌아보고, 결과 정리하기</h2></div>
     <h3 style="font-size:1rem;font-weight:800;color:var(--navy);margin:4px 0 8px">🗣 함께 이야기 나눠 보기</h3>
     <div class="discuss">
       <ol>
@@ -1050,7 +1160,7 @@
       <div class="report-note">💡 내려받은 <b>.doc 파일</b>은 한글(HWP)·MS Word·구글 문서에서 바로 열려요. 더 채우고 싶은 칸이 있으면 각 단계로 돌아가 작성한 뒤 다시 눌러도 됩니다. 사진이 많으면 만드는 데 몇 초 걸릴 수 있어요.</div>
     </div>
     <div class="nav-btns">
-      <button class="btn ghost" data-go="11">← 이전</button>
+      <button class="btn ghost" data-go="10">← 이전</button>
       <div style="display:flex;gap:10px"><button class="btn ghost" onclick="window.print()">🖨 결과 인쇄/저장</button><button class="btn primary" id="resetBtn">새로 시작</button></div>
     </div>
   </div>
@@ -1078,7 +1188,9 @@ if (typeof state.memberCount !== 'number') state.memberCount = state.members.len
 (function(){
   const STD=[5,10,15,20];
   const prev = Array.isArray(state.cal)?state.cal:[];
-  state.cal = STD.map((salt,i)=>{ const old=prev[i]||{}; return {salt, sal: old.sal||'', h: old.h||'', h2: old.h2||''}; });
+  const base = STD.map((salt,i)=>{ const old=prev[i]||{}; return {salt, sal: old.sal||'', h: old.h||'', h2: old.h2||''}; });
+  const extras = prev.slice(4).filter(x=>x&&typeof x==='object').slice(0,4).map(x=>({salt:(x.salt===0||x.salt)?x.salt:'', sal:x.sal||'', h:x.h||'', h2:x.h2||'', extra:true}));
+  state.cal = base.concat(extras);
 })();
 if (!state.mystery || typeof state.mystery!=='object') state.mystery={h:'',refSal:''};
 if (state.mystery.refSal===undefined) state.mystery.refSal='';
@@ -1087,6 +1199,8 @@ if (!state.report || typeof state.report!=='object') state.report={};
 if (!state.captions || typeof state.captions!=='object') state.captions={};
 if (state.ballCount===undefined || state.ballCount===null) state.ballCount='';
 if (state.s5pass===undefined) state.s5pass=false;
+if (state.s3pass===undefined) state.s3pass=false;
+state.step = Math.min(Math.max(parseInt(state.step)||1,1),11);
 
 const $ = id => document.getElementById(id);
 function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -1324,12 +1438,16 @@ function avgH(r){
   const vs=[r.h,r.h2].map(v=>parseFloat(v)).filter(isFinite);
   return vs.length ? vs.reduce((a,b)=>a+b,0)/vs.length : NaN;
 }
+const CAL_LBL=['A','B','C','D','E','F','G','H'];
 function renderCal(){
   $('caltbody').innerHTML = state.cal.map((r,i)=>{
     const av=avgH(r);
+    const saltCell = r.extra
+      ? `<div style="display:flex;align-items:center;gap:3px;justify-content:center"><b>${CAL_LBL[i]||''}</b><input type="text" inputmode="decimal" class="hcell" style="width:52px" data-i="${i}" data-f="salt" value="${r.salt||''}" placeholder="소금g"><button type="button" class="ph-del" style="position:static;padding:3px 7px" data-del="${i}" title="이 줄 삭제">×</button></div>`
+      : `${CAL_LBL[i]||''}<small>소금 ${r.salt}g</small>`;
     return `
     <tr>
-      <td class="lock">${['A','B','C','D'][i]}<small>소금 ${r.salt}g</small></td>
+      <td class="lock">${saltCell}</td>
       <td><input type="text" inputmode="decimal" class="hcell" data-i="${i}" data-f="sal" value="${r.sal}" placeholder="g/100g"></td>
       <td><input type="text" inputmode="decimal" class="hcell" data-i="${i}" data-f="h" value="${r.h}" placeholder="cm"></td>
       <td><input type="text" inputmode="decimal" class="hcell" data-i="${i}" data-f="h2" value="${r.h2||''}" placeholder="선택"></td>
@@ -1338,11 +1456,22 @@ function renderCal(){
 }
 $('caltbody').addEventListener('input', e=>{
   const i=+e.target.dataset.i, f=e.target.dataset.f;
+  if(!state.cal[i] || !f) return;
   state.cal[i][f]=e.target.value; saveState();
   const av=avgH(state.cal[i]);
   const ac=document.querySelector('.avgcell[data-avg="'+i+'"]');
   if(ac) ac.textContent=isFinite(av)?av.toFixed(2):'—';
   drawGraph(); estimate(); renderSummary();
+});
+$('caltbody').addEventListener('click', e=>{
+  const b=e.target.closest('button[data-del]'); if(!b) return;
+  const i=+b.dataset.del;
+  if(state.cal[i] && state.cal[i].extra){ state.cal.splice(i,1); saveState(); renderCal(); drawGraph(); estimate(); renderSummary(); }
+});
+if($('addCalRow')) $('addCalRow').addEventListener('click', ()=>{
+  if(state.cal.length>=8){ alert('측정값은 최대 8개까지예요!'); return; }
+  state.cal.push({salt:'', sal:'', h:'', h2:'', extra:true});
+  saveState(); renderCal(); renderSummary();
 });
 function fit(){
   const pts = state.cal
@@ -1391,7 +1520,7 @@ function drawGraph(){
   state.cal.forEach((d,ci)=>{ const xx=parseFloat(d.sal), yy=avgH(d); if(isFinite(xx)&&isFinite(yy)){
     gg.beginPath(); gg.arc(X(xx),Y(Math.min(yy,yMax)),5.5,0,7); gg.fill();
     gg.font='bold 11px Pretendard'; gg.textAlign='center'; gg.fillStyle='#12808C';
-    gg.fillText(['A','B','C','D'][ci]||'', X(xx), Y(Math.min(yy,yMax))+20);
+    gg.fillText(CAL_LBL[ci]||'', X(xx), Y(Math.min(yy,yMax))+20);
     gg.fillStyle='#0A3D4F';
   } });
   // 심화: 직선에서 가장 멀리 벗어난 점(최대 잔차) 표시
@@ -1439,7 +1568,7 @@ $('reason').addEventListener('input', e=>{ state.reason = e.target.value; saveSt
 function estimate(){
   const m=fit(); const out=$('estimate'); const eb=$('errBox');
   const h=parseFloat(state.mystery.h);
-  if(!m || Math.abs(m.a)<1e-9){ out.textContent='먼저 보정 관계를 완성하세요 (STEP 9)'; out.classList.add('warn'); eb.style.display='none'; return; }
+  if(!m || Math.abs(m.a)<1e-9){ out.textContent='먼저 보정 관계를 완성하세요 (STEP 8)'; out.classList.add('warn'); eb.style.display='none'; return; }
   if(!isFinite(h)){ out.textContent='— g/100g'; out.classList.remove('warn'); eb.style.display='none'; return; }
   const s=(h-m.b)/m.a;
   const xsArr=m.pts.map(p=>p.x), lo=Math.min(...xsArr), hi=Math.max(...xsArr);
@@ -1577,14 +1706,14 @@ function renderChecklist(){
     [!!(state.group&&state.group.trim()),'모둠 이름 (STEP 1)'],
     [!!(r.hypothesis&&r.hypothesis.trim()),'가설 (STEP 1)'],
     [!!(r.ideaCalib&&r.ideaCalib.trim()),'보정 아이디어 (STEP 2)'],
-    [!!(state.ballCount&&(''+state.ballCount).trim()),'쇠구슬 수 결정 (STEP 4)'],
-    [!!(state.refRule&&state.refRule.trim()),'측정 약속 (STEP 6)'],
-    [!!(r.predictCurve&&r.predictCurve.trim()),'그래프 예측 (STEP 8)'],
-    [nCal>=2,'기준 용액 측정값 '+nCal+'/4 (STEP 9)'],
-    [isFinite(parseFloat(state.mystery.h)),'미지 소금물 수면 위 길이 (STEP 10)'],
-    [isFinite(parseFloat(state.mystery.refSal)),'미지 소금물 기준값 (STEP 10)'],
-    [!!(r.errAnalysis&&r.errAnalysis.trim()),'오차 분석 (STEP 10)'],
-    [!!(state.reflect&&state.reflect.trim()),'알게 된 점 (STEP 12)'],
+    [!!(state.ballCount&&(''+state.ballCount).trim()),'쇠구슬 수 결정 (STEP 5)'],
+    [!!(state.refRule&&state.refRule.trim()),'측정 약속 (STEP 5)'],
+    [!!(r.predictCurve&&r.predictCurve.trim()),'그래프 예측 (STEP 7)'],
+    [nCal>=2,'기준 용액 측정값 '+nCal+'건 (STEP 8)'],
+    [isFinite(parseFloat(state.mystery.h)),'미지 소금물 수면 위 길이 (STEP 9)'],
+    [isFinite(parseFloat(state.mystery.refSal)),'미지 소금물 기준값 (STEP 9)'],
+    [!!(r.errAnalysis&&r.errAnalysis.trim()),'오차 분석 (STEP 9)'],
+    [!!(state.reflect&&state.reflect.trim()),'알게 된 점 (STEP 11)'],
     [nPhoto>0,'사진 '+nPhoto+'장'],
   ];
   const missing=items.filter(x=>!x[0]);
@@ -1655,7 +1784,7 @@ function buildReportHtml(){
   const names=(state.members||[]).filter(x=>x&&(x.name||x.sid)).map(x=>((x.sid||'')+' '+(x.name||'')).trim()).join(', ')||'—';
   const m=fit();
   let gimg=''; try{ drawGraph(); gimg=document.getElementById('graph').toDataURL('image/png'); }catch(e){}
-  const calRows=state.cal.map((x,ri)=>{const av=avgH(x); const hTxt=isFinite(av)?(av.toFixed(2)+(x.h2?' <span style="font-size:9pt;color:#666">(1차 '+x.h+' / 2차 '+x.h2+')</span>':'')):'—'; return '<tr><td>'+['A','B','C','D'][ri]+' (소금 '+x.salt+' g)</td><td>'+(x.sal!==''&&x.sal!=null?x.sal:'—')+'</td><td>'+hTxt+'</td></tr>';}).join('');
+  const calRows=state.cal.map((x,ri)=>{const av=avgH(x); const hTxt=isFinite(av)?(av.toFixed(2)+(x.h2?' <span style="font-size:9pt;color:#666">(1차 '+x.h+' / 2차 '+x.h2+')</span>':'')):'—'; return '<tr><td>'+(CAL_LBL[ri]||'')+' (소금 '+(x.salt||'—')+' g)</td><td>'+(x.sal!==''&&x.sal!=null?x.sal:'—')+'</td><td>'+hTxt+'</td></tr>';}).join('');
   const eq=m?('수면 위 길이 = '+m.a.toFixed(3)+' × 기준값 '+(m.b>=0?'+':'−')+' '+Math.abs(m.b).toFixed(3)+'  (R² = '+m.r2.toFixed(4)+')'):'(보정 관계를 만들 데이터가 아직 부족합니다)';
   const inv=m?('기준값 = (수면 위 길이 '+(m.b>=0?'− ':'+ ')+Math.abs(m.b).toFixed(3)+') ÷ '+m.a.toFixed(3)):'';
   const mh=parseFloat(state.mystery.h), rs=parseFloat(state.mystery.refSal);
@@ -1941,7 +2070,7 @@ if($('eggSalt')) $('eggSalt').addEventListener('input',e=>{ eggSalt=+e.target.va
 
 /* ===== STEP 5: 예측 게이트 + 확인 문제 ===== */
 function s5predDone(){ return ['p1','p2','p3'].every(g=>document.querySelector('input[name="'+g+'"]:checked')); }
-function s5unlock(){ const b=$('toStep6'); if(b){ b.disabled=false; b.innerHTML='다음 → 길이 측정법'; } }
+function s5unlock(){ const b=$('toStep6'); if(b){ b.disabled=false; b.innerHTML='다음 → 측정기 만들기'; } }
 if($('s5revealBtn')) $('s5revealBtn').addEventListener('click',()=>{
   if(!s5predDone()){ $('s5predMsg').style.color='var(--coral)'; $('s5predMsg').textContent='세 가지 예측에 모두 답해 주세요.'; return; }
   $('s5reveal').classList.remove('hide'); $('s5revealBtn').disabled=true;
@@ -1954,6 +2083,53 @@ if($('s5quizBtn')) $('s5quizBtn').addEventListener('click',()=>{
   if(ans<3){ m.innerHTML='<span style="color:var(--coral);font-weight:700">아직 안 푼 문제가 있어요.</span>'; return; }
   if(ok===3){ m.innerHTML='<span style="color:var(--teal);font-weight:800">✅ 모두 정답! 다음 단계가 열렸어요.</span>'; s5unlock(); state.s5pass=true; saveState(); }
   else { m.innerHTML='<span style="color:var(--coral);font-weight:700">'+ok+'/3 정답이에요. 원리 카드를 다시 읽고 틀린 문제를 고쳐 보세요.</span>'; }
+});
+
+/* ===== 클릭해서 여는 빈칸 ===== */
+document.addEventListener('click', e=>{ const b=e.target.closest('.blank'); if(b) b.classList.toggle('on'); });
+
+/* ===== STEP 2: 30초 교정 체험 게임 ===== */
+const CG_STEPS=[
+  {q:'1단계. 교정을 하려면 먼저 무엇이 필요할까요?', opts:[['질량을 정확히 알고 있는 표준 추',true],['아무 돌멩이나 하나',false]], good:'맞아요! 값을 정확히 알고 있는 기준 — 이것이 교정의 출발점이에요.', bad:'음… 아무 돌멩이는 질량을 모르잖아요? 기준은 값을 정확히 알아야 해요.'},
+  {q:'2단계. 100.0 g짜리 표준 추를 올렸더니 우리 저울이 「95」를 가리켜요. 이 「95」를 뭐라고 부를까요?', opts:[['지시값',true],['기준값',false]], good:'정답! 도구가 가리켜 보여주는 날것의 숫자 = 지시값이에요.', bad:'기준값은 표준 추의 100.0 g 쪽이에요. 저울이 가리킨 95는 지시값!'},
+  {q:'3단계. 기준값 100.0 g ↔ 지시값 95. 두 값을 비교하면 우리 저울은?', opts:[['5만큼 작게 가리킨다',true],['정확히 맞는다',false]], good:'그렇죠! 비교했더니 관계가 보이기 시작해요.', bad:'100인데 95를 가리켰으니… 5만큼 작게 가리키고 있어요.'},
+  {q:'4단계. 이 관계가 계속 유지된다면 — 저울이 「120」을 가리킬 때, 물체의 질량은 얼마라고 해석할까요?', opts:[['약 125 g',true],['정확히 120 g',false]], good:'완벽해요! 관계(5 작게 가리킴)를 이용해 지시값에 의미를 부여했어요.', bad:'우리 저울은 5 작게 가리키는 관계였죠? 그럼 120 + 5 = 125 g!'},
+  {q:'5단계. 방금 우리가 한 일 — 기준과 비교해 지시값을 해석하는 관계를 정하는 것 — 을 뭐라고 할까요?', opts:[['교정 (calibration)',true],['복사 (copy)',false]], good:'🎉 축하해요! 이것이 바로 교정 — 오늘 탐구에서 간이 염분계에 하게 될 일이에요!', bad:'힌트: 과학자 용어 TIP에서 봤던 그 단어예요!'},
+];
+let cgIdx=0;
+function cgRender(){
+  const g=$('calibGame'); if(!g) return;
+  const st=CG_STEPS[cgIdx];
+  g.querySelectorAll('.cg-prog span').forEach((s,i)=>s.classList.toggle('done', i<cgIdx));
+  if(!st){ $('cgQ').innerHTML='🏆 <b>교정 체험 완료!</b> 오늘 탐구에서는 표준 추 대신 <b>굴절 염분계의 기준값</b>을, 저울 대신 <b>간이 염분계</b>를 놓고 똑같은 일을 합니다.'; $('cgOpts').innerHTML='<button type="button" id="cgRestart">다시 해보기 ↻</button>'; $('cgFb').textContent='';
+    $('cgRestart').addEventListener('click',()=>{ cgIdx=0; cgRender(); });
+    return; }
+  $('cgQ').textContent=st.q;
+  const opts=[...st.opts].sort(()=>cgIdx%2?-1:1);
+  $('cgOpts').innerHTML='';
+  opts.forEach(o=>{
+    const b=document.createElement('button'); b.type='button'; b.textContent=o[0];
+    b.addEventListener('click',()=>{
+      const fb=$('cgFb');
+      if(o[1]){ fb.className='cg-fb good'; fb.textContent='✅ '+st.good; setTimeout(()=>{ cgIdx++; $('cgFb').textContent=''; cgRender(); }, 1400); }
+      else { fb.className='cg-fb bad'; fb.textContent='❌ '+st.bad; }
+    });
+    $('cgOpts').appendChild(b);
+  });
+}
+
+/* ===== STEP 3: '빛은 왜 꺾일까' 예측 게이트 ===== */
+function s3open(){
+  const r=$('s3reveal'); if(r) r.classList.remove('hide');
+  const btn=$('s3revealBtn'); if(btn) btn.disabled=true;
+  try{ setRefrMetrics(); drawCrit(); drawEye(); }catch(e){}
+}
+if($('s3revealBtn')) $('s3revealBtn').addEventListener('click', ()=>{
+  const sel=document.querySelector('input[name="s3p"]:checked');
+  if(!sel){ $('s3predMsg').style.color='var(--coral)'; $('s3predMsg').textContent='먼저 예측을 골라 주세요!'; return; }
+  $('s3predMsg').style.color='var(--teal)';
+  $('s3predMsg').textContent = sel.value==='a' ? '좋아요! 정말 그런지 아래 시뮬레이터로 확인해 보세요.' : '흥미로운 예측! 아래 시뮬레이터로 직접 확인해 보세요 — 각도 숫자를 잘 보면 답이 보여요.';
+  state.s3pass=true; saveState(); s3open();
 });
 
 /* ===== 초기화 ===== */
@@ -1971,6 +2147,8 @@ initPhotos();
 setRefrMetrics(); drawRefr(); drawCrit();
 drawBallSim(); updateDensity();
 drawCar(); drawEgg(); eggUpdate();
+cgRender();
+if(state.s3pass) s3open();
 if(state.s5pass){ var _sr=$('s5reveal'); if(_sr) _sr.classList.remove('hide'); s5unlock(); }
 $('makeReport').addEventListener('click', downloadWord);
 if (state.vibe.code) $('vibe-frame').srcdoc = state.vibe.code;
