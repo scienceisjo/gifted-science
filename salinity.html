@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>간이 염분계 보정하기 — 굴절 염분계로 보정곡선 만들기</title>
+<title>부력과 빛의 굴절, 두 원리를 짝짓다 — 간이 염분계 보정 탐구</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
@@ -302,9 +302,9 @@
 </div>
 <div class="wrap">
   <header>
-    <span class="kick">영재 과학 · 측정과 보정 탐구</span>
-    <h1>간이 염분계 보정하기</h1>
-    <p class="sub">정밀한 굴절 염분계로 우리 간이 염분계를 보정하고, 보정곡선으로 미지 용액의 염분을 알아내자!</p>
+    <span class="kick">영재 과학 · 부력 × 빛의 굴절</span>
+    <h1>부력과 빛의 굴절,<br>서로 다른 두 원리를 짝짓다</h1>
+    <p class="sub"><b style="color:var(--teal)">간이 염분계 보정하기</b> · 부력으로 <b>‘뜨는’</b> 우리 도구를, 빛의 굴절로 <b>‘재는’</b> 정밀 도구로 보정해 미지 용액의 농도를 알아내자!</p>
   </header>
   <nav class="steps" id="stepNav">
     <button class="step on" data-s="1"><span class="n">STEP 1</span><span class="t">시작</span></button>
@@ -544,7 +544,7 @@
         </svg>
       </div>
       <div class="gcard">
-        <div class="row"><span class="badge">4</span><div><h3>측정기에 눈금 표시 (선택)</h3><p>측정기에 <b>네임펜과 자로 눈금을 그려 두면</b> 떠오른 높이를 읽기 편해요(위쪽 끝을 0으로, 0.5 cm 간격). 꼭 그리지 않아도 됩니다 — <b>눈금실린더의 눈금</b>을 그대로 기준으로 써도 돼요. 측정 기준은 다음 단계에서 <b>우리 조가 정합니다.</b></p></div></div>
+        <div class="row"><span class="badge">4</span><div><h3>cm 눈금 테이프 붙이기</h3><p><b>투명테이프</b>를 손가락 두세 마디 길이로 자르고, <b>자를 대고 유성펜</b>으로 <b>0.5 cm 간격</b> 눈금과 숫자(0·1·2·3…)를 적어요 — <b>위쪽 끝을 0</b>으로. 눈금이 보이게 측정기 <b>가는 관에 세로로 곧게 붙이면</b>, 떠오른 높이를 바로 cm로 읽을 수 있어요. <span class="hint">(유성펜 자국이 번지면 잠깐 말린 뒤, 그 위에 투명테이프를 한 겹 더 덮으면 물에서도 안 지워져요.)</span></p></div></div>
         <svg viewBox="0 0 200 110" width="180" height="100" aria-hidden="true">
           <rect x="78" y="14" width="14" height="78" rx="3" fill="#fff" stroke="#0A3D4F" stroke-width="2"/>
           <ellipse cx="85" cy="96" rx="15" ry="11" fill="#fff" stroke="#0A3D4F" stroke-width="2"/>
@@ -570,7 +570,7 @@
           </div>
           <div class="ctrl" style="margin-top:14px"><div class="ctrl-row"><label style="margin:0">시험 소금물 농도</label><span class="v" id="ball-cv">8.5 g/100g</span></div><input type="range" id="ballConc" min="0" max="17" step="0.5" value="8.5"></div>
           <div class="ballstate good" id="ballState">양호<small>—</small></div>
-          <button class="btn primary" id="ballSweep" style="margin-top:12px;width:100%">▶ 염분 스윕 검사 — 0~17 전 구간 자동 확인</button>
+          <button class="btn primary" id="ballSweep" style="margin-top:12px;width:100%">▶ 싱거운 물 ~ 짠 물, 전 구간 자동 검사</button>
           <div id="ballSweepResult" class="note" style="display:none;margin-top:10px"></div>
         </div>
       </div>
@@ -578,7 +578,7 @@
         <div class="t">🔍 스스로 발견하기 — 세 가지를 꼭 관찰하세요</div>
         <label><input type="checkbox"> 쇠구슬이 <b>적을 때</b>(1~2개) 어떻게 되는지 봤다 — 기울어지고 너무 높이 뜸</label>
         <label><input type="checkbox"> 쇠구슬이 <b>너무 많을 때</b> 어떻게 되는지 봤다 — 가라앉음</label>
-        <label><input type="checkbox"> <b>‘염분 스윕 검사’</b>로 전 구간 ‘양호’인 개수를 찾았다</label>
+        <label><input type="checkbox"> <b>‘전 구간 자동 검사’</b> 버튼으로 싱거운 물~짠 물 모두 ‘양호’인 개수를 찾았다</label>
       </div>
       <details class="hint-d"><summary>왜 개수에 ‘딱 하나’가 아니라 ‘범위’가 있을까?</summary><div class="hb">어떤 개수는 <b>싱거운 물에선 좋은데 짠 물에선 너무 높이</b> 뜨거나, 그 반대일 수 있어요. 그래서 <b>가장 짠 물과 가장 싱거운 물 모두</b>에서 눈금이 읽히는 개수라야 합니다. 보통 <b>여러 개수</b>가 조건을 만족해요 — 그 중 하나를 고르면 됩니다. (쇠구슬을 아래로 몰수록 무게중심이 낮아져 덜 기울어져요.)</div></details>
       <div class="ballpick">
@@ -588,7 +588,8 @@
       </div>
       <div class="report-field" style="margin-top:12px"><label for="rk-ball">📝 이 개수로 정한 이유 <span class="hint" style="font-weight:500">(적은 개수·많은 개수는 왜 안 됐나?)</span></label>
         <textarea id="rk-ball" data-rkey="obsBallCount" placeholder="예: 3개는 짠물에서 너무 높이 떠 눈금 밖으로 나갔고, 11개는 가라앉았다. 6~9개가 전 구간 잘 읽혀서 7개로 정했다."></textarea></div>
-      <div class="trouble"><b>실물에서 시뮬레이터와 다를 때</b> — 실제 스포이드·쇠구슬 크기는 조금씩 달라요. 시뮬레이터에서 찾은 개수로 만들었는데 기울거나 너무 뜨면, 스포이드 <b>윗부분을 조금 더 자르</b>거나 쇠구슬을 <b>±1개</b> 조절해 보세요. 이것도 훌륭한 탐구예요.</div>
+      <div class="note" style="margin-top:12px">🔩 <b>쇠구슬 크기가 여러 가지라면</b> — <b>큰 것</b>으로 무게를 대강 맞춘 뒤 <b>작은 것</b>으로 미세하게 조정하면 ‘딱 맞는 무게’를 훨씬 쉽게 찾아요. 이때는 개수 대신 <b>‘큰 것 ○개 + 작은 것 ○개’</b>처럼 구성을 적어 두면 돼요(핵심은 개수가 아니라 <b>전체 무게</b>랍니다).</div>
+      <div class="trouble"><b>실물에서 시뮬레이터와 다를 때</b> — 실제 스포이드·쇠구슬 크기는 조금씩 달라요. 시뮬레이터에서 찾은 무게로 만들었는데 기울거나 너무 뜨면, 스포이드 <b>윗부분을 조금 더 자르</b>거나 쇠구슬을 <b>작은 것으로 ±1개</b> 조절해 보세요. 이것도 훌륭한 탐구예요.</div>
     </div>
     <div class="connect-card">
       <div class="cc-text">
@@ -621,7 +622,7 @@
       <div class="gcard"><div class="row"><span class="badge">1</span><div><h3>소금물을 눈금실린더에 붓기</h3><p>측정할 소금물을 눈금실린더에 옮겨 담습니다. 측정기가 잠길 만큼 충분히 부어 주세요. 용액이 바뀔 때마다 측정기를 헹궈요.</p></div></div></div>
       <div class="gcard"><div class="row"><span class="badge">2</span><div><h3>측정기 띄우기</h3><p>측정기(우리 조가 정한 쇠구슬 수)를 살며시 넣고 흔들림이 멈출 때까지 기다립니다. <b>모든 용액에 같은 측정기를 그대로</b> 사용하세요 — 그래야 용액끼리 공정하게 비교할 수 있어요.</p></div></div></div>
       <div class="gcard">
-        <div class="row"><span class="badge">3</span><div><h3>우리 조의 '기준' 정하기</h3><p>떠오른 높이를 <b>어디를 기준으로 잴지</b> 조가 정합니다. 무엇이든 <b>한 가지로 정해 끝까지 똑같이</b> 적용하면 돼요.<br>예: ① 수면이 닿는 <b>눈금실린더 눈금(mL)</b> 읽기 · ② 측정기 <b>윗끝이 닿는</b> 눈금 읽기 · ③ 측정기에 그린 눈금에서 수면 위치 읽기 · ④ 물 위로 나온 길이를 자로 재기</p></div></div>
+        <div class="row"><span class="badge">3</span><div><h3>우리 조의 '기준' 정하기</h3><p>떠오른 높이를 <b>어디를 기준으로 잴지</b> 조가 정합니다. 무엇이든 <b>한 가지로 정해 끝까지 똑같이</b> 적용하면 돼요.<br>예: ① 측정기에 붙인 <b>cm 테이프</b>에서 수면 위치 읽기 · ② 수면이 닿는 <b>눈금실린더 눈금(mL)</b> 읽기 · ③ 측정기 <b>윗끝이 닿는</b> 눈금 읽기 · ④ 물 위로 나온 길이를 자로 재기</p></div></div>
         <svg viewBox="0 0 230 130" width="210" height="118" aria-hidden="true">
           <rect x="92" y="8" width="46" height="116" rx="6" fill="none" stroke="#0A3D4F" stroke-width="2"/>
           <rect x="94" y="50" width="42" height="72" fill="#1AA7A0" fill-opacity=".22"/>
@@ -636,7 +637,25 @@
       </div>
       <div class="gcard"><div class="row"><span class="badge">4</span><div><h3>소금물마다 떠오른 높이 측정</h3><p>정한 기준으로 <b>각 소금물의 떠오른 높이</b>를 읽어 STEP 9 표에 적습니다. 눈을 <b>수면과 같은 높이</b>에 두고 0.1 단위까지 읽어요. 짠 물일수록 측정기가 더 높이 떠올라 값이 커집니다.</p></div></div></div>
     </div>
-    <div class="refbox"><label for="refRule">📌 우리 조가 정한 '떠오른 높이' 측정 기준</label><input id="refRule" type="text" placeholder="예: 수면이 닿는 눈금실린더 눈금(mL)을 읽는다"></div>
+    <h3 class="sec">🎯 떠오른 높이를 정확히 읽는 법</h3>
+    <div class="ok">
+      <ul style="margin:0 0 0 18px">
+        <li>눈을 반드시 <b>수면과 같은 높이</b>에 두고 읽어요. 위나 아래에서 비스듬히 보면 값이 달라져요(<b>계통 오차</b>!).</li>
+        <li>물이 관 벽을 타고 살짝 올라오는 <b>메니스커스(오목한 곡면)</b>가 생겨요. 항상 <b>곡면의 가장 아랫부분</b>을 기준으로 읽어요.</li>
+        <li>측정기가 <b>완전히 멈춘 뒤</b> 읽고, <b>2번 재서 평균</b>을 내면 우연 오차가 줄어요.</li>
+        <li>측정기가 <b>실린더 벽에 닿지 않게</b> 한가운데에 띄워요.</li>
+      </ul>
+    </div>
+    <div class="trouble" style="margin-top:12px"><b>측정기가 기울거나 문제가 생기면</b>
+      <ul style="margin:6px 0 0 17px">
+        <li><b>기울어질 때</b> → 쇠구슬이 벌브 <b>맨 아래로 모이도록</b> 톡톡 쳐서 무게중심을 낮춰요. 그래도 기울면 <b>쇠구슬을 조금 더</b> 넣어요.</li>
+        <li><b>관 속에 물이 들어갔을 때</b> → 꺼내서 물기를 털고 <b>입구를 잘 막은 뒤</b> 다시 띄워요.</li>
+        <li><b>기포(공기방울)가 붙었을 때</b> → 살짝 흔들거나 톡 쳐서 떼어내요(기포가 있으면 더 높이 떠요).</li>
+        <li><b>벽에 붙어 안 움직일 때</b> → 유리막대로 살살 밀어 가운데로 옮겨요.</li>
+        <li>용액을 바꿀 때는 측정기를 <b>맹물로 헹궈</b> 앞 소금물이 섞이지 않게 해요.</li>
+      </ul>
+    </div>
+    <div class="refbox"><label for="refRule">📌 우리 조가 정한 '떠오른 높이' 측정 기준</label><input id="refRule" type="text" placeholder="예: cm 테이프의 수면 위치를 읽는다 / 수면이 닿는 눈금실린더 눈금(mL)을 읽는다"></div>
     <div class="em">같은 측정기 · 같은 기준으로 모든 용액을 측정해야 비교가 정확해요. 한 번 정한 기준은 끝까지 바꾸지 않습니다.</div>
     <div class="nav-btns"><button class="btn ghost" data-go="5">← 이전</button><button class="btn primary" data-go="7">다음 → 기준 용액 만들기</button></div>
   </div>
@@ -733,6 +752,10 @@
   <div class="panel hide" data-step="7">
     <div class="secHead"><span class="secNo">STEP 7</span><h2>기준 용액 만들고 두 도구로 측정하기</h2></div>
     <p>보정에 쓸 <b>기준 용액 4개</b>를 만듭니다. 모두 <b>물 100 mL</b>로 같게 하고, 소금만 <b>5 · 10 · 15 · 20 g</b>으로 다르게 넣어요. 이렇게 만든 각 용액을 <b>굴절 염분계(농도 g/100g)</b>와 <b>간이 염분계(높이 cm)</b>로 모두 측정해 STEP 9 표에 적습니다.</p>
+    <div class="ok"><b>🔢 잠깐 — ‘퍼센트 농도(%)’가 뭘까?</b> 소금물이 얼마나 진한지를 나타내는 방법이에요. <b>용액 100 g 속에 소금이 몇 g</b> 녹아 있는지를 % 로 나타냅니다.
+      <div style="margin:8px 0;padding:9px 13px;background:#fff;border-radius:8px;border:1px solid var(--line)"><b>퍼센트 농도(%) = (소금 질량 ÷ 소금물 전체 질량) × 100</b></div>
+      예를 들어 소금물 100 g에 소금이 3.5 g 녹아 있으면 <b>3.5 %</b>예요(바닷물이 이 정도!). 우리 굴절 염분계의 눈금 <b>g/100g가 바로 이 퍼센트 농도</b>랍니다 — 그래서 3.5 g/100g = 3.5 %.
+      <br>💡 <b>주의!</b> ‘물 100 g에 소금 20 g’을 넣으면 20 %가 아니라, 전체가 <b>120 g</b>이니 20 ÷ 120 × 100 ≈ <b>16.7 %</b>예요. (‘넣은 소금 양’과 ‘퍼센트 농도’는 살짝 달라요.)</div>
     <div class="guide">
       <div class="gcard"><div class="row"><span class="badge">1</span><div><h3>전자저울 영점 맞추기</h3><p>전자저울에 <b>빈 비커</b>를 올린 뒤 '영점(Tare/0)' 버튼을 눌러 <b>0.0 g</b>으로 만듭니다. 비커 무게를 빼고 소금 무게만 잴 수 있어요.</p></div></div></div>
       <div class="gcard"><div class="row"><span class="badge">2</span><div><h3>소금 정량하기</h3><p>약수저로 소금을 비커에 조금씩 넣어 <b>5 g / 10 g / 15 g / 20 g</b>에 정확히 맞춥니다. 너무 많으면 살짝 덜어내요.</p></div></div></div>
@@ -866,6 +889,29 @@
     <div class="cmpbox" id="errBox" style="display:none"></div>
     <label for="reason" style="margin-top:18px">우리 모둠의 최종 답과 그 이유 (한두 줄로)</label>
     <textarea id="reason" placeholder="예: 떠오른 높이 2.3 cm를 보정곡선에 넣어 약 ○.○ g/100g로 추정했고, 굴절 염분계로는 ○.○이었다. 차이는 약 ○.○."></textarea>
+    <div class="callout" style="margin-top:16px;background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:14px 17px;font-size:.92rem;line-height:1.55">
+      <b style="color:var(--navy)">📎 두 가지 오차, 예시로 이해하기</b>
+      <div class="row2" style="margin-top:9px;gap:12px">
+        <div style="background:#FBEFE7;border:1px solid #F1C9B2;border-radius:9px;padding:10px 13px">
+          <b style="color:var(--coral)">① 계통 오차 — 늘 한쪽으로 치우침</b>
+          <ul style="margin:6px 0 0 17px">
+            <li>0점(영점)을 안 맞춰서 <b>모든 값이 +0.5씩</b> 크게 나옴</li>
+            <li>눈을 수면보다 <b>위에서 봐서</b> 매번 조금 크게 읽음</li>
+            <li>저울이 원래 <b>0.2 g 더</b> 나오게 맞춰져 있음</li>
+          </ul>
+          <div class="hint" style="margin-top:5px">→ 원인을 없애면 정확해져요(영점 맞추기, 눈높이 맞추기)</div>
+        </div>
+        <div style="background:var(--mint-soft);border:1px solid #9FD8CF;border-radius:9px;padding:10px 13px">
+          <b style="color:var(--teal)">② 우연 오차 — 잴 때마다 들쭉날쭉</b>
+          <ul style="margin:6px 0 0 17px">
+            <li>측정기가 <b>흔들려</b> 값이 오르락내리락</li>
+            <li>경계선이 흐릿해 <b>읽을 때마다 조금씩</b> 다름</li>
+            <li>손 떨림, 물결, 온도가 조금씩 바뀜</li>
+          </ul>
+          <div class="hint" style="margin-top:5px">→ <b>여러 번 재서 평균</b>하면 줄어들어요</div>
+        </div>
+      </div>
+    </div>
     <div class="report-field"><label for="rk-err">📝 오차 분석 — 추정값과 실제값의 차이는 어디서 왔을까? <span class="hint" style="font-weight:500">(항상 한쪽으로 치우치게 만드는 원인 = 계통 오차 / 잴 때마다 들쭉날쭉하게 만드는 원인 = 우연 오차로 나눠 보세요)</span></label>
       <textarea id="rk-err" data-rkey="errAnalysis" placeholder="예: 눈높이를 수면에 못 맞춰 높이를 매번 조금 크게 읽은 것 같다(계통 오차). 측정기가 흔들려 값이 오르내렸다(우연 오차). 더 정확히 하려면 …"></textarea></div>
     <div class="photo-block"><label>📷 미지 용액 측정 사진</label>
@@ -1025,8 +1071,8 @@ function drawEye(){
   const sy=yOf(3.5);
   ex.strokeStyle='#C75A2E'; ex.lineWidth=1.4; ex.setLineDash([5,4]);
   ex.beginPath(); ex.moveTo(0,sy); ex.lineTo(W,sy); ex.stroke(); ex.setLineDash([]);
-  ex.fillStyle='#A8431D'; ex.font='bold 11px Pretendard'; ex.textAlign='center';
-  ex.fillText('바닷물 3.5', cx, sy-6);
+  ex.fillStyle='#A8431D'; ex.font='bold 10px Pretendard'; ex.textAlign='right';
+  ex.fillText('바닷물 3.5', W-12, sy-5);
   // 눈금: 염화나트륨 g/100g (아래 0 → 위 28)
   const sxL=cx-R*0.5;
   ex.strokeStyle='#16313A'; ex.fillStyle='#16313A'; ex.lineWidth=1.6; ex.font='bold 12px Pretendard'; ex.textAlign='left';
